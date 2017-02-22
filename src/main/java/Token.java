@@ -1,18 +1,37 @@
-package main.java;
-
 public class Token {
-    public static final int
-        BAD = 0, EOF = 1, COLON = 2, SEMICOLON = 3,
-        DOT = 4, COMMA = 5, EQSIGN = 6, EQUALS = 7,
-        BANG = 8, ID = 9, INT = 10
-        ;
 
-    int kind, value;
-    StringBuffer id;
+    public enum TokenType {
+        COLON, SEMICOLON, DOT, COMMA, EQSIGN, EQUALS, BANG, LPAREN,
+        RPAREN, LBRACKET, RBRACKET, LBRACE, RBRACE, AND, OR, LESSTHAN,
+        PLUS, MINUS, TIMES, DIV, CLASS, PUBLIC, STATIC, VOID, STRING,
+        EXTENDS, INT, BOOLEAN, WHILE, IF, ELSE, MAIN, RETURN, LENGTH,
+        TRUE, FALSE, THIS, NEW, PRINTLN, SIDEF, ID, INTLIT, STRINGLIT;
+    }
 
-//    Token(int kind, StringBuffer id) {
-//        this.kind = kind;
-//        this.id= id;
-//    }
+    private int row, col, val;
+    TokenType t;
+    String id;
+
+    Token(int row, int col, TokenType t) {
+        this.row = row;
+        this.col = col;
+        this.t = t;
+    }
+
+    Token(int row, int col, TokenType t, int val) {
+        this(row, col, t);
+        this.val = val;
+    }
+
+    Token(int row, int col, TokenType t, String id) {
+        this(row, col, t);
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return row + ":" + col + " " + t + "(" + /*?????*/ ")";
+    }
+
 }
 
