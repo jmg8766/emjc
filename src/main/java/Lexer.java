@@ -18,7 +18,6 @@ public class Lexer {
 
     ConcurrentLinkedQueue<Char> chars = new ConcurrentLinkedQueue<>();
     ConcurrentLinkedQueue<Token> tokens = new ConcurrentLinkedQueue<>();
-
     AtomicBoolean allCharactersTokenized = new AtomicBoolean(false);
     String fileName;
 
@@ -27,115 +26,105 @@ public class Lexer {
         AtomicBoolean allCharactersRead = new AtomicBoolean(false);
         new Thread(() -> {
             try(BufferedReader file = Files.newBufferedReader(Paths.get(fileName))) {
-                // -- char stream logic --
+                 //-- char stream logic --
 
             } catch(IOException e) {}
             allCharactersRead.set(true);
         }).start();
 
         new Thread(() -> {
-            Char c; int row, col;
-            while((c = chars.poll()) != null || allCharactersRead.get()) {
-                row = c.row; col = c.col;
-                if(Character.isLetter(c.val)) { // identifier or keyword
-                    StringBuffer b = new StringBuffer();
-                    do {
-                        b.append(c.val);
-                        c = chars.poll();
-                    } while(c != null && (Character.isLetter(c.val) || Character.isDigit(c.val)));
-                    switch(b.toString()) {
-                        case "class":
-                            tokens.offer(new Token(row, col, Token.TokenType.CLASS));
-                            continue;
-                        case "public":
-                            tokens.offer(new Token(row, col, Token.TokenType.PUBLIC));
-                            continue;
-                        case "static":
-                            tokens.offer(new Token(row, col, Token.TokenType.STATIC));
-                            continue;
-                        case "void":
-                            tokens.offer(new Token(row, col, Token.TokenType.VOID));
-                            continue;
-                        case "String":
-                            tokens.offer(new Token(row, col, Token.TokenType.STRING));
-                            continue;
-                        case "extends":
-                            tokens.offer(new Token(row, col, Token.TokenType.EXTENDS));
-                            continue;
-                        case "int":
-                            tokens.offer(new Token(row, col, Token.TokenType.INT));
-                            continue;
-                        case "boolean":
-                            tokens.offer(new Token(row, col, Token.TokenType.BOOLEAN));
-                            continue;
-                        case "while":
-                            tokens.offer(new Token(row, col, Token.TokenType.WHILE));
-                            continue;
-                        case "if":
-                            tokens.offer(new Token(row, col, Token.TokenType.IF));
-                            continue;
-                        case "else":
-                            tokens.offer(new Token(row, col, Token.TokenType.ELSE));
-                        case "main":
-                            tokens.offer(new Token(row, col, Token.TokenType.MAIN));
-                            continue;
-                        case "return":
-                            tokens.offer(new Token(row, col, Token.TokenType.RETURN));
-                            continue;
-                        case "length":
-                            tokens.offer(new Token(row, col, Token.TokenType.LENGTH));
-                            continue;
-                        case "true":
-                            tokens.offer(new Token(row, col, Token.TokenType.TRUE));
-                            continue;
-                        case "false":
-                            tokens.offer(new Token(row, col, Token.TokenType.FALSE));
-                            continue;
-                        case "this":
-                            tokens.offer(new Token(row, col, Token.TokenType.THIS));
-                            continue;
-                        case "new":
-                            tokens.offer(new Token(row, col, Token.TokenType.NEW));
-                            continue;
-                        case "System":
-                            do { //TODO: make more efficient
-                                b.append(c);
-                                c = chars.poll();
-                            } while(c != null && "System.out.println".contains(b.toString()));
-                            if(b.toString().equals("System.out.println")) {
-                                tokens.offer(new Token(row, col, Token.TokenType.PRINTLN));
-                            } else; //TODO error handling
-                            continue;
-                        case "sidef":
-                            tokens.offer(new Token(row, col, Token.TokenType.SIDEF));
-                            continue;
-                        default: // identifier
-                            tokens.offer(new Token(row, col, Token.TokenType.ID, b.toString()));
-                    }
-                } else if(Character.isDigit(c.val)) {
-                    int i = 0;
-                    do {
-                        i = 10*i + Character.getNumericValue(c.val);
-                        c = chars.poll();
-                    } while(c != null && Character.isDigit(c.val));
-                    tokens.offer(new Token(row, col, Token.TokenType.INTLIT, i));
-                } else switch(c.val) {
-                    case ':':
-                        tokens.offer(new Token(row, col, Token.TokenType.COLON));
-                        continue;
-                    case ';':
-                        tokens.offer(new Token(row, col, Token.TokenType.SEMICOLON));
-                        continue;
-                    default:
-                }
-                //TODO
-            }
 
-            allCharactersTokenized.set(true);
         }).start();
     }
 
-    void genLexFiles() throws IOException {
+    /**
+     * @param input the String to tokenize
+     * @return a Stream of tokens
+     */
+    private Stream<Token> tokenize(String input) {
+        Stream.Builder<Token> tokens = Stream.builder();
+        for(int col = 0, row = 0, i = 0; i < input.length(); col = 0) {
+            if(Character.isLetter(input.charAt(i))) {
+                StringBuilder b = new StringBuilder();
+                do { b.append(input.charAt(i++)); col++; }
+                while(i < input.length() && Character.isLetterOrDigit(input.charAt(i)));
+                switch (b.toString()) {
+                    case "class":   tokens.accept(new Token(row, col, Token.TokenType.CLASS));   break;
+                    case "public":  tokens.accept(new Token(row, col, Token.TokenType.PUBLIC));  break;
+                    case "static":  tokens.accept(new Token(row, col, Token.TokenType.STATIC));  break;
+                    case "void":    tokens.accept(new Token(row, col, Token.TokenType.VOID));    break;
+                    case "String":  tokens.accept(new Token(row, col, Token.TokenType.STRING));  break;
+                    case "extends": tokens.accept(new Token(row, col, Token.TokenType.EXTENDS)); break;
+                    case "int":     tokens.accept(new Token(row, col, Token.TokenType.INT));     break;
+                    case "boolean": tokens.accept(new Token(row, col, Token.TokenType.BOOLEAN)); break;
+                    case "while":   tokens.accept(new Token(row, col, Token.TokenType.WHILE));   break;
+                    case "if":      tokens.accept(new Token(row, col, Token.TokenType.IF));      break;
+                    case "else":    tokens.accept(new Token(row, col, Token.TokenType.ELSE));    break;
+                    case "main":    tokens.accept(new Token(row, col, Token.TokenType.MAIN));    break;
+                    case "return":  tokens.accept(new Token(row, col, Token.TokenType.RETURN));  break;
+                    case "length":  tokens.accept(new Token(row, col, Token.TokenType.LENGTH));  break;
+                    case "true":    tokens.accept(new Token(row, col, Token.TokenType.TRUE));    break;
+                    case "false":   tokens.accept(new Token(row, col, Token.TokenType.FALSE));   break;
+                    case "this":    tokens.accept(new Token(row, col, Token.TokenType.THIS));    break;
+                    case "new":     tokens.accept(new Token(row, col, Token.TokenType.NEW));     break;
+                    case "sidef":   tokens.accept(new Token(row, col, Token.TokenType.SIDEF));   break;
+                    case "System":
+                        if(!input.substring(i).startsWith("System.out.println")) error(row, col, input);
+                        tokens.accept(new Token(row, col, Token.TokenType.PRINTLN));
+                        i += 18;
+                        break;
+                    default: tokens.accept(new Token(row, col, Token.TokenType.ID, b.toString()));
+                }
+            } else if(Character.isDigit(input.charAt(i))) {
+                int val = 0;
+                do { val = 10*val + Character.getNumericValue(input.charAt(i++)); col++; }
+                while(i < input.length() && Character.isDigit(input.charAt(i)));
+            } else switch(input.charAt(i)) {
+                case '\n': row++;
+                case ' ': case '\t': i++;                                                   break;
+                case ':':   tokens.accept(new Token(row, col, Token.TokenType.COLON));      break;
+                case ';':   tokens.accept(new Token(row, col, Token.TokenType.SEMICOLON));  break;
+                case '.':   tokens.accept(new Token(row, col, Token.TokenType.DOT));        break;
+                case '!':   tokens.accept(new Token(row, col, Token.TokenType.BANG));       break;
+                case '(':   tokens.accept(new Token(row, col, Token.TokenType.LPAREN));     break;
+                case ')':   tokens.accept(new Token(row, col, Token.TokenType.RPAREN));     break;
+                case '[':   tokens.accept(new Token(row, col, Token.TokenType.LBRACKET));   break;
+                case ']':   tokens.accept(new Token(row, col, Token.TokenType.RBRACKET));   break;
+                case '{':   tokens.accept(new Token(row, col, Token.TokenType.LBRACE));     break;
+                case '}':   tokens.accept(new Token(row, col, Token.TokenType.RBRACE));     break;
+                case '<':   tokens.accept(new Token(row, col, Token.TokenType.LESSTHAN));   break;
+                case '+':   tokens.accept(new Token(row, col, Token.TokenType.PLUS));       break;
+                case '-':   tokens.accept(new Token(row, col, Token.TokenType.MINUS));      break;
+                case '*':   tokens.accept(new Token(row, col, Token.TokenType.TIMES));      break;
+                case '/':
+                    if(++i < input.length() && input.charAt(i) == '/') {
+                        while(++i < input.length() && input.charAt(i) != '\n');
+                    } else if(i < input.length() && input.charAt(i) == '*') {
+                        while(++i < input.length() && input.charAt(i) != '*' && i+1 < input.length() && input.charAt(i+1) != '/');
+                    } else tokens.accept(new Token(row, col, Token.TokenType.DIV));
+                    break;
+                case '=':
+                    if(++i < input.length() && input.charAt(i) == '=') tokens.accept(new Token(row, col, Token.TokenType.EQUALS));
+                    else tokens.accept(new Token(row, col, Token.TokenType.EQSIGN));
+                    break;
+                case '&':
+                    if(++i < input.length() && input.charAt(i) == '&') tokens.accept(new Token(row, col, Token.TokenType.AND));
+                    else error(row, col, input);
+                case '|':
+                    if(++i < input.length() && input.charAt(i) == '|') tokens.accept(new Token(row, col, Token.TokenType.OR));
+                    else error(row, col, input);
+                default: error(row, col, input);
+            }
+        }
+        return tokens.build();
+    }
+
+    private void error(int row, int col, String word) {
+        System.out.println("lexing error in '" + word + "' on row:" + row + " column:" + col);
+        System.exit(1);
+    }
+
+    void genLexFile() throws IOException {
         while(!allCharactersTokenized.get());
         List<String> tokenStrings = tokens.stream().map(Token::toString).collect(Collectors.toList());
         Files.write(Paths.get(fileName), tokenStrings);
