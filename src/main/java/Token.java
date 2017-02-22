@@ -1,3 +1,5 @@
+package main.java;
+
 public class Token {
     public static final int
         BAD = 0, EOF = 1, COLON = 2, SEMICOLON = 3,
