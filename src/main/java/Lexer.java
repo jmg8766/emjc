@@ -34,9 +34,8 @@ public class Lexer {
         }).start();
 
         new Thread(() -> {
-            Char c = chars.poll();
-            int row, col;
-            while(c != null || allCharactersRead.get()) {
+            Char c; int row, col;
+            while((c = chars.poll()) != null || allCharactersRead.get()) {
                 row = c.row; col = c.col;
                 if(Character.isLetter(c.val)) { // identifier or keyword
                     StringBuffer b = new StringBuffer();
@@ -86,8 +85,18 @@ public class Lexer {
                         case "length":
                             tokens.offer(new Token(row, col, Token.TokenType.LENGTH));
                             continue;
-
-                        //TODO more cases
+                        case "true":
+                            tokens.offer(new Token(row, col, Token.TokenType.TRUE));
+                            continue;
+                        case "false":
+                            tokens.offer(new Token(row, col, Token.TokenType.FALSE));
+                            continue;
+                        case "this":
+                            tokens.offer(new Token(row, col, Token.TokenType.THIS));
+                            continue;
+                        case "new":
+                            tokens.offer(new Token(row, col, Token.TokenType.NEW));
+                            continue;
                         case "System":
                             do { //TODO: make more efficient
                                 b.append(c);
@@ -95,16 +104,28 @@ public class Lexer {
                             } while(c != null && "System.out.println".contains(b.toString()));
                             if(b.toString().equals("System.out.println")) {
                                 tokens.offer(new Token(row, col, Token.TokenType.PRINTLN));
-                            }
-                            break;
+                            } else; //TODO error handling
+                            continue;
+                        case "sidef":
+                            tokens.offer(new Token(row, col, Token.TokenType.SIDEF));
+                            continue;
                         default: // identifier
                             tokens.offer(new Token(row, col, Token.TokenType.ID, b.toString()));
                     }
-
                 } else if(Character.isDigit(c.val)) {
-                    //TODO
+                    int i = 0;
+                    do {
+                        i = 10*i + Character.getNumericValue(c.val);
+                        c = chars.poll();
+                    } while(c != null && Character.isDigit(c.val));
+                    tokens.offer(new Token(row, col, Token.TokenType.INTLIT, i));
                 } else switch(c.val) {
-                    //TODO
+                    case ':':
+                        tokens.offer(new Token(row, col, Token.TokenType.COLON));
+                        continue;
+                    case ';':
+                        tokens.offer(new Token(row, col, Token.TokenType.SEMICOLON));
+                        continue;
                     default:
                 }
                 //TODO
