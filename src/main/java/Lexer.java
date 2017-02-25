@@ -17,7 +17,7 @@ public class Lexer {
             file.read(cbuf);
             file.close();
             cbuf[cbuf.length-1] = (char)0;
-            outputFile = fileName.substring(0, fileName.indexOf('.')) + ".lex";
+            outputFile = fileName.substring(0, fileName.indexOf('.')) + ".lexed";
         } catch(IOException e) {
             System.out.println("An IO error occurred while attempting to read " + fileName);
         }
@@ -31,7 +31,7 @@ public class Lexer {
                     System.out.println("Error while lexing " + outputFile.substring(0, outputFile.indexOf('.'))
                         + " at row: " + token.row + " column: " + token.col);
                 }
-                out.write(token.toString());
+                out.write(token.toString() + '\n');
                 token = this.next();
             }
             out.flush();
