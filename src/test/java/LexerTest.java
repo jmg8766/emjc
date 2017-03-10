@@ -8,8 +8,8 @@ import java.util.Iterator;
 
 public class LexerTest {
 
-    @DataProvider()
-    public Iterator<Object[]> emjFiles() {
+    @DataProvider
+    public Iterator<Object[]> benchmarkFiles() {
         return Arrays
                 .stream(new File("src/test/benchmarks").listFiles())
                 .filter(f -> !f.getName().endsWith(".lexed"))
@@ -17,15 +17,25 @@ public class LexerTest {
                 .iterator();
     }
 
-    @Test(dataProvider = "emjFiles")
+    @Test(dataProvider = "benchmarkFiles")
     public void testGenLexFile(File f) {
         System.out.println("Generating lex file for" + f.getName());
-        Assert.assertEquals(true, new Lexer(f.getPath()).genLexFile());
+        // test if the file can be lexed without any errors
+        new Lexer(f.getPath()).genLexFile();
+    }
+
+    @DataProvider
+    public Iterator<Object[]> randomlyGeneratedFiles() {
+        return null; //TODO
+    }
+
+    @Test(dataProvider="randomlyGeneratedFiles", enabled = false)
+    public void testRandomlyGeneratedFiles(File f, String expectedOuput) {
+        //TODO
     }
 
     @Test
-    public void testNext() throws Exception {
+    public void testNext() {
 
     }
-
 }

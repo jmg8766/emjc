@@ -36,25 +36,18 @@ public class Lexer {
     /**
      *  Lexes a file by repeatedly calling the next() method until EOF is reached.
      */
-    boolean genLexFile() {
+    void genLexFile() {
         try (BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile))) {
             Token token = next();
-            while(token.type != TokenType.EOF && token.type != TokenType.BAD) {
+            do {
                 out.write(token.toString() + '\n');
-                token = next();
-            }
-            if(token.type == TokenType.BAD) {
-                System.out.println("Error while lexing " + inputFile + " at row: " + token.row + " column: " + token.col);
-                return false;
-            }
+            } while((token = next()).type != TokenType.EOF);
+
             out.write(token.toString() + '\n');
-            out.flush();
-            out.close();
+            out.flush(); out.close();
         } catch(IOException e ) {
-            System.out.println("An IO error occurred while attempting to write to " + outputFile);
-            return false;
+            throw new RuntimeException("An IO error occurred while attempting to write to " + outputFile);
         }
-        return true;
     }
 
     /**
@@ -107,7 +100,7 @@ public class Lexer {
                                cbuf[i++] == 'i' && cbuf[i++] == 'n' && cbuf[i++] == 't' && cbuf[i++] == 'l' &&
                                cbuf[i++] == 'n') {
                                     return new Token(row, col, TokenType.PRINTLN);
-                        } else      return new Token(row, col, TokenType.BAD);
+                        } else throw new RuntimeException("Error while lexing " + inputFile + " at row: " + row + " column: " + (i-rowStart) + tabSpaces);
                     default:        return new IdentifierToken(row, col, id.toString());
                 }
             //---- int literals ----
@@ -138,7 +131,7 @@ public class Lexer {
                 StringBuilder str = new StringBuilder();
                 while(true) {
                     switch (cbuf[i]) {
-                        case(char)0:case'\n': return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
+                        case(char)0:case'\n': throw new RuntimeException("Error while lexing " + inputFile + " at row: " + row + " column: " + (i-rowStart) + tabSpaces);
                         case'"': i++; return new StringLiteralToken(row, (i - rowStart) + tabSpaces, str.toString());
                         default: str.append(cbuf[i++]);
                     }
@@ -152,12 +145,12 @@ public class Lexer {
                 if(cbuf[i] == '&') {
                     i++;
                     return new Token(row, (i - rowStart) + tabSpaces, TokenType.AND);
-                } else return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
+                } else throw new RuntimeException("Error while lexing " + inputFile + " at row: " + row + " column: " + (i-rowStart) + tabSpaces);
             case'|':
                 if(cbuf[i] == '|') {
                     i++;
                     return new Token(row, (i - rowStart) + tabSpaces, TokenType.OR);
-                } else return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
+                } else throw new RuntimeException("Error while lexing " + inputFile + " at row: " + row + " column: " + (i-rowStart) + tabSpaces);
             case'/':
                 switch(cbuf[i]) {
                     case'/':
@@ -171,7 +164,7 @@ public class Lexer {
                         return next();
                     default: return new Token(row, (i - rowStart) + tabSpaces, TokenType.DIV);
                 }
-            default: return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
+            default: throw new RuntimeException("Error while lexing " + inputFile + " at row: " + row + " column: " + (i-rowStart) + tabSpaces);
         }
     }
 }
