@@ -36,7 +36,7 @@ public class Lexer {
     /**
      *  Lexes a file by repeatedly calling the next() method until EOF is reached.
      */
-    void genLexFile() {
+    boolean genLexFile() {
         try (BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile))) {
             Token token = next();
             while(token.type != TokenType.EOF && token.type != TokenType.BAD) {
@@ -45,12 +45,16 @@ public class Lexer {
             }
             if(token.type == TokenType.BAD) {
                 System.out.println("Error while lexing " + inputFile + " at row: " + token.row + " column: " + token.col);
+                return false;
             }
+            out.write(token.toString() + '\n');
             out.flush();
             out.close();
         } catch(IOException e ) {
             System.out.println("An IO error occurred while attempting to write to " + outputFile);
+            return false;
         }
+        return true;
     }
 
     /**
@@ -63,9 +67,11 @@ public class Lexer {
             // ---- EOF ----
             case(char)0: return new Token(row, (i - rowStart) + tabSpaces, TokenType.EOF);
             //---- whitespace ----
-            case'\n':   row++; rowStart = i + tabSpaces;    return next();
-            case'\t':   tabSpaces+=4;                       return next();
-            case' ':                                        return next();
+            case'\r':
+                if(cbuf[i] == '\n') i++;
+            case'\n': row++; rowStart = i + tabSpaces;    return next();
+            case'\t':       tabSpaces+=3;                       return next();
+            case' ':                                            return next();
             //---- identifiers and keywords -----
             case'a':case'b':case'c':case'd':case'e':case'f':case'g':case'h':case'i':case'j':case'k':case'l':case'm':
             case'n':case'o':case'p':case'q':case'r':case's':case't':case'u':case'v':case'w':case'x':case'y':case'z':
@@ -96,10 +102,10 @@ public class Lexer {
                     case"void":     return new Token(row, col, TokenType.VOID);
                     case"String":   return new Token(row, col, TokenType.STRING);
                     case"System":
-                        if(i + 11 < cbuf.length && cbuf[i] == '.'   && cbuf[++i] == 'o' && cbuf[++i] == 'u' &&
-                               cbuf[++i] == 't' && cbuf[++i] == '.' && cbuf[++i] == 'p' && cbuf[++i] == 'r' &&
-                               cbuf[++i] == 'i' && cbuf[++i] == 'n' && cbuf[++i] == 't' && cbuf[++i] == 'l' &&
-                               cbuf[++i] == 'n') {
+                        if(i + 11 < cbuf.length && cbuf[i++] == '.'   && cbuf[i++] == 'o' && cbuf[i++] == 'u' &&
+                               cbuf[i++] == 't' && cbuf[i++] == '.' && cbuf[i++] == 'p' && cbuf[i++] == 'r' &&
+                               cbuf[i++] == 'i' && cbuf[i++] == 'n' && cbuf[i++] == 't' && cbuf[i++] == 'l' &&
+                               cbuf[i++] == 'n') {
                                     return new Token(row, col, TokenType.PRINTLN);
                         } else      return new Token(row, col, TokenType.BAD);
                     default:        return new IdentifierToken(row, col, id.toString());
@@ -138,14 +144,20 @@ public class Lexer {
                     }
                 }
             case'=':
-                if(cbuf[i++] == '=') return new Token(row, (i - rowStart) + tabSpaces, TokenType.EQUALS);
-                else                 return new Token(row, (i - rowStart) + tabSpaces, TokenType.EQSIGN);
+                if(cbuf[i] == '=') {
+                    i++;
+                    return new Token(row, (i - rowStart) + tabSpaces, TokenType.EQUALS);
+                } else return new Token(row, (i - rowStart) + tabSpaces, TokenType.EQSIGN);
             case'&':
-                if(cbuf[i++] == '&') return new Token(row, (i - rowStart) + tabSpaces, TokenType.AND);
-                else                 return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
+                if(cbuf[i] == '&') {
+                    i++;
+                    return new Token(row, (i - rowStart) + tabSpaces, TokenType.AND);
+                } else return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
             case'|':
-                if(cbuf[i++] == '|') return new Token(row, (i - rowStart) + tabSpaces, TokenType.OR);
-                else                 return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
+                if(cbuf[i] == '|') {
+                    i++;
+                    return new Token(row, (i - rowStart) + tabSpaces, TokenType.OR);
+                } else return new Token(row, (i - rowStart) + tabSpaces, TokenType.BAD);
             case'/':
                 switch(cbuf[i]) {
                     case'/':
