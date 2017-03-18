@@ -1,3 +1,5 @@
+import Tokens.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -60,11 +62,10 @@ public class Lexer {
             // ---- EOF ----
             case(char)0: return new Token(row, (i - rowStart) + tabSpaces, TokenType.EOF);
             //---- whitespace ----
-            case'\r':
-                if(cbuf[i] == '\n') i++;
+            case'\r': if(cbuf[i] == '\n') i++; // mac newline = '\r' windows newline = "\r\n"
             case'\n': row++; rowStart = i + tabSpaces;    return next();
-            case'\t':       tabSpaces+=3;                       return next();
-            case' ':                                            return next();
+            case'\t': tabSpaces+=3;                       return next();
+            case' ':                                      return next();
             //---- identifiers and keywords -----
             case'a':case'b':case'c':case'd':case'e':case'f':case'g':case'h':case'i':case'j':case'k':case'l':case'm':
             case'n':case'o':case'p':case'q':case'r':case's':case't':case'u':case'v':case'w':case'x':case'y':case'z':
@@ -95,7 +96,7 @@ public class Lexer {
                     case"void":     return new Token(row, col, TokenType.VOID);
                     case"String":   return new Token(row, col, TokenType.STRING);
                     case"System":
-                        if(i + 11 < cbuf.length && cbuf[i++] == '.'   && cbuf[i++] == 'o' && cbuf[i++] == 'u' &&
+                        if(i + 11 < cbuf.length && cbuf[i++] == '.' && cbuf[i++] == 'o' && cbuf[i++] == 'u' &&
                                cbuf[i++] == 't' && cbuf[i++] == '.' && cbuf[i++] == 'p' && cbuf[i++] == 'r' &&
                                cbuf[i++] == 'i' && cbuf[i++] == 'n' && cbuf[i++] == 't' && cbuf[i++] == 'l' &&
                                cbuf[i++] == 'n') {
@@ -132,8 +133,8 @@ public class Lexer {
                 while(true) {
                     switch (cbuf[i]) {
                         case(char)0:case'\n': throw new RuntimeException("Error while lexing " + inputFile + " at row: " + row + " column: " + (i-rowStart) + tabSpaces);
-                        case'"': i++; return new StringLiteralToken(row, (i - rowStart) + tabSpaces, str.toString());
-                        default: str.append(cbuf[i++]);
+                        case'"': i++;         return new StringLiteralToken(row, (i - rowStart) + tabSpaces, str.toString());
+                        default:              str.append(cbuf[i++]);
                     }
                 }
             case'=':

@@ -1,9 +1,13 @@
+package Tokens;
+
+import Tokens.TokenType;
+
 public class Token {
 
-    int row, col;
-    TokenType type;
+    public int row, col;
+    public TokenType type;
 
-    Token(int row, int col, TokenType t) {
+    public Token(int row, int col, TokenType t) {
         this.row = row;
         this.col = col;
         this.type = t;
@@ -13,5 +17,6 @@ public class Token {
     public String toString() {
         return row + ":" + col + " " + type + "()";
     }
+
 }
 
