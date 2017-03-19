@@ -1,13 +1,13 @@
-package ast.Expression;
+package ast.expression;
 
 import ast.Type.Int;
 import ast.Visitor;
 
-public class Times extends Expression<Int> {
+public class LessThan extends Expression<Int> {
     public Expression<Int> lhs;
     public Expression<Int> rhs;
 
-    public Times(Expression<Int> lhs, Expression<Int> rhs) {
+    public LessThan(Expression<Int> lhs, Expression<Int> rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
     }

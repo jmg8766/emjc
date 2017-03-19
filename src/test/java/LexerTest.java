@@ -1,5 +1,5 @@
-import Tokens.Token;
-import Tokens.TokenType;
+import token.Token;
+import token.TokenType;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

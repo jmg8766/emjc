@@ -1,7 +1,7 @@
 package ast.Statement;
 
-import ast.Expression.Expression;
-import ast.Expression.Var;
+import ast.expression.Expression;
+import ast.expression.Var;
 import ast.Type.Type;
 import ast.Visitor;
 

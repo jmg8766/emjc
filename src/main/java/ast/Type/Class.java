@@ -1,7 +1,7 @@
 package ast.Type;
 
-import ast.Expression.Var;
-import ast.Expression.Method;
+import ast.expression.Var;
+import ast.expression.Method;
 import ast.Visitor;
 
 import java.util.ArrayList;

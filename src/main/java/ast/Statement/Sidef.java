@@ -1,6 +1,6 @@
 package ast.Statement;
 
-import ast.Expression.Expression;
+import ast.expression.Expression;
 import ast.Visitor;
 
 public class Sidef extends Statement {

@@ -1,7 +1,4 @@
-package Tokens;
-
-import Tokens.Token;
-import Tokens.TokenType;
+package token;
 
 public class StringLiteralToken extends Token {
     public String value;

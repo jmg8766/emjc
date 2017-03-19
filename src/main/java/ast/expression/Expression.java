@@ -1,4 +1,4 @@
-package ast.Expression;
+package ast.expression;
 
 import ast.Tree;
 import ast.Type.Type;

@@ -1,4 +1,4 @@
-package ast.Expression;
+package ast.expression;
 
 import ast.Type.Type;
 import ast.Visitor;

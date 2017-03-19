@@ -1,6 +1,5 @@
-package ast.Expression;
+package ast.expression;
 
-import ast.Expression.Expression;
 import ast.Visitor;
 
 public class Neg extends Expression {

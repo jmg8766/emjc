@@ -1,4 +1,4 @@
-import Tokens.*;
+import token.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

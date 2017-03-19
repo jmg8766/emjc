@@ -6,8 +6,8 @@ import ast.Visitor;
 import java.util.ArrayList;
 
 public class Program extends Tree {
-    MainClassDeclaration main;
-    ArrayList<ClassDeclaration> classDeclarations;
+    public MainClassDeclaration main;
+    public ArrayList<ClassDeclaration> classDeclarations;
 
     public Program(MainClassDeclaration main, ArrayList<ClassDeclaration> classDeclarations) {
         this.main = main;

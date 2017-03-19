@@ -1,7 +1,6 @@
 package ast.Statement;
 
-import ast.Expression.Expression;
-import ast.Statement.Statement;
+import ast.expression.Expression;
 import ast.Type.Boolean;
 import ast.Visitor;
 

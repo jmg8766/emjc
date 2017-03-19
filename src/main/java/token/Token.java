@@ -1,6 +1,4 @@
-package Tokens;
-
-import Tokens.TokenType;
+package token;
 
 public class Token {
 

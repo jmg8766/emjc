@@ -1,4 +1,4 @@
-package Tokens;
+package token;
 
 public enum TokenType {
     COLON, SEMICOLON, DOT, COMMA, EQSIGN, EQUALS, BANG, LPAREN, RPAREN,
