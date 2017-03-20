@@ -3,8 +3,6 @@ package ast.Statement;
 import ast.Visitor;
 import ast.expression.ID;
 
-import java.util.ArrayList;
-
 public class MainClassDeclaration extends Statement {
     ID id;
     ID args;

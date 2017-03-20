@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 /**
  * Contains the main method for the E mini Java Compiler.
  */

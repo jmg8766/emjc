@@ -5,8 +5,8 @@ import ast.Type.Type;
 import ast.Visitor;
 
 public class VarDeclaration<T extends Type> extends Statement {
-    T type;
-    String id;
+    public T type;
+    public String id;
 
     public VarDeclaration(T t, String id) {
         this.id = id;
