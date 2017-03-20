@@ -1,8 +1,7 @@
-package ast.Statement;
+package ast.statement;
 
 import ast.expression.Expression;
-import ast.expression.Var;
-import ast.Type.Type;
+import ast.type.Type;
 import ast.Visitor;
 
 public class Assign<T extends Type> extends Statement {

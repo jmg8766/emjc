@@ -1,6 +1,6 @@
-package ast.Statement;
+package ast.statement;
 
-import ast.Type.Type;
+import ast.type.Type;
 import ast.Visitor;
 import ast.expression.Expression;
 

@@ -1,6 +1,6 @@
 package ast.expression;
 
-import ast.Type.String;
+import ast.type.String;
 import ast.Visitor;
 
 public class StringPlus extends Expression<String> {

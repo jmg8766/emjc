@@ -1,6 +1,5 @@
-package ast.Type;
+package ast.type;
 
-import ast.Type.Type;
 import ast.Visitor;
 
 public class Array<T extends Type> extends Type {

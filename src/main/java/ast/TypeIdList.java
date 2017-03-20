@@ -1,6 +1,6 @@
 package ast;
 
-import ast.Type.Type;
+import ast.type.Type;
 import ast.expression.ID;
 
 import java.util.ArrayList;

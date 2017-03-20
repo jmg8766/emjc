@@ -1,6 +1,6 @@
 package ast.expression;
 
-import ast.Type.Type;
+import ast.type.Type;
 import ast.Visitor;
 
 public class Equals<V extends Type> extends Expression<V> {

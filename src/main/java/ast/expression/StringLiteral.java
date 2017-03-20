@@ -1,10 +1,10 @@
 package ast.expression;
 
-import ast.Type.String;
+import ast.type.String;
 import ast.Visitor;
 
 public class StringLiteral extends Expression<String> {
-    String val;
+    public String val;
 
     public StringLiteral(String val) {
         this.val = val;

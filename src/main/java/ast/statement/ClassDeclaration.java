@@ -1,6 +1,6 @@
-package ast.Statement;
+package ast.statement;
 
-import ast.Type.String;
+import ast.type.String;
 import ast.Visitor;
 
 import java.util.ArrayList;

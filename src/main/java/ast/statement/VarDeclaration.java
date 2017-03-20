@@ -1,7 +1,7 @@
-package ast.Statement;
+package ast.statement;
 
-import ast.Type.String;
-import ast.Type.Type;
+import ast.type.String;
+import ast.type.Type;
 import ast.Visitor;
 
 public class VarDeclaration<T extends Type> extends Statement {

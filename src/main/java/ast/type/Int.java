@@ -1,4 +1,4 @@
-package ast.Type;
+package ast.type;
 
 import ast.Visitor;
 

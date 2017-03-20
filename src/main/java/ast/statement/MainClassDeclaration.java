@@ -1,12 +1,12 @@
-package ast.Statement;
+package ast.statement;
 
 import ast.Visitor;
 import ast.expression.ID;
 
 public class MainClassDeclaration extends Statement {
-    ID id;
-    ID args;
-    Block body;
+    public ID id;
+    public ID args;
+    public Block body;
 
     public MainClassDeclaration(ID id, ID args, Block body) {
         this.id = id;

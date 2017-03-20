@@ -1,6 +1,6 @@
 package ast.expression;
 
-import ast.Type.Int;
+import ast.type.Int;
 import ast.Visitor;
 
 public class Times extends Expression<Int> {

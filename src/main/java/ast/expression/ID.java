@@ -3,7 +3,7 @@ package ast.expression;
 import ast.Visitor;
 
 public class ID extends Expression {
-    String id;
+    public String id;
 
     public ID(String id) {
         this.id = id;

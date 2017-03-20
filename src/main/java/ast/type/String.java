@@ -1,12 +1,11 @@
-package ast.Type;
+package ast.type;
 
-import ast.Type.Type;
 import ast.Visitor;
 
-public class Boolean extends Type {
-    boolean val;
+public class String extends Type {
+    String val;
 
-    public Boolean(boolean val) {
+    public String(String val) {
         this.val = val;
     }
 

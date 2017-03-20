@@ -1,4 +1,4 @@
-package ast.Statement;
+package ast.statement;
 
 import ast.Tree;
 import ast.Visitor;

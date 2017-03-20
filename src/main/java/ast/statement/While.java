@@ -1,7 +1,7 @@
-package ast.Statement;
+package ast.statement;
 
 import ast.expression.Expression;
-import ast.Type.Boolean;
+import ast.type.Boolean;
 import ast.Visitor;
 
 public class While extends Statement {

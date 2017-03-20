@@ -1,10 +1,10 @@
 package ast.expression;
 
-import ast.Type.Int;
+import ast.type.Int;
 import ast.Visitor;
 
 public class IntPlus extends Expression<Int> {
-    Expression<Int> lhs, rhs;
+    public Expression<Int> lhs, rhs;
 
     public IntPlus(Expression<Int> lhs, Expression<Int> rhs) {
         this.lhs = lhs;

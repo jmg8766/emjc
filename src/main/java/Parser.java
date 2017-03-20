@@ -1,7 +1,7 @@
-import ast.Statement.Block;
-import ast.Statement.ClassDeclaration;
-import ast.Statement.MainClassDeclaration;
-import ast.Statement.Program;
+import ast.statement.Block;
+import ast.statement.ClassDeclaration;
+import ast.statement.MainClassDeclaration;
+import ast.statement.Program;
 import ast.expression.ID;
 import token.IdentifierToken;
 import token.Token;
