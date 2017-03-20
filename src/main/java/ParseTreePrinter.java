@@ -4,7 +4,6 @@ import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 import ast.type.Boolean;
-import ast.type.Class;
 import ast.type.String;
 
 public class ParseTreePrinter implements Visitor<java.lang.String> {
@@ -56,7 +55,11 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(ClassDeclaration n) {
-		return null;
+		StringBuilder b = new StringBuilder("(CLASS ").append(n.id.accept(this));
+		if(n.parent != null) b.append("EXTENDS ").append(n.parent.accept(this));
+		for (VarDeclaration v : n.varDeclarations) b.append("\n").append(v.accept(this));
+		for (MethodDeclaration m : n.methodDeclarations) b.append("\n").append(m.accept(this));
+		return b.append("\n").append(")").toString();
 	}
 
 	@Override
@@ -76,36 +79,27 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(Return n) {
-		return null;
+		return "(RETURN " + n.returnValue.accept(this) + ")";
 	}
 
 	@Override
 	public java.lang.String visit(Int n) {
-		return null;
+		return "INT";
 	}
 
 	@Override
 	public java.lang.String visit(Boolean n) {
-		return null;
+		return "BOOLEAN";
 	}
 
 	@Override
 	public java.lang.String visit(String n) {
-		return null;
+		return "STRING";
 	}
 
 	@Override
 	public java.lang.String visit(Array n) {
-		return null;
-	}
-
-	@Override
-	public java.lang.String visit(Class n) {
-		StringBuilder b = new StringBuilder("(CLASS ").append(n.id.accept(this));
-		if(n.parent != null) b.append("EXTENDS ").append(n.parent.accept(this));
-		for (VarDeclaration v : n.varDeclarations) b.append("\n").append(v.accept(this));
-		for (MethodDeclaration m : n.methodDeclarations) b.append("\n").append(m.accept(this));
-		return b.append(")").toString();
+		return null; //TODO
 	}
 
 	@Override

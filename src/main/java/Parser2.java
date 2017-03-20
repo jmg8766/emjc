@@ -5,9 +5,7 @@ import ast.Visitor;
 import ast.expression.*;
 import ast.type.*;
 import ast.type.Boolean;
-import ast.type.Class;
 import ast.type.String;
-import token.Token;
 
 public class Parser2 implements Visitor<Tree> {
 	Lexer l;

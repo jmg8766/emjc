@@ -1,20 +1,20 @@
 package ast.statement;
 
+import ast.expression.ID;
 import ast.type.String;
 import ast.Visitor;
 
 import java.util.ArrayList;
 
 public class ClassDeclaration extends Statement {
-    String id;
-    String parentId;
-    ArrayList<VarDeclaration> varDeclarations;
-    ArrayList<MethodDeclaration> methodDeclarations;
+    public ID id, parent;
+    public ArrayList<VarDeclaration> varDeclarations;
+    public ArrayList<MethodDeclaration> methodDeclarations;
 
-    public ClassDeclaration(String id, String parentId, ArrayList<VarDeclaration> varDeclarations,
+    public ClassDeclaration(ID id, ID parentId, ArrayList<VarDeclaration> varDeclarations,
                             ArrayList<MethodDeclaration> methodDeclarations) {
         this.id = id;
-        this.parentId = parentId;
+        this.parent = parent;
         this.varDeclarations = varDeclarations;
         this.methodDeclarations = methodDeclarations;
     }
