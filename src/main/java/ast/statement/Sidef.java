@@ -4,7 +4,7 @@ import ast.expression.Expression;
 import ast.Visitor;
 
 public class Sidef extends Statement {
-    Expression expression;
+    public Expression expression;
 
     public Sidef(Expression expression) {
         this.expression = expression;

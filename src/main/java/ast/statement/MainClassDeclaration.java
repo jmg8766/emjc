@@ -4,8 +4,7 @@ import ast.Visitor;
 import ast.expression.ID;
 
 public class MainClassDeclaration extends Statement {
-    public ID id;
-    public ID args;
+    public ID id, args;
     public Block body;
 
     public MainClassDeclaration(ID id, ID args, Block body) {

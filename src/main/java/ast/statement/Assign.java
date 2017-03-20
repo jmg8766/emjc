@@ -1,15 +1,16 @@
 package ast.statement;
 
 import ast.expression.Expression;
+import ast.expression.ID;
 import ast.type.Type;
 import ast.Visitor;
 
 public class Assign<T extends Type> extends Statement {
-    public Var<T> var;
+    public ID id;
     public Expression<T> expr;
 
-    public Assign(Var<T> var, Expression<T> expr) {
-        this.var = var;
+    public Assign(ID id, Expression<T> expr) {
+        this.id = id;
         this.expr = expr;
     }
 

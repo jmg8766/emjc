@@ -1,15 +1,15 @@
 package ast.statement;
 
+import ast.expression.Expression;
+import ast.expression.ID;
 import ast.type.String;
 import ast.Visitor;
 
 public class Print extends Statement {
-    public String msg;
-    public String varID;
+    public Expression<String> msg;
 
-    public Print(String msg, String varID) {
+    public Print(Expression<String> msg) {
         this.msg = msg;
-        this.varID = varID;
     }
 
     public <R> R accept(Visitor<R> v) {
