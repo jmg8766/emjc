@@ -1,6 +1,6 @@
 //author: Dhanasekar Elangovan & Justin Gottshall
 //The class implements mergesort
-public class MergeSort {
+class MergeSort {
     public static void main(String[] args) {
 
         MergeSorter sorter = new MergeSorter();

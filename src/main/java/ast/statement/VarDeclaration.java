@@ -5,11 +5,12 @@ import ast.type.String;
 import ast.type.Type;
 import ast.Visitor;
 
-public class VarDeclaration<T extends Type> extends Statement {
-    public T type;
+public class VarDeclaration extends Statement {
+    public Type type;
     public ID id;
 
-    public VarDeclaration(T t, ID id) {
+    public VarDeclaration(Type type, ID id) {
+        this.type = type;
         this.id = id;
     }
 
