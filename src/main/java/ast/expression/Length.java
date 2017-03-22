@@ -1,13 +1,13 @@
 package ast.expression;
-import ast.ID;
 import ast.Tree;
 import ast.Visitor;
 
 public class Length extends Tree implements Expression{
     public Expression expr;
-    public ID id;
 
-    public Length(Expression expr) {
+    public Length(int row, int col, Expression expr) {
+        this.row = row;
+        this.col = col;
         this.expr = expr;
     }
 

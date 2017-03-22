@@ -1,10 +1,12 @@
 import ast.ID;
 import ast.TypeIdList;
+import ast.Visitor;
 import ast.expression.*;
 import ast.expression.operators.*;
 import ast.statement.*;
 import ast.type.Boolean;
 import ast.type.Int;
+import ast.type.IntArray;
 import ast.type.String;
 
 public class ParseTreePrinter implements Visitor<java.lang.String> {
@@ -33,12 +35,12 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(Assign n) {
-		return "(EQSIGN " + n.id.accept(this) + " " + n.expr.accept(this) + ")";
+		return "(EQSIGN " + n.lhs.accept(this) + " " + n.rhs.accept(this) + ")";
 	}
 
 	@Override
 	public java.lang.String visit(Skip n) {
-		return "(SKIP)";
+		return "SKIP";
 	}
 
 	@Override
@@ -119,6 +121,41 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 	}
 
 	@Override
+	public java.lang.String visit(IntArray n) {
+		return "INT[]";
+	}
+
+	@Override
+	public java.lang.String visit(NewObject n) {
+		return "(NEW-OBJECT " + n.className.accept(this) + ")";
+	}
+
+	@Override
+	public java.lang.String visit(NewArray n) {
+		return "(NEW-INT[]" + n.arrayLength.accept(this) + ")";
+	}
+
+	@Override
+	public java.lang.String visit(Precedence n) {
+		return n.expr.accept(this);
+	}
+
+	@Override
+	public java.lang.String visit(ArrayIndex n) {
+		return "(ARRAY-INDEX " + n.array.accept(this) + " " + n.index.accept(this) + ")";
+	}
+
+	@Override
+	public java.lang.String visit(This n) {
+		return "THIS";
+	}
+
+	@Override
+	public java.lang.String visit(BooleanLiteral n) {
+		return "" + n.value;
+	}
+
+	@Override
 	public java.lang.String visit(IntLiteral n) {
 		return "(INTLIT " + n.value + ")";
 	}
@@ -146,11 +183,6 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 	@Override
 	public java.lang.String visit(Division n) {
 		return "(/ " + n.lhs.accept(this) + " " + n.rhs.accept(this) + ")";
-	}
-
-	@Override
-	public java.lang.String visit(Modulo n) {
-		return "(% " + n.lhs.accept(this) + " " + n.rhs.accept(this) + ")";
 	}
 
 	@Override
@@ -188,5 +220,10 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 		StringBuilder b = new StringBuilder("(FUN-CALL ").append(n.id.accept(this));
 		for (Expression e : n.params) b.append(" ").append(e.accept(this));
 		return b.append(")").toString();
+	}
+
+	@Override
+	public java.lang.String visit(Length n) {
+		return "(LENGTH)";
 	}
 }

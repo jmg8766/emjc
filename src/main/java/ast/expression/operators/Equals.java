@@ -7,7 +7,7 @@ import ast.expression.Expression;
 public class Equals extends Tree implements Expression {
 	public Expression lhs, rhs;
 
-	public Equals(Expression lhs, Expression rhs) {
+	public Equals(int row, int col, Expression lhs, Expression rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 	}

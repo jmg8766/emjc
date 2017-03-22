@@ -4,12 +4,12 @@ import ast.Tree;
 import ast.Visitor;
 
 public class Precedence extends Tree implements Expression {
-	public Expression e;
+	public Expression expr;
 
-	public Precedence(int row, int col, Expression e) {
+	public Precedence(int row, int col, Expression expr) {
 		this.row = row;
 		this.col = col;
-		this.e = e;
+		this.expr = expr;
 	}
 
 	@Override

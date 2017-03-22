@@ -1,3 +1,7 @@
 package ast.expression;
 
-public interface Expression {}
+import ast.Visitor;
+
+public interface Expression {
+	<R> R accept(Visitor<R> v);
+}

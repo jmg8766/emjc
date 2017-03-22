@@ -31,7 +31,6 @@ public interface Visitor<R> {
     R visit(Boolean n);
     R visit(String n);
     R visit(IntArray n);
-    R visit(Class n);
 
     // expression
     R visit(NewObject n);
@@ -46,7 +45,6 @@ public interface Visitor<R> {
     R visit(Minus n);
     R visit(Times n);
     R visit(Division n);
-    R visit(Modulo n);
     R visit(Equals n);
     R visit(LessThan n);
     R visit(And n);

@@ -46,8 +46,8 @@ public class Parser {
 		}
 
 		TypeIdList param = new TypeIdList(types, ids);
-		param.setRow(row);
-		param.setCol(col);
+		param.row = row;
+		param.col = col;
 
 		currentToken = input.next();
 		return param;
@@ -72,19 +72,6 @@ public class Parser {
 			currentToken = input.next();
 			return true;
 		} else return false;
-	}
-
-	/**
-	 * Checks that the current token is specific type. Then moves the pointer to the next token.
-	 *
-	 * @param t : the expected TokenType for the current token
-	 * @return : the next token
-	 */
-	Token parse(TokenType t) {
-		if (currentToken.type != t) ; //error
-		Token ret = currentToken;
-		currentToken = input.next();
-		return ret;
 	}
 
 	// ================== EXPRESSIONS =================================================================================
@@ -125,37 +112,37 @@ public class Parser {
 				switch (currentToken.type) {
 					case AND:
 						currentToken = input.next();
-						return new And(expr1, parseExpression());
+						return new And(currentToken.row, currentToken.col, expr1, parseExpression());
 					case OR:
 						currentToken = input.next();
-						return new Or(expr1, parseExpression());
+						return new Or(currentToken.row, currentToken.col, expr1, parseExpression());
 					case EQUALS:
 						currentToken = input.next();
-						return new Equals(expr1, parseExpression());
+						return new Equals(currentToken.row, currentToken.col, expr1, parseExpression());
 					case LESSTHAN:
 						currentToken = input.next();
-						return new LessThan(expr1, parseExpression());
+						return new LessThan(currentToken.row, currentToken.col, expr1, parseExpression());
 					case PLUS:
 						currentToken = input.next();
-						return new Plus(expr1, parseExpression());
+						return new Plus(currentToken.row, currentToken.col, expr1, parseExpression());
 					case MINUS:
 						currentToken = input.next();
-						return new Minus(expr1, parseExpression());
+						return new Minus(currentToken.row, currentToken.col, expr1, parseExpression());
 					case TIMES:
 						currentToken = input.next();
-						return new Times(expr1, parseExpression());
+						return new Times(currentToken.row, currentToken.col, expr1, parseExpression());
 					case DIV:
 						currentToken = input.next();
-						return new Division(expr1, parseExpression());
+						return new Division(currentToken.row, currentToken.col, expr1, parseExpression());
 					case LBRACKET:
 						currentToken = input.next();
 						Expression expr2 = parseExpression();
 						checkType(TokenType.RBRACKET);
-						return new ArrayIndex(expr1, expr2);
+						return new ArrayIndex(currentToken.row, currentToken.col, expr1, expr2);
 					case DOT:
 						currentToken = input.next();
 						if (assertType(TokenType.LENGTH))
-							return new Length(expr1);
+							return new Length(currentToken.row, currentToken.col, expr1);
 						else { //Function call
 							ID id = parseID();
 							checkType(TokenType.LPAREN);
@@ -220,6 +207,8 @@ public class Parser {
 		return i;
 	}
 
+	// ================== OPERATORS ===================================================================================
+
 	// ================== STATEMENTS ==================================================================================
 	private Statement parseStatement() throws SyntaxException {
 		int row = currentToken.row;
@@ -240,8 +229,8 @@ public class Parser {
 					elze = parseStatement();
 				}
 				IfThenElse ifThenElse = new IfThenElse(expr, then, elze);
-				ifThenElse.setRow(row);
-				ifThenElse.setCol(col);
+				ifThenElse.row = row;
+				ifThenElse.col = col;
 				return ifThenElse;
 			case WHILE:
 				currentToken = input.next();
@@ -294,15 +283,15 @@ public class Parser {
 		MethodDeclaration method = new MethodDeclaration(type, id, params, variables, statements, returnExpression);
 		currentToken = input.next();
 
-		method.setRow(row);
-		method.setCol(col);
+		method.row = row;
+		method.col = col;
 		return method;
 	}
 
 	private VarDeclaration parseVarDeclarations() throws SyntaxException {
 		int row = currentToken.row; int col = currentToken.col;
 		VarDeclaration variable = new VarDeclaration(parseType(), parseID());
-		variable.setRow(row); variable.setCol(col);
+		variable.row = row; variable.col = col;
 		currentToken = input.next();
 		return variable;
 	}
@@ -338,8 +327,8 @@ public class Parser {
 			methods.add(parseMethodDeclarations());
 		}
 		ClassDeclaration claz = new ClassDeclaration(className, parentName, variables, methods);
-		claz.setRow(row);
-		claz.setCol(col);
+		claz.row = row;
+		claz.col = col;
 
 		currentToken = input.next();
 		return claz;
@@ -369,8 +358,8 @@ public class Parser {
 		checkType(TokenType.RBRACE);
 
 		MainClassDeclaration main = new MainClassDeclaration(className, paramName, body);
-		main.setCol(col);
-		main.setRow(row);
+		main.col = col;
+		main.row = row;
 		currentToken = input.next();
 
 		return main;

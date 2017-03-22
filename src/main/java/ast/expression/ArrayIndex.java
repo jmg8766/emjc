@@ -6,7 +6,9 @@ import ast.Visitor;
 public class ArrayIndex extends Tree implements Assignable, Expression {
 	public Expression array, index;
 
-	public ArrayIndex(Expression array, Expression index) {
+	public ArrayIndex(int row, int col, Expression array, Expression index) {
+		this.row = row;
+		this.col = col;
 		this.array = array;
 		this.index = index;
 	}
