@@ -1,7 +1,7 @@
+import ast.ID;
 import ast.TypeIdList;
 import ast.expression.*;
 import ast.statement.*;
-import ast.type.Array;
 import ast.type.Boolean;
 import ast.type.Int;
 import ast.type.String;

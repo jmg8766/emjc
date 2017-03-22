@@ -1,12 +1,12 @@
 package ast.expression;
 
-import ast.type.Int;
+import ast.Tree;
+import ast.Visitor;
 
-public class Times extends Expression<Int> {
-    public Expression<Int> lhs;
-    public Expression<Int> rhs;
+public class Times extends Tree {
+    public Expression lhs, rhs;
 
-    public Times(Expression<Int> lhs, Expression<Int> rhs) {
+    public Times(Expression lhs, Expression rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
     }

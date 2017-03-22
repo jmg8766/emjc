@@ -1,18 +1,17 @@
 package ast.expression;
 
+import ast.Tree;
 import ast.Visitor;
-import ast.type.Boolean;
 
-public class Or extends Expression<Boolean> {
-    public Expression<Boolean> lhs;
-    public Expression<Boolean> rhs;
+public class Or extends Tree implements Expression {
+	public Expression lhs, rhs;
 
-    public Or(Expression<Boolean> lhs, Expression<Boolean> rhs) {
-        this.lhs = lhs;
-        this.rhs = rhs;
-    }
+	public Or(Expression lhs, Expression rhs) {
+		this.lhs = lhs;
+		this.rhs = rhs;
+	}
 
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

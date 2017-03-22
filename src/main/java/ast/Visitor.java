@@ -29,9 +29,13 @@ public interface Visitor<R> {
     R visit(Int n);
     R visit(Boolean n);
     R visit(String n);
-    R visit(Array n);
+    R visit(IntArray n);
+    R visit(Class n);
 
     // expression
+    R visit(ArrayIndex n);
+	R visit(This n);
+    R visit(BooleanLiteral n);
     R visit(IntLiteral n);
     R visit(StringLiteral n);
     R visit(StringPlus n);

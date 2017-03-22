@@ -1,17 +1,17 @@
 package ast.expression;
 
-import ast.type.Int;
+import ast.Tree;
+import ast.Visitor;
 
-public class LessThan extends Expression<Int> {
-    public Expression<Int> lhs;
-    public Expression<Int> rhs;
+public class LessThan extends Tree implements Expression {
+	public Expression lhs, rhs;
 
-    public LessThan(Expression<Int> lhs, Expression<Int> rhs) {
-        this.lhs = lhs;
-        this.rhs = rhs;
-    }
+	public LessThan(Expression lhs, Expression rhs) {
+		this.lhs = lhs;
+		this.rhs = rhs;
+	}
 
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

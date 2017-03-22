@@ -1,20 +1,21 @@
 package ast.statement;
 
+import ast.ID;
+import ast.Tree;
 import ast.Visitor;
-import ast.expression.ID;
 
-public class MainClassDeclaration extends Statement {
-    public ID id, args;
-    public Statement body;
+public class MainClassDeclaration extends Tree implements Statement {
+	public ID id, args;
+	public Statement body;
 
-    public MainClassDeclaration(ID id, ID args, Statement body) {
-        this.id = id;
-        this.args = args;
-        this.body = body;
-    }
+	public MainClassDeclaration(ID id, ID args, Statement body) {
+		this.id = id;
+		this.args = args;
+		this.body = body;
+	}
 
-    @Override
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	@Override
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

@@ -1,20 +1,21 @@
 package ast.statement;
 
+import ast.Tree;
+import ast.Visitor;
 import ast.expression.Expression;
-import ast.type.Boolean;
 
-public class IfThenElse extends Statement {
-    public Expression<Boolean> expr;
-    public Statement then;
-    public Statement elze;  // we cannot use "else" here since it is a reserved word
+public class IfThenElse extends Tree implements Statement {
+	public Expression expr;
+	public Statement then;
+	public Statement elze;  // we cannot use "else" here since it is a reserved word
 
-    public IfThenElse(Expression<Boolean> expr, Statement then, Statement elze) {
-        this.expr = expr;
-        this.then = then;
-        this.elze = elze;
-    }
+	public IfThenElse(Expression expr, Statement then, Statement elze) {
+		this.expr = expr;
+		this.then = then;
+		this.elze = elze;
+	}
 
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

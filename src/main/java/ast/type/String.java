@@ -1,6 +1,9 @@
 package ast.type;
 
-public class String extends Type {
+import ast.Tree;
+import ast.Visitor;
+
+public class String extends Tree implements Type {
 
     @Override
     public <R> R accept(Visitor<R> v) {

@@ -1,16 +1,17 @@
 package ast.statement;
 
+import ast.Tree;
+import ast.Visitor;
 import ast.expression.Expression;
-import ast.type.String;
 
-public class Print extends Statement {
-    public Expression<String> msg;
+public class Print extends Tree implements Statement {
+	public Expression msg;
 
-    public Print(Expression<String> msg) {
-        this.msg = msg;
-    }
+	public Print(Expression msg) {
+		this.msg = msg;
+	}
 
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

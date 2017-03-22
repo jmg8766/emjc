@@ -1,3 +1,4 @@
 package ast.type;
 
-public abstract class Type extends Tree {}
+public interface Type {
+}

@@ -1,17 +1,18 @@
 package ast.statement;
 
+import ast.Tree;
 import ast.Visitor;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public class Block extends Statement {
-    public List<Statement> statements;
+public class Block extends Tree implements Statement {
+	public ArrayList<Statement> statements;
 
-    public Block(List<Statement> body) {
-        this.statements = body;
-    }
+	public Block(ArrayList<Statement> body) {
+		this.statements = body;
+	}
 
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

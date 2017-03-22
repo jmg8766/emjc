@@ -1,16 +1,17 @@
 package ast.expression;
 
-import ast.type.Boolean;
+import ast.Tree;
+import ast.Visitor;
 
-public class Not extends Expression<Boolean> {
+public class Not extends Tree implements Expression {
 
-    public Expression<Boolean> expr;
+	public Expression expr;
 
-    public Not(Expression<Boolean> expr) {
-        this.expr = expr;
-    }
+	public Not(Expression expr) {
+		this.expr = expr;
+	}
 
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

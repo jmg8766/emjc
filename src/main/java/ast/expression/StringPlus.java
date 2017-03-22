@@ -1,17 +1,18 @@
 package ast.expression;
 
-import ast.type.String;
+import ast.Tree;
+import ast.Visitor;
 
-public class StringPlus extends Expression<String> {
-    public Expression<String> lhs, rhs;
+public class StringPlus extends Tree implements Expression {
+	public Expression lhs, rhs;
 
-    public StringPlus(Expression<String> lhs, Expression<String> rhs) {
-        this.lhs = lhs;
-        this.rhs = rhs;
-    }
+	public StringPlus(Expression lhs, Expression rhs) {
+		this.lhs = lhs;
+		this.rhs = rhs;
+	}
 
-    @Override
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	@Override
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

@@ -20,7 +20,7 @@ public class Lexer {
      *
      * @param fileName - the name of the input file
      */
-    Lexer(final String fileName) {
+    public Lexer(final String fileName) {
         try (BufferedReader file = Files.newBufferedReader(Paths.get(fileName))) {
             // read the entire file into a char array
             cbuf = new char[(int)new File(fileName).length() + 1];

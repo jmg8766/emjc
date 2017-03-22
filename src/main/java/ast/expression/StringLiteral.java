@@ -1,11 +1,14 @@
 package ast.expression;
 
-import ast.type.String;
+import ast.Tree;
+import ast.Visitor;
 
-public class StringLiteral extends Expression<String> {
-    public String val;
+public class StringLiteral extends Tree implements Expression {
+    public java.lang.String val;
 
-    public StringLiteral(String val) {
+    public StringLiteral(int row, int col, java.lang.String val) {
+        this.row = row;
+        this.col = col;
         this.val = val;
     }
 

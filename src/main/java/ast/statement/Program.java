@@ -1,8 +1,11 @@
 package ast.statement;
 
+import ast.Tree;
+import ast.Visitor;
+
 import java.util.ArrayList;
 
-public class Program extends Tree {
+public class Program extends Tree implements Statement {
     public MainClassDeclaration main;
     public ArrayList<ClassDeclaration> classDeclarations;
 

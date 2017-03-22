@@ -1,13 +1,13 @@
 package ast.expression;
 
+import ast.Tree;
 import ast.Visitor;
-import ast.type.Boolean;
 
-public class And extends Expression<Boolean> {
-    public Expression<Boolean> lhs;
-    public Expression<Boolean> rhs;
+public class And extends Tree implements Expression {
+    public Expression lhs;
+    public Expression rhs;
 
-    public And(Expression<Boolean> lhs, Expression<Boolean> rhs) {
+    public And(Expression lhs, Expression rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
     }

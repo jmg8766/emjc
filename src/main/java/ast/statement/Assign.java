@@ -1,20 +1,20 @@
 package ast.statement;
 
+import ast.Tree;
 import ast.Visitor;
+import ast.expression.Assignable;
 import ast.expression.Expression;
-import ast.expression.ID;
-import ast.type.Type;
 
-public class Assign<T extends Type> extends Statement {
-    public ID id;
-    public Expression<T> expr;
+public class Assign extends Tree implements Statement {
+	public Assignable lhs;
+	public Expression rhs;
 
-    public Assign(ID id, Expression<T> expr) {
-        this.id = id;
-        this.expr = expr;
-    }
+	public Assign(Assignable lhs, Expression rhs) {
+		this.lhs = lhs;
+		this.rhs = rhs;
+	}
 
-    public <R> R accept(Visitor<R> v) {
-        return v.visit(this);
-    }
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }
