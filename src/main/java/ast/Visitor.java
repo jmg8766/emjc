@@ -1,6 +1,7 @@
 package ast;
 
 import ast.expression.*;
+import ast.expression.operators.*;
 import ast.statement.*;
 import ast.type.*;
 import ast.type.Boolean;
@@ -33,6 +34,8 @@ public interface Visitor<R> {
     R visit(Class n);
 
     // expression
+    R visit(NewObject n);
+    R visit(NewArray n);
     R visit(Precedence n);
     R visit(ArrayIndex n);
 	R visit(This n);

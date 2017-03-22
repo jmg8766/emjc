@@ -2,11 +2,11 @@ import ast.ID;
 import ast.SyntaxException;
 import ast.TypeIdList;
 import ast.expression.*;
+import ast.expression.operators.*;
 import ast.statement.*;
+import ast.type.*;
 import ast.type.Boolean;
-import ast.type.Int;
-import ast.type.IntArray;
-import ast.type.Type;
+import ast.type.String;
 import token.*;
 
 import java.util.ArrayList;
@@ -103,8 +103,19 @@ public class Parser {
 			case THIS:
 				return parseThis();
 			case NEW:
-				//TODO
-				return null;
+				int row = currentToken.row;
+				int col = currentToken.col;
+				currentToken = input.next();
+				if(currentToken.type == TokenType.INT) {
+					assertType(TokenType.LBRACKET);
+					Expression e = parseExpression();
+					assertType(TokenType.RBRACKET);
+					return new NewArray(row, col, e);
+				} else {
+					ID i = parseID();
+					assertType(TokenType.LPAREN);
+					assertType(TokenType.RPAREN);
+				}
 			case BANG:
 				return parseNot();
 			case LPAREN:
@@ -376,18 +387,25 @@ public class Parser {
 				}
 				return new Int();
 			case BOOLEAN:
-				currentToken = input.next();
-				return new Boolean();
+				return parseBoolean();
 			case STRING:
-				currentToken = input.next();
-				return new ast.type.String();
+				return parseString();
 			case ID:
-				currentToken = input.next();
 				return parseID();
 			default:
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Type instead of " + currentToken.type);
 		}
 	}
 
+	private Boolean parseBoolean() {
+		Boolean i = new Boolean(currentToken.row, currentToken.col);
+		currentToken = input.next();
+		return i;
+	}
 
+	private ast.type.String parseString() {
+		String i = new String(currentToken.row, currentToken.col);
+		currentToken = input.next();
+		return i;
+	}
 }

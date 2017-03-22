@@ -1,7 +1,8 @@
-package ast.expression;
+package ast.expression.operators;
 
 import ast.Tree;
 import ast.Visitor;
+import ast.expression.Expression;
 
 public class And extends Tree implements Expression {
     public Expression lhs;
