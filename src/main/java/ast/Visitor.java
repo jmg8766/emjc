@@ -51,4 +51,5 @@ public interface Visitor<R> {
     R visit(Not n);
     R visit(ID n);
     R visit(FunctionCall n);
+    R visit(Length n);
 }
