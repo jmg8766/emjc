@@ -118,11 +118,6 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 	}
 
 	@Override
-	public java.lang.String visit(Array n) {
-		return null; //TODO
-	}
-
-	@Override
 	public java.lang.String visit(IntLiteral n) {
 		return "(INTLIT " + n.value + ")";
 	}
@@ -133,12 +128,7 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 	}
 
 	@Override
-	public java.lang.String visit(StringPlus n) {
-		return "(+ " + n.lhs.accept(this) + " " + n.rhs.accept(this) + ")";
-	}
-
-	@Override
-	public java.lang.String visit(IntPlus n) {
+	public java.lang.String visit(Plus n) {
 		return "(+ " + n.lhs.accept(this) + " " + n.rhs.accept(this) + ")";
 	}
 

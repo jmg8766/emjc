@@ -40,9 +40,8 @@ public class Parser {
 		while (currentToken.type != TokenType.RPAREN) {
 			types.add(parseType());
 			ids.add(parseID());
-
-			if (assertType(TokenType.COMMA)) {    //TODO should we throw error if there is no entry followed by ,
-				if (assertType(TokenType.RPAREN)) throw new SyntaxException("");
+			if (assertType(TokenType.COMMA)) {
+				if (assertType(TokenType.RPAREN)) throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Parameters after , found none");
 			}
 		}
 
@@ -62,10 +61,9 @@ public class Parser {
 	 * @throws SyntaxException
 	 */
 	private void checkType(TokenType t) throws SyntaxException {
-		if (!(currentToken.type == t)) {
-			throw new SyntaxException("<" + currentToken.row + " >:<" + currentToken.col + " Expected " + t + " " +
-					"instead of " + currentToken.getClass());
-		}
+		if (!(currentToken.type == t))
+			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t +
+					"instead of " + currentToken.type);
 		currentToken = input.next();
 	}
 
@@ -126,9 +124,9 @@ public class Parser {
 					case LESSTHAN:
 						currentToken = input.next();
 						return new LessThan(expr1, parseExpression());
-					case PLUS: //TODO string conc
+					case PLUS:
 						currentToken = input.next();
-						return new IntPlus(expr1, parseExpression());
+						return new Plus(expr1, parseExpression());
 					case MINUS:
 						currentToken = input.next();
 						return new Minus(expr1, parseExpression());
@@ -138,11 +136,11 @@ public class Parser {
 					case DIV:
 						currentToken = input.next();
 						return new Division(expr1, parseExpression());
-					case LBRACE:
+					case LBRACKET:
 						currentToken = input.next();
 						Expression expr2 = parseExpression();
-						checkType(TokenType.RBRACE);
-						return null; //TODO create new in expression??
+						checkType(TokenType.RBRACKET);
+						return new ArrayIndex(expr1, expr2);
 					case DOT:
 						currentToken = input.next();
 						if (assertType(TokenType.LENGTH))
@@ -158,10 +156,9 @@ public class Parser {
 							return new FunctionCall(expr1, id, params);
 						}
 					default:
-						return null;
+						throw new SyntaxException(currentToken.row + ":" + currentToken.col + "error: Expected Expression " +
+								"instead of " + currentToken.type);
 				}
-
-
 		}
 	}
 
@@ -254,8 +251,7 @@ public class Parser {
 				Expression sidefExpr = parseExpression();
 				return new Sidef(sidefExpr);
 			default:
-				//TODO Verify we throw and error
-				throw new SyntaxException("");
+				throw new SyntaxException(currentToken.row + ":"+currentToken.col+ " error: Expected Statement instead of " + currentToken.type);
 		}
 	}
 
@@ -293,12 +289,9 @@ public class Parser {
 	}
 
 	private VarDeclaration parseVarDeclarations() throws SyntaxException {
-		int row = currentToken.row;
-		int col = currentToken.col;
+		int row = currentToken.row; int col = currentToken.col;
 		VarDeclaration variable = new VarDeclaration(parseType(), parseID());
-		variable.setRow(row);
-		variable.setCol(col);
-
+		variable.setRow(row); variable.setCol(col);
 		currentToken = input.next();
 		return variable;
 	}
@@ -320,7 +313,7 @@ public class Parser {
 			case LBRACE:
 				break;
 			default:
-				new SyntaxException(""); //TODO Add exception message
+				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead of " + currentToken.type);
 		}
 		currentToken = input.next();
 
@@ -392,7 +385,7 @@ public class Parser {
 				currentToken = input.next();
 				return parseID();
 			default:
-				throw new SyntaxException("");
+				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Type instead of " + currentToken.type);
 		}
 	}
 

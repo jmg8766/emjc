@@ -39,8 +39,7 @@ public interface Visitor<R> {
     R visit(BooleanLiteral n);
     R visit(IntLiteral n);
     R visit(StringLiteral n);
-    R visit(StringPlus n);
-    R visit(IntPlus n);
+    R visit(Plus n);
     R visit(Minus n);
     R visit(Times n);
     R visit(Division n);
