@@ -33,6 +33,7 @@ public interface Visitor<R> {
     R visit(Class n);
 
     // expression
+    R visit(Precedence n);
     R visit(ArrayIndex n);
 	R visit(This n);
     R visit(BooleanLiteral n);

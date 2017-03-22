@@ -3,8 +3,10 @@ import ast.SyntaxException;
 import ast.TypeIdList;
 import ast.expression.*;
 import ast.statement.*;
-import ast.type.*;
 import ast.type.Boolean;
+import ast.type.Int;
+import ast.type.IntArray;
+import ast.type.Type;
 import token.*;
 
 import java.util.ArrayList;
@@ -53,11 +55,16 @@ public class Parser {
 	}
 
 
-
-
-	private void checkType(TokenType type) throws SyntaxException {
-		if (!(currentToken.type == type)) {
-			throw new SyntaxException("<" + currentToken.row + " >:<" + currentToken.col + " Expected " + type + " " + "instead of " + currentToken.getClass());
+	/**
+	 * Checks that the current token has type t, then move the pointer forward
+	 *
+	 * @param t
+	 * @throws SyntaxException
+	 */
+	private void checkType(TokenType t) throws SyntaxException {
+		if (!(currentToken.type == t)) {
+			throw new SyntaxException("<" + currentToken.row + " >:<" + currentToken.col + " Expected " + t + " " +
+					"instead of " + currentToken.getClass());
 		}
 		currentToken = input.next();
 	}
@@ -76,7 +83,7 @@ public class Parser {
 	 * @return : the next token
 	 */
 	Token parse(TokenType t) {
-		if(currentToken.type != t); //error
+		if (currentToken.type != t) ; //error
 		Token ret = currentToken;
 		currentToken = input.next();
 		return ret;
@@ -88,24 +95,22 @@ public class Parser {
 			case INTLIT:
 				return parseIntLiteral();
 			case STRINGLIT:
-				return new StringLiteral(currentToken.row, currentToken.col, ((StringLiteralToken)currentToken).value);
+				return parseStringLiteral();
 			case TRUE:
-				return new BooleanLiteral(currentToken.row, currentToken.col, true);
+				return parseTrue();
 			case FALSE:
-				return new BooleanLiteral(currentToken.row, currentToken.col, false);
+				return parseFalse();
 			case ID:
 				return parseID();
 			case THIS:
-				return new This(currentToken.row, currentToken.col);
+				return parseThis();
 			case NEW:
 				//TODO
 				return null;
 			case BANG:
-				//TODO
-				return null;
+				return parseNot();
 			case LPAREN:
-				//TODO
-				return null;
+				return parsePrecedence();
 			default:
 				Expression expr1 = parseExpression();
 				switch (currentToken.type) {
@@ -125,8 +130,43 @@ public class Parser {
 	}
 
 	private IntLiteral parseIntLiteral() {
-		IntLiteral i = new IntLiteral(currentToken.row, currentToken.col, ((IntLiteralToken)currentToken).value);
+		IntLiteral i = new IntLiteral(currentToken.row, currentToken.col, ((IntLiteralToken) currentToken).value);
 		currentToken = input.next();
+		return i;
+	}
+
+	private StringLiteral parseStringLiteral() {
+		StringLiteral i = new StringLiteral(currentToken.row, currentToken.col, ((StringLiteralToken) currentToken)
+				.value);
+		currentToken = input.next();
+		return i;
+	}
+
+	private BooleanLiteral parseTrue() {
+		BooleanLiteral i = new BooleanLiteral(currentToken.row, currentToken.col, true);
+		currentToken = input.next();
+		return i;
+	}
+
+	private BooleanLiteral parseFalse() {
+		BooleanLiteral i = new BooleanLiteral(currentToken.row, currentToken.col, false);
+		currentToken = input.next();
+		return i;
+	}
+
+	private This parseThis() {
+		This i = new This(currentToken.row, currentToken.col);
+		currentToken = input.next();
+		return i;
+	}
+
+	private Not parseNot() throws SyntaxException {
+		return new Not(currentToken.row, currentToken.col, parseExpression());
+	}
+
+	private Precedence parsePrecedence() throws SyntaxException {
+		Precedence i = new Precedence(currentToken.row, currentToken.col, parseExpression());
+		checkType(TokenType.RPAREN);
 		return i;
 	}
 
@@ -290,7 +330,7 @@ public class Parser {
 		return main;
 	}
 
-// ================== TYPES =======================================================================================
+	// ================== TYPES =======================================================================================
 	private Type parseType() throws SyntaxException {
 		switch (currentToken.type) {
 			case INT:
@@ -313,4 +353,6 @@ public class Parser {
 				throw new SyntaxException("");
 		}
 	}
+
+
 }
