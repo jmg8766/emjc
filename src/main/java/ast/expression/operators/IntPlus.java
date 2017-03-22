@@ -1,12 +1,13 @@
-package ast.expression;
+package ast.expression.operators;
 
 import ast.Tree;
 import ast.Visitor;
+import ast.expression.Expression;
 
-public class StringPlus extends Tree implements Expression {
+public class IntPlus extends Tree implements Expression {
 	public Expression lhs, rhs;
 
-	public StringPlus(Expression lhs, Expression rhs) {
+	public IntPlus(Expression lhs, Expression rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 	}

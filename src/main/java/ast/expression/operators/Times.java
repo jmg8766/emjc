@@ -1,13 +1,13 @@
-package ast.expression;
+package ast.expression.operators;
 
 import ast.Tree;
 import ast.Visitor;
+import ast.expression.Expression;
 
-public class Division extends Tree implements Expression {
-
+public class Times extends Tree {
     public Expression lhs, rhs;
 
-    public Division(Expression lhs, Expression rhs) {
+    public Times(Expression lhs, Expression rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
     }

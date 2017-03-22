@@ -1,17 +1,17 @@
-package ast.expression;
+package ast.expression.operators;
 
 import ast.Tree;
 import ast.Visitor;
+import ast.expression.Expression;
 
-public class IntPlus extends Tree implements Expression {
+public class Minus extends Tree implements Expression {
 	public Expression lhs, rhs;
 
-	public IntPlus(Expression lhs, Expression rhs) {
+	public Minus(Expression lhs, Expression rhs) {
 		this.lhs = lhs;
 		this.rhs = rhs;
 	}
 
-	@Override
 	public <R> R accept(Visitor<R> v) {
 		return v.visit(this);
 	}
