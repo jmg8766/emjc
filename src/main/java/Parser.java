@@ -114,7 +114,49 @@ public class Parser {
 			default:
 				Expression expr1 = parseExpression();
 				switch (currentToken.type) {
-					//TODO
+					case AND:
+						currentToken = input.next();
+						return new And(expr1, parseExpression());
+					case OR:
+						currentToken = input.next();
+						return new Or(expr1, parseExpression());
+					case EQUALS:
+						currentToken = input.next();
+						return new Equals(expr1, parseExpression());
+					case LESSTHAN:
+						currentToken = input.next();
+						return new LessThan(expr1, parseExpression());
+					case PLUS: //TODO string conc
+						currentToken = input.next();
+						return new IntPlus(expr1, parseExpression());
+					case MINUS:
+						currentToken = input.next();
+						return new Minus(expr1, parseExpression());
+					case TIMES:
+						currentToken = input.next();
+						return new Times(expr1, parseExpression());
+					case DIV:
+						currentToken = input.next();
+						return new Division(expr1, parseExpression());
+					case LBRACE:
+						currentToken = input.next();
+						Expression expr2 = parseExpression();
+						checkType(TokenType.RBRACE);
+						return null; //TODO create new in expression??
+					case DOT:
+						currentToken = input.next();
+						if (assertType(TokenType.LENGTH))
+							return new Length(expr1);
+						else { //Function call
+							ID id = parseID();
+							checkType(TokenType.LPAREN);
+							ArrayList<Expression> params = new ArrayList<>();
+							while ((currentToken = input.next()).type != TokenType.RPAREN) {
+								params.add(parseExpression());
+								assertType(TokenType.COMMA);
+							}
+							return new FunctionCall(expr1, id, params);
+						}
 					default:
 						return null;
 				}
