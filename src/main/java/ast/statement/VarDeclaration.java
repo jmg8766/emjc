@@ -1,9 +1,7 @@
 package ast.statement;
 
 import ast.expression.ID;
-import ast.type.String;
 import ast.type.Type;
-import ast.Visitor;
 
 public class VarDeclaration extends Statement {
     public Type type;

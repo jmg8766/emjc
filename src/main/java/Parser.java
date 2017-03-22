@@ -1,7 +1,6 @@
 import ast.SyntaxException;
 import ast.TypeIdList;
-import ast.expression.Expression;
-import ast.expression.ID;
+import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 import ast.type.Boolean;
@@ -167,7 +166,7 @@ public class Parser {
         switch (currentToken.type) {
             case LBRACKET:
                 ArrayList<Statement> stmts = new ArrayList<>();
-                while (!assertType(TokenType.RBRACKET))
+                while ((currentToken = input.next()).type != TokenType.RBRACKET)
                     stmts.add(parseStatments());
                 currentToken = input.next();
                 return new Block(stmts);
@@ -297,9 +296,39 @@ public class Parser {
                 //TODO
                 return null;
             default:
-                Expression expr1 = parseExpression();
+                Expression epxr1 = parseExpression();
                 switch (currentToken.type) {
-                    //TODO
+                    case AND: currentToken = input.next(); return new And(epxr1, parseExpression());
+                    case OR: currentToken = input.next(); return new Or(epxr1, parseExpression());
+                    case EQUALS: currentToken = input.next(); return new Equals(epxr1, parseExpression());
+                    case LESSTHAN: currentToken = input.next(); return new LessThan(epxr1, parseExpression());
+                    case PLUS: //TODO string and int
+                        currentToken = input.next(); return new IntPlus(epxr1, parseExpression());
+                    case MINUS: currentToken = input.next();return new Minus(epxr1, parseExpression());
+                    case TIMES: currentToken = input.next(); return new Times(epxr1, parseExpression());
+                    case DIV: currentToken = input.next(); return new Division(epxr1, parseExpression());
+                    case LBRACE:
+                        currentToken = input.next();
+                        Expression expr2 = parseExpression();
+                        checkType(TokenType.RBRACE);
+                        return null; //TODO create new array in expression??
+                    case DOT:
+                        currentToken = input.next();
+                        if(assertType(TokenType.LENGTH))
+                            return null;
+                        if(assertType(TokenType.ID)) {
+                            checkType(TokenType.LPAREN);
+                            ID id = parseID();
+                            ArrayList<Expression> params = new ArrayList<>();
+                            params.add(parseExpression());
+                            while ((currentToken = input.next()).type != TokenType.RPAREN)
+                            {
+                                if(assertType(TokenType.COMMA))
+                                    params.add(parseExpression());
+                            }
+                            //TODO function call should have parent
+                        }
+                        else throw new SyntaxException("");
                     default:
                         return null;
                 }

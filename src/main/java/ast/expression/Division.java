@@ -1,7 +1,7 @@
 package ast.expression;
 
-import ast.type.Int;
 import ast.Visitor;
+import ast.type.Int;
 
 public class Division extends Expression<Int> {
 

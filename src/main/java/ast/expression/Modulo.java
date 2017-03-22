@@ -1,7 +1,5 @@
 package ast.expression;
 
-import ast.Visitor;
-
 public class Modulo extends Expression {
 	public Expression lhs;
 	public Expression rhs;

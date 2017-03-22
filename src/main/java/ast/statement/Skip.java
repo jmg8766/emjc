@@ -1,7 +1,5 @@
 package ast.statement;
 
-import ast.Visitor;
-
 /* Skip represents empty statement.
  * It is useful e.g. as "else" block of and if-then-else statement
  */

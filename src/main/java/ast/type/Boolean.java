@@ -1,7 +1,5 @@
 package ast.type;
 
-import ast.Visitor;
-
 public class Boolean extends Type {
 
     @Override

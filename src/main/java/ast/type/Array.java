@@ -1,7 +1,5 @@
 package ast.type;
 
-import ast.Visitor;
-
 public class Array<T extends Type> extends Type {
     public T[] val;
 

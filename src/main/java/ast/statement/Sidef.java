@@ -1,7 +1,7 @@
 package ast.statement;
 
-import ast.expression.Expression;
 import ast.Visitor;
+import ast.expression.Expression;
 
 public class Sidef extends Statement {
     public Expression expression;

@@ -1,7 +1,6 @@
 package ast.expression;
 
 import ast.type.String;
-import ast.Visitor;
 
 public class StringLiteral extends Expression<String> {
     public String val;

@@ -1,7 +1,6 @@
 package ast.expression;
 
 import ast.type.Int;
-import ast.Visitor;
 
 public class IntLiteral extends Expression<Int> {
     public int value;

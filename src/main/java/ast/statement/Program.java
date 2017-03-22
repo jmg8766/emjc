@@ -1,8 +1,5 @@
 package ast.statement;
 
-import ast.Tree;
-import ast.Visitor;
-
 import java.util.ArrayList;
 
 public class Program extends Tree {

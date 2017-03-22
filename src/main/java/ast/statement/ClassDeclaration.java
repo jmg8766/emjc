@@ -1,8 +1,7 @@
 package ast.statement;
 
-import ast.expression.ID;
-import ast.type.String;
 import ast.Visitor;
+import ast.expression.ID;
 
 import java.util.ArrayList;
 

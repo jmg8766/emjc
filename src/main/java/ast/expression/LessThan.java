@@ -1,7 +1,6 @@
 package ast.expression;
 
 import ast.type.Int;
-import ast.Visitor;
 
 public class LessThan extends Expression<Int> {
     public Expression<Int> lhs;

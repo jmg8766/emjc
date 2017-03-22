@@ -1,5 +1,4 @@
 import ast.TypeIdList;
-import ast.Visitor;
 import ast.expression.*;
 import ast.statement.*;
 import ast.type.Array;

@@ -2,7 +2,6 @@ package ast.statement;
 
 import ast.expression.Expression;
 import ast.type.Boolean;
-import ast.Visitor;
 
 public class IfThenElse extends Statement {
     public Expression<Boolean> expr;

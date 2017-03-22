@@ -1,7 +1,6 @@
 package ast.expression;
 
 import ast.type.Boolean;
-import ast.Visitor;
 
 public class Not extends Expression<Boolean> {
 

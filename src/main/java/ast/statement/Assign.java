@@ -1,9 +1,9 @@
 package ast.statement;
 
+import ast.Visitor;
 import ast.expression.Expression;
 import ast.expression.ID;
 import ast.type.Type;
-import ast.Visitor;
 
 public class Assign<T extends Type> extends Statement {
     public ID id;

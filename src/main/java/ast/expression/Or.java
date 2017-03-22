@@ -1,7 +1,7 @@
 package ast.expression;
 
-import ast.type.Boolean;
 import ast.Visitor;
+import ast.type.Boolean;
 
 public class Or extends Expression<Boolean> {
     public Expression<Boolean> lhs;
