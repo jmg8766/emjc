@@ -8,7 +8,7 @@ public class ParserTest {
 	@Test(dataProvider = "benchmarkFiles")
 	void testGenAstFile(File f) {
 		System.out.println("Generating ast file for " + f.getName());
-		Emjc.main(new String[] {"--ast", f.getName()});
+		Emjc.main(new String[] {"--ast", f.getPath()});
 	}
 
 	@Test

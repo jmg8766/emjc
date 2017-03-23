@@ -11,6 +11,7 @@ public class Emjc {
                     return;
                 case"--ast":
                     new Parser(new Lexer(args[1])).genAstFile();
+                    return;
             }
         }
         //print --help info
