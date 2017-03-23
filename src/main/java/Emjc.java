@@ -10,13 +10,13 @@ public class Emjc {
                     new Lexer(args[1]).genLexFile();
                     return;
                 case"--ast":
-                    //TODO:
-                    return;
+                    new Parser(new Lexer(args[1])).genAstFile();
             }
         }
         //print --help info
         System.out.println("Usage: emjc [option] [source file]");
         System.out.println("\nOptions:\n\t--lex\t\t generates output from lexical analysis");
         System.out.println("\t--ast\t\t generates output from syntactic analysis");
+        System.out.println("\t--help\t\t Prints a synopsis of options");
     }
 }

@@ -4,21 +4,37 @@ import ast.TypeIdList;
 import ast.expression.*;
 import ast.expression.operators.*;
 import ast.statement.*;
-import ast.type.*;
 import ast.type.Boolean;
+import ast.type.*;
 import ast.type.String;
 import token.*;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Parser {
 
 	private Lexer input;
 	private Token currentToken;
+	private java.lang.String outputFile;
 
-	Parser(Lexer lexer) throws SyntaxException {
+	Parser(Lexer lexer) {
 		this.input = lexer;
 		currentToken = input.next();
+		outputFile = lexer.inputFile.substring(0, lexer.inputFile.indexOf('.')) + ".ast";
+	}
+
+	void genAstFile() {
+		try (BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile))) {
+			out.write(parseProgram().accept(new ParseTreePrinter()));
+		} catch (IOException e) {
+			System.out.println("An IO error has occurred");
+		} catch (SyntaxException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	Program parseProgram() throws SyntaxException {
@@ -41,7 +57,9 @@ public class Parser {
 			types.add(parseType());
 			ids.add(parseID());
 			if (assertType(TokenType.COMMA)) {
-				if (assertType(TokenType.RPAREN)) throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Parameters after , found none");
+				if (assertType(TokenType.RPAREN))
+					throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " +
+							"Parameters" + " after , found none");
 			}
 		}
 
@@ -53,7 +71,6 @@ public class Parser {
 		return param;
 	}
 
-
 	/**
 	 * Checks that the current token has type t, then move the pointer forward
 	 *
@@ -62,8 +79,8 @@ public class Parser {
 	 */
 	private void checkType(TokenType t) throws SyntaxException {
 		if (!(currentToken.type == t))
-			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t +
-					"instead of " + currentToken.type);
+			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t + "instead "
+					+ "of " + currentToken.type);
 		currentToken = input.next();
 	}
 
@@ -93,7 +110,7 @@ public class Parser {
 				int row = currentToken.row;
 				int col = currentToken.col;
 				currentToken = input.next();
-				if(currentToken.type == TokenType.INT) {
+				if (currentToken.type == TokenType.INT) {
 					assertType(TokenType.LBRACKET);
 					Expression e = parseExpression();
 					assertType(TokenType.RBRACKET);
@@ -141,8 +158,7 @@ public class Parser {
 						return new ArrayIndex(currentToken.row, currentToken.col, expr1, expr2);
 					case DOT:
 						currentToken = input.next();
-						if (assertType(TokenType.LENGTH))
-							return new Length(currentToken.row, currentToken.col, expr1);
+						if (assertType(TokenType.LENGTH)) return new Length(currentToken.row, currentToken.col, expr1);
 						else { //Function call
 							ID id = parseID();
 							checkType(TokenType.LPAREN);
@@ -154,8 +170,8 @@ public class Parser {
 							return new FunctionCall(expr1, id, params);
 						}
 					default:
-						throw new SyntaxException(currentToken.row + ":" + currentToken.col + "error: Expected Expression " +
-								"instead of " + currentToken.type);
+						throw new SyntaxException(currentToken.row + ":" + currentToken.col + "error: Expected " +
+								"Expression " + "instead of " + currentToken.type);
 				}
 		}
 	}
@@ -207,8 +223,6 @@ public class Parser {
 		return i;
 	}
 
-	// ================== OPERATORS ===================================================================================
-
 	// ================== STATEMENTS ==================================================================================
 	private Statement parseStatement() throws SyntaxException {
 		int row = currentToken.row;
@@ -251,7 +265,8 @@ public class Parser {
 				Expression sidefExpr = parseExpression();
 				return new Sidef(sidefExpr);
 			default:
-				throw new SyntaxException(currentToken.row + ":"+currentToken.col+ " error: Expected Statement instead of " + currentToken.type);
+				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Statement " +
+						"instead of " + currentToken.type);
 		}
 	}
 
@@ -289,9 +304,11 @@ public class Parser {
 	}
 
 	private VarDeclaration parseVarDeclarations() throws SyntaxException {
-		int row = currentToken.row; int col = currentToken.col;
+		int row = currentToken.row;
+		int col = currentToken.col;
 		VarDeclaration variable = new VarDeclaration(parseType(), parseID());
-		variable.row = row; variable.col = col;
+		variable.row = row;
+		variable.col = col;
 		currentToken = input.next();
 		return variable;
 	}
@@ -313,7 +330,8 @@ public class Parser {
 			case LBRACE:
 				break;
 			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead of " + currentToken.type);
+				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead " +
+						"" + "" + "" + "" + "" + "of " + currentToken.type);
 		}
 		currentToken = input.next();
 
@@ -382,7 +400,8 @@ public class Parser {
 			case ID:
 				return parseID();
 			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Type instead of " + currentToken.type);
+				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Type instead "
+						+ "of " + currentToken.type);
 		}
 	}
 

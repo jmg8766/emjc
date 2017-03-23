@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 
 public class Lexer {
     // the names of the file being lexed and the tokenized file
-    private String inputFile, outputFile;
+    public String inputFile, outputFile;
     // an array of all characters in the inputFile
     private char[] cbuf;
     // the current row; the index in cbuf; the start of the current row; the number of tabs * 4
@@ -48,7 +48,7 @@ public class Lexer {
             out.write(token.toString() + '\n');
             out.flush(); out.close();
         } catch(IOException e ) {
-            throw new RuntimeException("An IO error occurred while attempting to write to " + outputFile);
+            System.out.println("An IO error occurred while attempting to write to " + outputFile);
         }
     }
 
