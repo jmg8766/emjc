@@ -1,7 +1,7 @@
 package ast;
 
-public class SyntaxException extends Exception {
-	public SyntaxException(String errorMessage) {
-		super(errorMessage);
-	}
+public class SyntaxException extends RuntimeException {
+    public SyntaxException(String errorMessage) {
+        super(errorMessage);
+    }
 }

@@ -32,12 +32,30 @@ public class Parser {
 			out.write(parseProgram().accept(new ParseTreePrinter()));
 		} catch (IOException e) {
 			System.out.println("An IO error has occurred");
-		} catch (SyntaxException e) {
-			System.out.println(e.getMessage());
 		}
 	}
 
-	Program parseProgram() throws SyntaxException {
+	/**
+	 * Checks that the current token has type t, then move the pointer forward
+	 *
+	 * @param t
+	 * @throws SyntaxException
+	 */
+	private void checkType(TokenType t) throws SyntaxException {
+		if (!(currentToken.type == t))
+			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t + " instead "
+					+ "of " + currentToken.type);
+		currentToken = input.next();
+	}
+
+	private boolean assertType(TokenType type) {
+		if (currentToken.type == type) {
+			currentToken = input.next();
+			return true;
+		} else return false;
+	}
+
+	private Program parseProgram() throws SyntaxException {
 		MainClassDeclaration main = parseMain();
 		ArrayList<ClassDeclaration> classes = new ArrayList<>();
 		while (currentToken.type != TokenType.EOF) {
@@ -69,26 +87,6 @@ public class Parser {
 
 		currentToken = input.next();
 		return param;
-	}
-
-	/**
-	 * Checks that the current token has type t, then move the pointer forward
-	 *
-	 * @param t
-	 * @throws SyntaxException
-	 */
-	private void checkType(TokenType t) throws SyntaxException {
-		if (!(currentToken.type == t))
-			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t + "instead "
-					+ "of " + currentToken.type);
-		currentToken = input.next();
-	}
-
-	private boolean assertType(TokenType type) {
-		if (currentToken.type == type) {
-			currentToken = input.next();
-			return true;
-		} else return false;
 	}
 
 	// ================== EXPRESSIONS =================================================================================
@@ -170,13 +168,15 @@ public class Parser {
 							return new FunctionCall(expr1, id, params);
 						}
 					default:
-						throw new SyntaxException(currentToken.row + ":" + currentToken.col + "error: Expected " +
-								"Expression " + "instead of " + currentToken.type);
+						throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected an " +
+								"Expression instead of " + currentToken.type);
 				}
 		}
 	}
 
-	private ID parseID() {
+	private ID parseID() throws SyntaxException {
+		if (currentToken.type != TokenType.ID)
+			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: expected an ID intead of " + currentToken.type);
 		ID id = new ID(currentToken.row, currentToken.col, ((IdentifierToken) currentToken).value);
 		currentToken = input.next();
 		return id;
@@ -252,7 +252,11 @@ public class Parser {
 				Statement whileStmt = parseStatement();
 				return new While(whileExpr, whileStmt);
 			case PRINTLN:
-				return new Print(parseExpression());
+				currentToken = input.next();
+				checkType(TokenType.LPAREN);
+				Expression printExpression = parseExpression();
+				checkType(TokenType.RPAREN);
+				return new Print(printExpression);
 			case ID:
 				ID id = parseID();
 				if (assertType(TokenType.LBRACE)) //TODO set type
@@ -331,7 +335,7 @@ public class Parser {
 				break;
 			default:
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead " +
-						"" + "" + "" + "" + "" + "of " + currentToken.type);
+						"" + "" + "" + "" + "" + "" + "" + "of " + currentToken.type);
 		}
 		currentToken = input.next();
 
@@ -357,7 +361,6 @@ public class Parser {
 		int row = currentToken.row;
 		int col = currentToken.col;
 
-		checkType(TokenType.ID);
 		ID className = parseID();
 		checkType(TokenType.LBRACE);
 		checkType(TokenType.PUBLIC);
@@ -369,10 +372,11 @@ public class Parser {
 		checkType(TokenType.LBRACKET);
 		checkType(TokenType.RBRACKET);
 
-		currentToken = input.next();
 		ID paramName = parseID();
+		checkType(TokenType.RPAREN);
+		checkType(TokenType.LBRACE);
 		Statement body = parseStatement();
-
+		checkType(TokenType.RBRACE);
 		checkType(TokenType.RBRACE);
 
 		MainClassDeclaration main = new MainClassDeclaration(className, paramName, body);
