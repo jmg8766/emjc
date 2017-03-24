@@ -24,6 +24,31 @@ class Primes {
     }
 }
 
+class Primes {
+    // generate the first 1000 primes really inefficiently
+    printPrimesSlow() {
+        int[] primes; int index = 0; String s = "";
+        primes = new PrimeGen().generatePrimesSlow(1000);
+        while(primes[index] != 0) {
+            s = s + primes[index] + " ";
+            index = index + 1;
+        }
+        System.out.println(s);
+    }
+
+    // generate the first 1000 primes slightly more efficiently
+    printPrimesFast() {
+        index = 0; s = "";
+        primes = new PrimeGen().generatePrimesFast(1000);
+        // report the result
+        while(primes[index] != 0) {
+            s = s + primes[index] + " ";
+            index = index + 1;
+        }
+        System.out.println(s);
+    }
+}
+
 class PrimeGen {
 
     // generates primes up to num really inefficiently

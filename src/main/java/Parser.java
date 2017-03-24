@@ -44,7 +44,7 @@ public class Parser {
 	private void checkType(TokenType t) throws SyntaxException {
 		if (!(currentToken.type == t))
 			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t + " instead " +
-					"" + "" + "" + "" + "" + "" + "" + "of " + currentToken.type);
+					"" + "" + "" + "" + "" + "" + "" + "" + "of " + currentToken.type);
 		currentToken = input.next();
 	}
 
@@ -137,39 +137,44 @@ public class Parser {
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected an " +
 						"Expression instead of " + currentToken.type);
 		}
+
+		return parseOperator(e);
+	}
+
+	private Expression parseOperator(Expression lhs) {
 		switch (currentToken.type) {
 			case AND:
 				currentToken = input.next();
-				return new And(currentToken.row, currentToken.col, e, parseExpression());
+				return new And(currentToken.row, currentToken.col, lhs, parseExpression());
 			case OR:
 				currentToken = input.next();
-				return new Or(currentToken.row, currentToken.col, e, parseExpression());
+				return new Or(currentToken.row, currentToken.col, lhs, parseExpression());
 			case EQUALS:
 				currentToken = input.next();
-				return new Equals(currentToken.row, currentToken.col, e, parseExpression());
+				return new Equals(currentToken.row, currentToken.col, lhs, parseExpression());
 			case LESSTHAN:
 				currentToken = input.next();
-				return new LessThan(currentToken.row, currentToken.col, e, parseExpression());
+				return new LessThan(currentToken.row, currentToken.col, lhs, parseExpression());
 			case PLUS:
 				currentToken = input.next();
-				return new Plus(currentToken.row, currentToken.col, e, parseExpression());
+				return new Plus(currentToken.row, currentToken.col, lhs, parseExpression());
 			case MINUS:
 				currentToken = input.next();
-				return new Minus(currentToken.row, currentToken.col, e, parseExpression());
+				return new Minus(currentToken.row, currentToken.col, lhs, parseExpression());
 			case TIMES:
 				currentToken = input.next();
-				return new Times(currentToken.row, currentToken.col, e, parseExpression());
+				return new Times(currentToken.row, currentToken.col, lhs, parseExpression());
 			case DIV:
 				currentToken = input.next();
-				return new Division(currentToken.row, currentToken.col, e, parseExpression());
+				return new Division(currentToken.row, currentToken.col, lhs, parseExpression());
 			case LBRACKET:
 				currentToken = input.next();
-				Expression expr2 = parseExpression();
+				Expression indexExpression = parseExpression();
 				checkType(TokenType.RBRACKET);
-				return new ArrayIndex(currentToken.row, currentToken.col, e, expr2);
+				return parseOperator(new ArrayIndex(currentToken.row, currentToken.col, lhs, indexExpression));
 			case DOT:
 				currentToken = input.next();
-				if (assertType(TokenType.LENGTH)) return new Length(currentToken.row, currentToken.col, e);
+				if (assertType(TokenType.LENGTH)) return new Length(currentToken.row, currentToken.col, lhs);
 				else { //Function call
 					ID id = parseID();
 					checkType(TokenType.LPAREN);
@@ -179,10 +184,10 @@ public class Parser {
 						assertType(TokenType.COMMA);
 					}
 					checkType(TokenType.RPAREN);
-					return new FunctionCall(e, id, params);
+					return new FunctionCall(lhs, id, params);
 				}
 			default:
-				return e;
+				return lhs;
 		}
 	}
 
@@ -373,7 +378,7 @@ public class Parser {
 				break;
 			default:
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead " +
-						"" + "" + "" + "of " + currentToken.type);
+						"" + "" + "" + "" + "of " + currentToken.type);
 		}
 		checkType(TokenType.LBRACE);
 
