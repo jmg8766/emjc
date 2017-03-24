@@ -44,7 +44,7 @@ public class Parser {
 	private void checkType(TokenType t) throws SyntaxException {
 		if (!(currentToken.type == t))
 			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t + " instead " +
-					"" + "" + "" + "of " + currentToken.type);
+					"" + "" + "" + "" + "" + "" + "of " + currentToken.type);
 		currentToken = input.next();
 	}
 
@@ -85,7 +85,6 @@ public class Parser {
 		param.row = row;
 		param.col = col;
 
-		currentToken = input.next();
 		return param;
 	}
 
@@ -174,15 +173,16 @@ public class Parser {
 					ID id = parseID();
 					checkType(TokenType.LPAREN);
 					ArrayList<Expression> params = new ArrayList<>();
-					while ((currentToken = input.next()).type != TokenType.RPAREN) {
+					currentToken = input.next();
+					while(currentToken.type != TokenType.RPAREN) {
 						params.add(parseExpression());
 						assertType(TokenType.COMMA);
 					}
+					checkType(TokenType.RPAREN);
 					return new FunctionCall(e, id, params);
 				}
 			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected an " +
-						"Expression instead of " + currentToken.type);
+				return e;
 		}
 	}
 
@@ -237,23 +237,23 @@ public class Parser {
 	}
 
 	// ================== STATEMENTS ==================================================================================
-	private Statement parseStatement() throws SyntaxException {
+	private Statement parseStatement(Assignable a) throws SyntaxException {
 		int row = currentToken.row;
 		int col = currentToken.col;
 		switch (currentToken.type) {
 			case LBRACKET: //BLOCK
 				ArrayList<Statement> stmts = new ArrayList<>();
-				while (!assertType(TokenType.RBRACKET)) stmts.add(parseStatement());
+				while (!assertType(TokenType.RBRACKET)) stmts.add(parseStatement(null));
 				currentToken = input.next();
 				return new Block(stmts);
 			case IF:
 				currentToken = input.next();
 				Expression expr = parseExpression();
 				checkType(TokenType.LPAREN);
-				Statement then = parseStatement();
+				Statement then = parseStatement(null);
 				Statement elze = null;
 				if (assertType(TokenType.ELSE)) {
-					elze = parseStatement();
+					elze = parseStatement(null);
 				}
 				IfThenElse ifThenElse = new IfThenElse(expr, then, elze);
 				ifThenElse.row = row;
@@ -262,7 +262,7 @@ public class Parser {
 			case WHILE:
 				currentToken = input.next();
 				Expression whileExpr = parseExpression();
-				Statement whileStmt = parseStatement();
+				Statement whileStmt = parseStatement(null);
 				return new While(whileExpr, whileStmt);
 			case PRINTLN:
 				currentToken = input.next();
@@ -272,7 +272,9 @@ public class Parser {
 				checkType(TokenType.SEMICOLON);
 				return new Print(printExpression);
 			case ID:
-				Assignable a = parseID();
+				a = parseID();
+			case EQSIGN:
+			case LBRACE:
 				if (currentToken.type == TokenType.LBRACE) {
 					currentToken = input.next();
 					a = new ArrayIndex(currentToken.row, currentToken.col, a, parseExpression());
@@ -287,6 +289,7 @@ public class Parser {
 				Expression sidefExpr = parseExpression();
 				checkType(TokenType.SEMICOLON);
 				return new Sidef(sidefExpr);
+
 			default:
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Statement " +
 						"instead of " + currentToken.type);
@@ -301,25 +304,39 @@ public class Parser {
 		ID id = parseID();
 		checkType(TokenType.LPAREN);
 
-
 		TypeIdList params = parseTypeIdList();
 
 		checkType(TokenType.RPAREN);
 		checkType(TokenType.LBRACE);
 
 		ArrayList<VarDeclaration> variables = new ArrayList<>();
-		while (currentToken.type != TokenType.RBRACE) {
-			variables.add(parseVarDeclarations());
-		}
-
 		ArrayList<Statement> statements = new ArrayList<>();
-		while (currentToken.type != TokenType.RETURN) {
-			statements.add(parseStatement());
+
+		while ((currentToken.type != TokenType.RBRACE && currentToken.type != TokenType.RETURN) || currentToken.type
+				== TokenType.INT || currentToken.type == TokenType.STRING || currentToken.type == TokenType.BOOLEAN) {
+			if (currentToken.type == TokenType.ID) {
+				ID i = parseID();
+				if (currentToken.type == TokenType.ID) {
+					variables.add(new VarDeclaration(i, parseID()));
+				} else {
+					statements.add(parseStatement(i));
+					break;
+				}
+			} else {
+				variables.add(new VarDeclaration(parseType(), parseID()));
+			}
+			checkType(TokenType.SEMICOLON);
 		}
 
-		Return returnExpression = new Return(parseType(), parseExpression());
+		while (currentToken.type != TokenType.RETURN) {
+			statements.add(parseStatement(null));
+		}
+
+		checkType(TokenType.RETURN);
+		Return returnExpression = new Return(parseExpression());
+		checkType(TokenType.SEMICOLON);
 		MethodDeclaration method = new MethodDeclaration(type, id, params, variables, statements, returnExpression);
-		currentToken = input.next();
+		checkType(TokenType.RBRACE);
 
 		method.row = row;
 		method.col = col;
@@ -332,7 +349,7 @@ public class Parser {
 		VarDeclaration variable = new VarDeclaration(parseType(), parseID());
 		variable.row = row;
 		variable.col = col;
-		currentToken = input.next();
+		checkType(TokenType.SEMICOLON);
 		return variable;
 	}
 
@@ -342,7 +359,7 @@ public class Parser {
 		int col = currentToken.col;
 		ID className = parseID();
 		ID parentName = null;
-		switch ((currentToken = input.next()).type) {
+		switch (currentToken.type) {
 			case EXTENDS:
 				currentToken = input.next();
 				parentName = parseID();
@@ -352,17 +369,17 @@ public class Parser {
 				break;
 			default:
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead " +
-						"" + "" + "" + "" + "" + "" + "" + "" + "" + "" + "of " + currentToken.type);
+						"" + "" + "of " + currentToken.type);
 		}
 		currentToken = input.next();
 
 		ArrayList<VarDeclaration> variables = new ArrayList<>();
-		while ((currentToken = input.next()).type != TokenType.PUBLIC && currentToken.type != TokenType.RBRACE) {
+		while (currentToken.type != TokenType.PUBLIC && currentToken.type != TokenType.RBRACE) {
 			variables.add(parseVarDeclarations());
 		}
 
 		ArrayList<MethodDeclaration> methods = new ArrayList<>();
-		while ((currentToken = input.next()).type != TokenType.RBRACE) {
+		while (currentToken.type != TokenType.RBRACE) {
 			methods.add(parseMethodDeclarations());
 		}
 		ClassDeclaration claz = new ClassDeclaration(className, parentName, variables, methods);
@@ -392,7 +409,7 @@ public class Parser {
 		ID paramName = parseID();
 		checkType(TokenType.RPAREN);
 		checkType(TokenType.LBRACE);
-		Statement body = parseStatement();
+		Statement body = parseStatement(null);
 		checkType(TokenType.RBRACE);
 		checkType(TokenType.RBRACE);
 
@@ -419,8 +436,8 @@ public class Parser {
 			case ID:
 				return parseID();
 			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Type instead "
-						+ "of " + currentToken.type);
+				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected type: Type " +
+						"instead " + "of " + currentToken.type);
 		}
 	}
 
