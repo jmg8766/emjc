@@ -16,7 +16,7 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 		StringBuilder b = new StringBuilder("(TY-ID-LIST ");
 		for (int i = 0; i < n.types.size(); i++) {
 			b.append("(").append(n.types.get(i).accept(this));
-			b.append(" (").append(n.ids.get(i).accept(this)).append("))");
+			b.append(" ").append(n.ids.get(i).accept(this)).append(")");
 		}
 		return b.append(")").toString();
 	}
@@ -45,17 +45,15 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(Block n) {
-		StringBuilder b = new StringBuilder("(BLOCK\n");
+		StringBuilder b = new StringBuilder("(BLOCK");
 		for (Statement s : n.statements) b.append("\n").append(s.accept(this));
 		return b.append(")").toString();
 	}
 
 	@Override
 	public java.lang.String visit(IfThenElse n) {
-		StringBuilder b = new StringBuilder("(IF ").append(n.expr.accept(this));
-		b.append("\n\t").append(n.then.accept(this));
-		b.append("\n\t").append(n.elze.accept(this));
-		return b.append("\n)").toString();
+		return new StringBuilder("(IF ").append(n.expr.accept(this)).append("\n\t").append(n.then.accept(this)).append
+				("\n\t").append(n.elze.accept(this)).append("\n)").toString();
 	}
 
 	@Override
@@ -76,7 +74,7 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 		if (n.parent != null) b.append("EXTENDS ").append(n.parent.accept(this));
 		for (VarDeclaration v : n.varDeclarations) b.append("\n").append(v.accept(this));
 		for (MethodDeclaration m : n.methodDeclarations) b.append("\n").append(m.accept(this));
-		return b.append("\n").append(")").toString();
+		return b.append(")").toString();
 	}
 
 	@Override
@@ -86,16 +84,15 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(MethodDeclaration n) {
-		StringBuilder b = new StringBuilder("(MTD-DECL ").append(n.id.accept(this));
-		b.append(" ").append(n.params.accept(this)).append("\n");
-		b.append(n.body.accept(this)).append("\n");
-		return b.append(n.returnExpr.accept(this)).append(")").toString();
+		return new StringBuilder("(MTD-DECL ").append(n.returnType.accept(this)).append(" ").append(n.id.accept(this))
+				.append(" ").append(n.params.accept(this)).append("\n").append(n.body.accept(this)).append(")")
+				.toString();
 	}
 
 	@Override
 	public java.lang.String visit(MainClassDeclaration n) {
 		StringBuilder b = new StringBuilder("(MAIN-CLASS ").append(n.id.accept(this));
-		b.append("\n").append("(MAIN-MTD-DECLR STRING[] ").append(n.args.accept(this));
+		b.append("\n").append("(MAIN-MTD-DECLR ").append(n.args.accept(this));
 		b.append("\n").append(n.body.accept(this));
 		return b.append("\n").append(")").toString();
 	}
@@ -217,9 +214,10 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(FunctionCall n) {
-		StringBuilder b = new StringBuilder("(FUN-CALL ").append(n.id.accept(this));
+		StringBuilder b = new StringBuilder("(DOT ").append(n.object.accept(this)).append(" (FUN-CALL ").append(n.id
+				.accept(this));
 		for (Expression e : n.params) b.append(" ").append(e.accept(this));
-		return b.append(")").toString();
+		return b.append("))").toString();
 	}
 
 	@Override

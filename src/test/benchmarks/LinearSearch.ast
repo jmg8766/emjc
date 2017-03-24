@@ -1,38 +1,34 @@
 (MAIN-CLASS (ID LinearSearch)
-(MAIN-MTD-DECLR STRING[] (ID a)
-(PRINT (FUN-CALL (ID Start) (INTLIT 10)))
+(MAIN-MTD-DECLR (ID a)
+(PRINT (DOT (NEW-OBJECT (ID LS)) (FUN-CALL (ID Start) (INTLIT 10))))
 )
 (CLASS (ID LS)
 (VAR-DECL INT[] (ID number))
 (VAR-DECL INT (ID size))
-(MTD-DECL (ID Start) (TY-ID-LIST (INT ((ID sz))))
+(MTD-DECL INT (ID Start) (TY-ID-LIST (INT (ID sz)))
 (BLOCK
-
 (VAR-DECL INT (ID aux01))
 (VAR-DECL INT (ID aux02))
-(EQSIGN (ID aux01) (FUN-CALL (ID Init) (ID sz)))
-(EQSIGN (ID aux02) (FUN-CALL (ID Print)))
+(EQSIGN (ID aux01) (DOT THIS (FUN-CALL (ID Init) (ID sz))))
+(EQSIGN (ID aux02) (DOT THIS (FUN-CALL (ID Print))))
 (PRINT (INTLIT 9999))
-(PRINT (FUN-CALL (ID Search) (INTLIT 8)))
-(PRINT (FUN-CALL (ID Search) (INTLIT 12)))
-(PRINT (FUN-CALL (ID Search) (INTLIT 17)))
-(PRINT (FUN-CALL (ID Search) (INTLIT 50))))
-(RETURN (INTLIT 55)))
-(MTD-DECL (ID Print) (TY-ID-LIST )
+(PRINT (DOT THIS (FUN-CALL (ID Search) (INTLIT 8))))
+(PRINT (DOT THIS (FUN-CALL (ID Search) (INTLIT 12))))
+(PRINT (DOT THIS (FUN-CALL (ID Search) (INTLIT 17))))
+(PRINT (DOT THIS (FUN-CALL (ID Search) (INTLIT 50))))
+(RETURN (INTLIT 55))))
+(MTD-DECL INT (ID Print) (TY-ID-LIST )
 (BLOCK
-
 (VAR-DECL INT (ID j))
 (EQSIGN (ID j) (INTLIT 1))
 (WHILE (< (ID j) (ID size))
 	(BLOCK
-
 (PRINT (ARRAY-INDEX (ID number) (ID j)))
 (EQSIGN (ID j) (+ (ID j) (INTLIT 1))))
-))
-(RETURN (INTLIT 0)))
-(MTD-DECL (ID Search) (TY-ID-LIST (INT ((ID num))))
+)
+(RETURN (INTLIT 0))))
+(MTD-DECL INT (ID Search) (TY-ID-LIST (INT (ID num)))
 (BLOCK
-
 (VAR-DECL INT (ID j))
 (VAR-DECL BOOLEAN (ID ls01))
 (VAR-DECL INT (ID ifound))
@@ -44,7 +40,6 @@
 (EQSIGN (ID ifound) (INTLIT 0))
 (WHILE (< (ID j) (ID size))
 	(BLOCK
-
 (EQSIGN (ID aux01) (ARRAY-INDEX (ID number) (ID j)))
 (EQSIGN (ID aux02) (+ (ID num) (INTLIT 1)))
 (IF (< (ID aux01) (ID num))
@@ -52,18 +47,16 @@
 	(IF (NOT (< (ID aux01) (ID aux02)))
 	(EQSIGN (ID nt) (INTLIT 0))
 	(BLOCK
-
 (EQSIGN (ID ls01) true)
 (EQSIGN (ID ifound) (INTLIT 1))
 (EQSIGN (ID j) (ID size)))
 )
 )
 (EQSIGN (ID j) (+ (ID j) (INTLIT 1))))
-))
-(RETURN (ID ifound)))
-(MTD-DECL (ID Init) (TY-ID-LIST (INT ((ID sz))))
+)
+(RETURN (ID ifound))))
+(MTD-DECL INT (ID Init) (TY-ID-LIST (INT (ID sz)))
 (BLOCK
-
 (VAR-DECL INT (ID j))
 (VAR-DECL INT (ID k))
 (VAR-DECL INT (ID aux01))
@@ -74,12 +67,10 @@
 (EQSIGN (ID k) (+ (ID size) (INTLIT 1)))
 (WHILE (< (ID j) (ID size))
 	(BLOCK
-
 (EQSIGN (ID aux01) (* (INTLIT 2) (ID j)))
 (EQSIGN (ID aux02) (- (ID k) (INTLIT 3)))
 (EQSIGN (ARRAY-INDEX (ID number) (ID j)) (+ (ID aux01) (ID aux02)))
 (EQSIGN (ID j) (+ (ID j) (INTLIT 1)))
 (EQSIGN (ID k) (- (ID k) (INTLIT 1))))
-))
-(RETURN (INTLIT 0)))
 )
+(RETURN (INTLIT 0)))))

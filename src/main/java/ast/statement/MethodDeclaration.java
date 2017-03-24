@@ -13,7 +13,6 @@ public class MethodDeclaration extends Tree implements Statement {
 	public ID id;
 	public TypeIdList params;
 	public Block body;
-	public Return returnExpr;
 
 	public MethodDeclaration(Type returnType, ID id, TypeIdList params, ArrayList<VarDeclaration> varDeclarations,
 	                         ArrayList<Statement> statements, Return returnExpr) {
@@ -23,7 +22,7 @@ public class MethodDeclaration extends Tree implements Statement {
 		body = new Block(new ArrayList<Statement>());
 		body.statements.addAll(varDeclarations);
 		body.statements.addAll(statements);
-		this.returnExpr = returnExpr;
+		body.statements.add(returnExpr);
 	}
 
 	@Override
