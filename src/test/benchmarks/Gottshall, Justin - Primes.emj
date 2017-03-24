@@ -1,0 +1,105 @@
+//author: Justin Gottshall & Dhanasekar Elangovan
+
+class Primes {
+
+    public static void main(String[] a) {
+        // generate the first 1000 primes really inefficiently
+        int[] primes; int index = 0; String s = "";
+        primes = new PrimeGen().generatePrimesSlow(1000);
+        while(primes[index] != 0) {
+            s = s + primes[index] + " ";
+            index = index + 1;
+        }
+        System.out.println(s);
+
+        // generate the first 1000 primes slightly more efficiently
+        index = 0; s = "";
+        primes = new PrimeGen().generatePrimesFast(1000);
+        // report the result
+        while(primes[index] != 0) {
+            s = s + primes[index] + " ";
+            index = index + 1;
+        }
+        System.out.println(s);
+    }
+}
+
+class PrimeGen {
+
+    // generates primes up to num really inefficiently
+    public int[] generatePrimesSlow(int num) {
+        int[] primes = new int[num];
+        primes[0] = 1;
+        int primesIndex = 1, i = 2;
+        while (i < num) {
+            if(this.isPrimeSlow(i)) {
+                primes[primesIndex] = i;
+                primesIndex = primesIndex + 1;
+            }
+            i = i + 1;
+        }
+        return primes;
+    }
+
+    // generates primes up to num faster than generatePrimesSlow
+    public int[] generatePrimesFast(int num) {
+        int[] primes = new int[num];
+        primes[0] = 1;
+        int primesIndex = 1, i = 3;
+        while (i < num) {
+            if (this.isPrimeFast(i)) {
+                primes[primesIndex] = i;
+                primesIndex = primesIndex + 1;
+            }
+            i = i + 2;
+        }
+        return primes;
+    }
+
+    // checks primality of a number very inefficiently
+    public boolean isPrimeSlow(int num) {
+        boolean isPrime = true;
+        if(new Math().isDivisible(num, 2)) isPrime = false;
+        int i = 2;
+        while (i < num) {
+            if(new Math().isDivisible(num, i)) isPrime = false;
+            i = i + 1;
+        }
+        return isPrime;
+    }
+
+    // checks primality of a number faster than isPrimeSlow
+    public boolean isPrimeFast(int num) {
+        if(new Math().isDivisible(num, 2)) return false;
+        int sqrt = new Math().sqrtFloor(num);
+        int i = 3;
+        while(i < sqrt + 1) {
+            if(new Math().isDivisible(num, i)) return false;
+            i = i + 2;
+        }
+        return true;
+    }
+}
+
+class Math {
+
+    // checks if a number if divisible by another number
+    public boolean isDivisible(int dividend, int divisor) {
+        int quotient = dividend / divisor;
+        return quotient * divisor == dividend;
+    }
+
+    // returns the floor of the square root of an integer
+    public int sqrtFloor(int num) {
+        int i = 2;
+        while ((i * i) < num) {
+            i = i + 1;
+        }
+
+        if(num < (i*i)) {
+            return i-1;
+        } else {
+            return i;
+        }
+    }
+}
