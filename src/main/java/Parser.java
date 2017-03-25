@@ -36,9 +36,10 @@ class Parser {
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (SyntaxException e) {
-			System.out.println("\t" + e.getMessage());
 		}
+//      catch (SyntaxException e) {
+//			System.out.println("\t" + e.getMessage());
+//		}
 	}
 
 	private void checkType(TokenType t) throws SyntaxException {
@@ -176,11 +177,8 @@ class Parser {
 				if (assertType(TokenType.LENGTH)) { //.length
 					return parseOperator(new Length(currentToken.row, currentToken.col, lhs));
 				}
-				ID id = parseID();
-				if (assertType(TokenType.LBRACKET)) { // .id[expr]
-					lhs = new ArrayIndex(currentToken.row, currentToken.col, id, parseExpression());
-					checkType(TokenType.RBRACKET);
-				} else { //.method(arg1, arg2...)
+				else { //.method(arg1, arg2...)
+					ID id = parseID();
 					checkType(TokenType.LPAREN);
 					ArrayList<Expression> params = new ArrayList<>();
 					while (currentToken.type != TokenType.RPAREN) {

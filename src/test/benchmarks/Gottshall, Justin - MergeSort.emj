@@ -77,31 +77,31 @@ class MergeSorter {
         oPtr = start;
 
         while (copyPtr < (end+1) ) {
-            tempArray[copyPtr] = this.inputArray[copyPtr];
+            tempArray[copyPtr] = inputArray[copyPtr];
             copyPtr = copyPtr + 1;
         }
 
         while (sPtr < (middle + 1) && mPtr < (end + 1)) {
 
-            if (this.tempArray[sPtr] < this.tempArray[mPtr]) {
-                inputArray[oPtr] = this.tempArray[sPtr];
+            if (tempArray[sPtr] < tempArray[mPtr]) {
+                inputArray[oPtr] = tempArray[sPtr];
                 oPtr = oPtr + 1;
                 sPtr = sPtr + 1;
             } else {
-                inputArray[oPtr] = this.tempArray[mPtr];
+                inputArray[oPtr] = tempArray[mPtr];
                 oPtr = oPtr + 1;
                 mPtr = mPtr + 1;
             }
         }
 
         while (sPtr < (middle + 1)) {
-            inputArray[oPtr] = this.tempArray[sPtr];
+            inputArray[oPtr] = tempArray[sPtr];
             oPtr = oPtr + 1;
             sPtr = sPtr + 1;
         }
 
         while (mPtr < (end + 1)) {
-            inputArray[oPtr] = this.tempArray[mPtr];
+            inputArray[oPtr] = tempArray[mPtr];
             oPtr = oPtr + 1;
             mPtr = mPtr + 1;
         }
