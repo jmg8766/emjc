@@ -15,7 +15,6 @@ public interface Visitor<R> {
     R visit(Program n);
     R visit(Print n);
     R visit(Assign n);
-    R visit(Skip n);
     R visit(Block n);
     R visit(IfThenElse n);
     R visit(While n);

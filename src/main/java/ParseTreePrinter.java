@@ -39,11 +39,6 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 	}
 
 	@Override
-	public java.lang.String visit(Skip n) {
-		return "SKIP";
-	}
-
-	@Override
 	public java.lang.String visit(Block n) {
 		StringBuilder b = new StringBuilder("(BLOCK");
 		for (Statement s : n.statements) b.append("\n").append(s.accept(this));
@@ -52,8 +47,8 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(IfThenElse n) {
-		return new StringBuilder("(IF ").append(n.expr.accept(this)).append("\n\t").append(n.then.accept(this)).append
-				("\n\t").append(n.elze.accept(this)).append("\n)").toString();
+		return "(IF " + n.expr.accept(this) + "\n\t" + n.then.accept(this) + "\n\t" + (n.elze == null ? "" : n.elze
+				.accept(this)) + "\n)";
 	}
 
 	@Override
@@ -84,9 +79,8 @@ public class ParseTreePrinter implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(MethodDeclaration n) {
-		return new StringBuilder("(MTD-DECL ").append(n.returnType.accept(this)).append(" ").append(n.id.accept(this))
-				.append(" ").append(n.params.accept(this)).append("\n").append(n.body.accept(this)).append(")")
-				.toString();
+		return "(MTD-DECL " + n.returnType.accept(this) + " " + n.id.accept(this) + " " + n.params.accept(this) + "\n"
+				+ n.body.accept(this) + ")";
 	}
 
 	@Override

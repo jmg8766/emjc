@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class Parser {
+class Parser {
 
 	private Lexer input;
 	private Token currentToken;
@@ -28,23 +28,23 @@ public class Parser {
 	}
 
 	void genAstFile() {
-		try (BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile))) {
-			out.write(parseProgram().accept(new ParseTreePrinter()));
+		try {
+			Program p = parseProgram();
+			BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile));
+			out.write(p.accept(new ParseTreePrinter()));
+			out.flush();
+			out.close();
 		} catch (IOException e) {
-			System.out.println("An IO error has occurred");
+			e.printStackTrace();
+		} catch (SyntaxException e) {
+			System.out.println("\t" + e.getMessage());
 		}
 	}
 
-	/**
-	 * Checks that the current token has type t, then move the pointer forward
-	 *
-	 * @param t
-	 * @throws SyntaxException
-	 */
 	private void checkType(TokenType t) throws SyntaxException {
 		if (!(currentToken.type == t))
 			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t + " instead " +
-					"" + "" + "" + "" + "" + "" + "" + "" + "of " + currentToken.type);
+					"" + "" + "" + "" + "" + "" + "" + "" + "" + "of " + currentToken.type);
 		currentToken = input.next();
 	}
 
@@ -68,8 +68,8 @@ public class Parser {
 		int row = currentToken.row;
 		int col = currentToken.col;
 
-		ArrayList<Type> types = new ArrayList();
-		ArrayList<ID> ids = new ArrayList();
+		ArrayList<Type> types = new ArrayList<>();
+		ArrayList<ID> ids = new ArrayList<>();
 
 		while (currentToken.type != TokenType.RPAREN) {
 			types.add(parseType());
@@ -137,7 +137,6 @@ public class Parser {
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected an " +
 						"Expression instead of " + currentToken.type);
 		}
-
 		return parseOperator(e);
 	}
 
@@ -174,9 +173,14 @@ public class Parser {
 				return parseOperator(new ArrayIndex(currentToken.row, currentToken.col, lhs, indexExpression));
 			case DOT:
 				currentToken = input.next();
-				if (assertType(TokenType.LENGTH)) return new Length(currentToken.row, currentToken.col, lhs);
-				else { //Function call
-					ID id = parseID();
+				if (assertType(TokenType.LENGTH)) { //.length
+					return parseOperator(new Length(currentToken.row, currentToken.col, lhs));
+				}
+				ID id = parseID();
+				if (assertType(TokenType.LBRACKET)) { // .id[expr]
+					lhs = new ArrayIndex(currentToken.row, currentToken.col, id, parseExpression());
+					checkType(TokenType.RBRACKET);
+				} else { //.method(arg1, arg2...)
 					checkType(TokenType.LPAREN);
 					ArrayList<Expression> params = new ArrayList<>();
 					while (currentToken.type != TokenType.RPAREN) {
@@ -184,8 +188,9 @@ public class Parser {
 						assertType(TokenType.COMMA);
 					}
 					checkType(TokenType.RPAREN);
-					return new FunctionCall(lhs, id, params);
+					lhs = new FunctionCall(lhs, id, params);
 				}
+				return parseOperator(lhs);
 			default:
 				return lhs;
 		}
@@ -294,7 +299,9 @@ public class Parser {
 				return new Assign(a, idExpr);
 			case SIDEF:
 				currentToken = input.next();
+				checkType(TokenType.LPAREN);
 				Expression sidefExpr = parseExpression();
+				checkType(TokenType.RPAREN);
 				checkType(TokenType.SEMICOLON);
 				return new Sidef(sidefExpr);
 
@@ -378,7 +385,7 @@ public class Parser {
 				break;
 			default:
 				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead " +
-						"" + "" + "" + "" + "of " + currentToken.type);
+						"" + "" + "" + "" + "" + "of " + currentToken.type);
 		}
 		checkType(TokenType.LBRACE);
 

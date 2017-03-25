@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 public class Providers {
 
-	@DataProvider
+	@DataProvider(parallel = false)
     public static Iterator<Object[]> benchmarkFiles() {
         return Arrays
                 .stream(new File("src/test/benchmarks").listFiles())

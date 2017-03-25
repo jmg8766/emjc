@@ -164,7 +164,7 @@
 )
 	(BLOCK
 (IF (ID is_root)
-	(IF (&& (NOT (DOT (ID current_node) (FUN-CALL (ID GetHas_Right)))) (NOT (DOT (ID current_node) (FUN-CALL (ID GetHas_Left)))))
+	(IF (NOT (&& (DOT (ID current_node) (FUN-CALL (ID GetHas_Right))) (NOT (DOT (ID current_node) (FUN-CALL (ID GetHas_Left))))))
 	(EQSIGN (ID ntb) true)
 	(EQSIGN (ID ntb) (DOT THIS (FUN-CALL (ID Remove) (ID parent_node) (ID current_node))))
 )

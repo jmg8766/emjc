@@ -1,27 +1,45 @@
 //author: Dhanasekar Elangovan & Justin Gottshall
 //The class implements mergesort
-public class MergeSort {
+class MergeSort {
     public static void main(String[] args) {
-
-        MergeSorter sorter = new MergeSorter();
-        sorter.tempArray = new int[sorter.inputArray.length];
-
-        sorter.mergeSort(0, sorter.inputArray.length - 1);
-
-        int i = 0;
-        while (i < sorter.inputArray.length) {
-            System.out.println(sorter.inputArray[i]);
-            i = i + 1;
-        }
-    }
+    	sidef(new MergeSortPrinter().print());
+   }
 }
 
+class MergeSortPrinter {
+    MergeSorter sorter;
+    int[] inputArray;
+    int i;
+
+    public int print() {
+        inputArray = new int[11];
+        inputArray[0] = 16;
+        inputArray[1] = 13;
+        inputArray[2] = 14;
+        inputArray[3] = 40;
+        inputArray[4] = 3;
+        inputArray[5] = 32;
+        inputArray[6] = 7;
+        inputArray[7] = 22;
+        inputArray[8] = 19;
+        inputArray[9] = 8;
+        inputArray[10] = 13;
+        sorter = new MergeSorter();
+        sidef(sorter.setInputArray(inputArray));
+        sidef(sorter.mergeSort(0, sorter.getInputArray().length - 1));
+        i = 0;
+        while (i < sorter.getInputArray().length) {
+            System.out.println(sorter.getInputArray()[i]);
+            i = i + 1;
+        }
+        return 0;
+    }
+}
 
 class MergeSorter {
 
     int[] tempArray;
-    int[] inputArray = {16, 13, 40, 3, 32, 7, 22, 19, 8, 13};
-
+    int[] inputArray;
 
     /**
      * Performs merge sort
@@ -30,19 +48,16 @@ class MergeSorter {
      * @param end
      */
     public int mergeSort(int start, int end) {
-
+        int middle;
         if (start < end) {
-            int middle = (start + end) / 2;
-
-            this.mergeSort(start, middle);
-            this.mergeSort(middle + 1, end);
-
-            this.merge(start, middle, end);
+            middle = (start + end) / 2;
+            sidef(this.mergeSort(start, middle));
+            sidef(this.mergeSort(middle + 1, end));
+            sidef(this.merge(start, middle, end));
         }
 
         return 0;
     }
-
 
     /**
      * Merges the given two segments into a single segment in increasing order
@@ -52,38 +67,41 @@ class MergeSorter {
      * @param end
      */
     public int merge(int start, int middle, int end) {
-
-        int copyPtr = start;
-        int sPtr = start;
-        int mPtr = middle + 1;
-        int oPtr = start;
+        int copyPtr;
+        int sPtr;
+        int mPtr;
+        int oPtr;
+        copyPtr = start;
+        sPtr = start;
+        mPtr = middle + 1;
+        oPtr = start;
 
         while (copyPtr < (end+1) ) {
-            this.tempArray[copyPtr] = this.inputArray[copyPtr];
+            tempArray[copyPtr] = this.inputArray[copyPtr];
             copyPtr = copyPtr + 1;
         }
 
         while (sPtr < (middle + 1) && mPtr < (end + 1)) {
 
             if (this.tempArray[sPtr] < this.tempArray[mPtr]) {
-                this.inputArray[oPtr] = this.tempArray[sPtr];
+                inputArray[oPtr] = this.tempArray[sPtr];
                 oPtr = oPtr + 1;
                 sPtr = sPtr + 1;
             } else {
-                this.inputArray[oPtr] = this.tempArray[mPtr];
+                inputArray[oPtr] = this.tempArray[mPtr];
                 oPtr = oPtr + 1;
                 mPtr = mPtr + 1;
             }
         }
 
         while (sPtr < (middle + 1)) {
-            this.inputArray[oPtr] = this.tempArray[sPtr];
+            inputArray[oPtr] = this.tempArray[sPtr];
             oPtr = oPtr + 1;
             sPtr = sPtr + 1;
         }
 
         while (mPtr < (end + 1)) {
-            this.inputArray[oPtr] = this.tempArray[mPtr];
+            inputArray[oPtr] = this.tempArray[mPtr];
             oPtr = oPtr + 1;
             mPtr = mPtr + 1;
         }
@@ -91,4 +109,12 @@ class MergeSorter {
         return 0;
     }
 
+    public int setInputArray(int[] newArray) {
+    	inputArray = newArray;
+    	return 0;
+    }
+
+    public int[] getInputArray() {
+    	return inputArray;
+    }
 }
