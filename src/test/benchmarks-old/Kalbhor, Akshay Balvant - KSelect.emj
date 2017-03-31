@@ -25,7 +25,7 @@ class Select {
 			return 0;
 		}
 		
-		if (k > right) {
+		if (right < k) {
 			System.out.println("Value of k is invalid");
 			return 0;
 		}

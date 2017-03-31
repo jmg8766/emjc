@@ -2,11 +2,20 @@
 
 class QuickSort {
 	public static void main(String[] args) {
+		System.out.println(new TestSuite().start());
+	}
+
+}
+
+class TestSuite {
+	public int start() {
 		SortClass sort;
-		sort = new SortClass();
 		int[] input;
 		int[] results;
+		int i;
+		
 		input = new int[10];
+		sort = new SortClass();
 		
 		input[0] = 25;
 		input[1] = 14;
@@ -20,56 +29,58 @@ class QuickSort {
 		input[9] = 130;
 		
 		results = sort.sort(input);
-		int i;
+		
 		i = 0;
 		while (i < 10) {
 			System.out.println("I = " + i);
 			System.out.println("X = " + results[i]);
 			i = i + 1;
 		}
+		
+		return 0;
 	}
-
 }
 
 class SortClass {
 	int[] array;
-	int length;
+	int size;
 	
 	public int[] sort(int[] inputArray) {
-		this.array = inputArray;
-		this.length = inputArray.length;
-		quickSort(0, this.length - 1);
-		return this.array;
+		array = inputArray;
+		size = inputArray.length;
+		sidef(this.quickSort(0, size - 1));
+		return array;
 	}
 	
 	public int quickSort(int lowerIndex, int higherIndex) {
 		int i;
 		int j;
+		int pivot;
+		
 		i = lowerIndex;
 		j = higherIndex;
 		
-		int pivot;
 		pivot = array[lowerIndex + (higherIndex-lowerIndex)/2];
 		
 		while (i < (j+1)) {
-			while (this.array[i] < pivot) {
+			while (array[i] < pivot) {
 				i = i + 1;
 			}
-			while (pivot < this.array[j]) {
+			while (pivot < array[j]) {
 				j = j - 1;
 			}
 			if (i < (j + 1)) {
-				exchangeNumbers(i, j);
+				sidef(this.exchangeNumbers(i, j));
 				i = i + 1;
 				j = j - 1;
 			}
 		}
 		
 		if (lowerIndex < j) {
-			quickSort(lowerIndex, j);
+			sidef(this.quickSort(lowerIndex, j));
 		}
 		if (i < higherIndex) {
-			quickSort(i, higherIndex);
+			sidef(this.quickSort(i, higherIndex));
 		}
 		return 0;
 	}

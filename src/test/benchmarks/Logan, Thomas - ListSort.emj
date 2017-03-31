@@ -1,13 +1,22 @@
-public class ListSort {
+class listSort {
 
      public static void main ( String [ ] args ) {
-         Maker m; List l; int[] arr;
-         String arrString; int i;
+           sidef(        new Start()  .  start()   );
+
+     }
+
+}
+
+class Start {
+  public int start () {
+
+       Maker m; List l; int[] arr;
+       String arrString; int i;
 
          m = new Maker();
          l = m.cons(54, m.cons(73, m.cons(7, m.cons(42, m.cons(33, m.cons(7, m.nil()))))));
           System.out.println ("list: " + l.toString()) ;
-          System.out.println ("sorted list: " + l.sort().toString()) ;
+          System.out.println ("sorted list: " + (l.sort()).toString()) ;
           arr = l.toArray();
           arrString = "";
           i = 0;
@@ -16,8 +25,8 @@ public class ListSort {
             i = i + 1;
           }
           System.out.println ("array: " + arrString) ;
-     }
-
+          return 0;
+  }
 }
 
 class Maker {

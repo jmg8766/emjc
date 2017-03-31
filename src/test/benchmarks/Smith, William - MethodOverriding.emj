@@ -2,63 +2,72 @@
 
 class MethodOverriding {
 	public static void main (String[] args) {
+		System.out.println(new TestSuite().start());
+	}
+}
+
+class TestSuite {
+	public int start() {
 		Rectangle A;
-		A = new Rectangle();
 		Square B;
+		int aArea;
+		int aPerim;
+		int bArea;
+		int bPerim;
+		
+		A = new Rectangle();
 		B= new Square();
 		
-		A.setHeight(5);
-		A.setLength(10);
-		B.setHeight(5);
-		B.setLength(5);
+		sidef(A.setHeight(5));
+		sidef(A.setLength(10));
+		sidef(B.setHeight(5));
+		sidef(B.setLength(5));
 		
-		int aArea;
 		aArea = A.area();
-		int aPerim;
 		aPerim = A.perimeter();
-		int bArea;
 		bArea = B.area();
-		int bPerim;
 		bPerim = B.perimeter();
 		
 		System.out.println("A Area: " + aArea);
 		System.out.println("A Perimeter: " + aPerim);
 		System.out.println("B Area: " + bArea);
 		System.out.println("B Perimeter: " + bPerim);
+		
+		return 0;
 	}
 }
 
 class Rectangle {
-	int height;
-	int length;
+	int h;
+	int l;
 	
-	public int setHeight(int h) {
-		this.height = h;
+	public int setHeight(int h2) {
+		h = h2;
 		return 0;
 	}
 	
-	public int setLength(int l) {
-		this.length = l;
+	public int setLength(int l1) {
+		l = l1;
 		return 0;
 	}
 	
 	public int area() {
-		return this.length * this.height;
+		return l * h;
 	}
 	
 	public int perimeter() {
-		return this.length * 2 + this.height * 2;
+		return l * 2 + h * 2;
 	}
 }
 
 class Square extends Rectangle {
 	public int area() {
 		System.out.println("I'm a square!");
-		return this.length * this.height;
+		return l * h;
 	}
 	
 	public int perimeter() {
 		System.out.println("My sides are all equal");
-		return this.length * 4;
+		return l * 4;
 	}
 }

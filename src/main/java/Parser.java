@@ -36,10 +36,9 @@ class Parser {
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (SyntaxException e) {
+			System.out.println("\t" + e.getMessage());
 		}
-//      catch (SyntaxException e) {
-//			System.out.println("\t" + e.getMessage());
-//		}
 	}
 
 	private void checkType(TokenType t) throws SyntaxException {

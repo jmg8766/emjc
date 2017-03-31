@@ -122,14 +122,19 @@ class HeapS {
 
 	public int print() {
 		int count;
-
+		String toPrint;
+		String attach;
+		
 		count = 0;
-		System.out.print("[");
+		attach = "";
+		toPrint = "[";
 		while (count < data.length) {
-			System.out.print(" " + data[count]);
+			attach = " " + data[count];
+			toPrint = toPrint + attach;
 			count = count + 1;
 		}
-		System.out.println(" ]");
+		toPrint = toPrint + "]";
+		System.out.println(toPrint);
 		return 0;
 	}
 }
