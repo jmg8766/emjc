@@ -1,14 +1,12 @@
 package ast.statement;
 
-import ast.ID;
-import ast.Tree;
-import ast.TypeIdList;
-import ast.Visitor;
+import ast.*;
 import ast.type.Type;
 
 import java.util.ArrayList;
 
-public class MethodDeclaration extends Tree implements Statement {
+public class MethodDeclaration extends Tree implements Statement, Binding {
+
 	public Type returnType;
 	public ID id;
 	public TypeIdList params;

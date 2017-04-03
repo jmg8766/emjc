@@ -1,12 +1,13 @@
 package ast.statement;
 
+import ast.Binding;
 import ast.ID;
 import ast.Tree;
 import ast.Visitor;
 
 import java.util.ArrayList;
 
-public class ClassDeclaration extends Tree implements Statement {
+public class ClassDeclaration extends Tree implements Statement, Binding {
 	public ID id, parent;
 	public ArrayList<VarDeclaration> varDeclarations;
 	public ArrayList<MethodDeclaration> methodDeclarations;
