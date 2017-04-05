@@ -1,7 +1,7 @@
-package ast.type;
+package ast;
 
 /**
  * Created by justin on 4/3/17.
  */
-public class Type {
+public class MethodDecl {
 }
