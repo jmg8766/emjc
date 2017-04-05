@@ -1,7 +1,7 @@
-package ast.type;
+package oldast.type;
 
-import ast.Tree;
-import ast.Visitor;
+import oldast.Tree;
+import oldast.Visitor;
 
 public class Int extends Tree implements Type {
 

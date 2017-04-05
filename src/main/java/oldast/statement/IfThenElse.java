@@ -1,8 +1,8 @@
-package ast.statement;
+package oldast.statement;
 
-import ast.Tree;
-import ast.Visitor;
-import ast.expression.Expression;
+import oldast.Tree;
+import oldast.Visitor;
+import oldast.expression.Expression;
 
 public class IfThenElse extends Tree implements Statement {
 	public Expression expr;

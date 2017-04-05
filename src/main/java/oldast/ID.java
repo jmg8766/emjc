@@ -1,7 +1,7 @@
-package ast;
+package oldast;
 
-import ast.expression.Assignable;
-import ast.type.Type;
+import oldast.expression.Assignable;
+import oldast.type.Type;
 
 public class ID extends Tree implements Assignable, Type {
 	public Binding binding;

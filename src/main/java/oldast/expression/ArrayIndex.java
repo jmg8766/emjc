@@ -1,7 +1,7 @@
-package ast.expression;
+package oldast.expression;
 
-import ast.Tree;
-import ast.Visitor;
+import oldast.Tree;
+import oldast.Visitor;
 
 public class ArrayIndex extends Tree implements Assignable, Expression {
 	public Expression array, index;

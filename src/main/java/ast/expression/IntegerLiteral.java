@@ -1,7 +1,9 @@
 package ast.expression;
 
-/**
- * Created by justin on 4/3/17.
- */
 public class IntegerLiteral {
+	public int i;
+
+	public IntegerLiteral(int i) {
+		this.i = i;
+	}
 }

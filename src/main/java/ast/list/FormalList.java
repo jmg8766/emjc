@@ -1,7 +1,9 @@
 package ast.list;
 
-/**
- * Created by justin on 4/3/17.
- */
+import ast.Formal;
+
+import java.util.Vector;
+
 public class FormalList {
+	public Vector<Formal> list = new Vector();
 }

@@ -1,10 +1,10 @@
-package ast.statement;
+package oldast.statement;
 
-import ast.Binding;
-import ast.ID;
-import ast.Tree;
-import ast.Visitor;
-import ast.type.Type;
+import oldast.Binding;
+import oldast.ID;
+import oldast.Tree;
+import oldast.Visitor;
+import oldast.type.Type;
 
 public class VarDeclaration extends Tree implements Statement, Binding {
     public Type type;

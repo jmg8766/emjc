@@ -1,7 +1,13 @@
 package ast;
 
-/**
- * Created by justin on 4/5/17.
- */
-public class VarDecl {
+import ast.type.Type;
+
+public class VarDecl implements Binding {
+	public Type t;
+	public Identifier i;
+
+	public VarDecl(Type t, Identifier i) {
+		this.t = t;
+		this.i = i;
+	}
 }

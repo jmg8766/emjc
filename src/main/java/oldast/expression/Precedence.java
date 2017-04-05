@@ -1,7 +1,7 @@
-package ast.expression;
+package oldast.expression;
 
-import ast.Tree;
-import ast.Visitor;
+import oldast.Tree;
+import oldast.Visitor;
 
 public class Precedence extends Tree implements Expression {
 	public Expression expr;

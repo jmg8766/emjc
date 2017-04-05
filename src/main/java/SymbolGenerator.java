@@ -1,22 +1,20 @@
-import ast.Binding;
-import ast.ID;
-import ast.TypeIdList;
-import ast.Visitor;
-import ast.expression.*;
-import ast.expression.operators.*;
-import ast.statement.*;
-import ast.type.Boolean;
-import ast.type.Int;
-import ast.type.IntArray;
-import ast.type.String;
+import oldast.Binding;
+import oldast.ID;
+import oldast.TypeIdList;
+import oldast.Visitor;
+import oldast.expression.*;
+import oldast.expression.operators.*;
+import oldast.statement.*;
+import oldast.type.Boolean;
+import oldast.type.Int;
+import oldast.type.IntArray;
+import oldast.type.String;
+import symbol.Symbol;
 
-import java.util.Hashtable;
-import java.util.Stack;
+import java.util.HashMap;
 
 public class SymbolGenerator implements Visitor {
-
-	Hashtable<ID, Binding> symbols = new Hashtable<>();
-	Stack<ID> ids;
+	HashMap<Symbol, Binding> global, curClass, curMethod;
 
 	@Override
 	public Object visit(TypeIdList n) {
@@ -25,6 +23,14 @@ public class SymbolGenerator implements Visitor {
 
 	@Override
 	public Object visit(Program n) {
+		global = new HashMap<>();
+		global.put(Symbol.symbol(n.main.id.id), n.main);
+		n.classDeclarations.forEach(c -> global.put(Symbol.symbol(c.id.id), c));
+		n.main.accept(this);
+		n.classDeclarations.forEach(c -> {
+			curClass = new HashMap<>();
+			c.accept(this);
+		});
 		return null;
 	}
 
@@ -60,6 +66,7 @@ public class SymbolGenerator implements Visitor {
 
 	@Override
 	public Object visit(ClassDeclaration n) {
+		if(n.parent != null) n.a
 		return null;
 	}
 
@@ -75,6 +82,8 @@ public class SymbolGenerator implements Visitor {
 
 	@Override
 	public Object visit(MainClassDeclaration n) {
+		global.put(Symbol.symbol(n.id.id), n);
+		curMethod.clear(); curMethod.put(Symbol.symbol(n.args.id)):
 		return null;
 	}
 

@@ -1,7 +1,9 @@
 package ast.expression;
 
-/**
- * Created by justin on 4/3/17.
- */
 public class IdentifierExp {
+	public String s;
+
+	public IdentifierExp(String s) {
+		this.s = s;
+	}
 }

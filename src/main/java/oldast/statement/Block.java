@@ -1,7 +1,7 @@
-package ast.statement;
+package oldast.statement;
 
-import ast.Tree;
-import ast.Visitor;
+import oldast.Tree;
+import oldast.Visitor;
 
 import java.util.ArrayList;
 

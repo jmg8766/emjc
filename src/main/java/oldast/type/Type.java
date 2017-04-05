@@ -1,6 +1,6 @@
-package ast.type;
+package oldast.type;
 
-import ast.Visitor;
+import oldast.Visitor;
 
 public interface Type {
 

@@ -1,39 +1,36 @@
 package symbol;
 
-import ast.Binding;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Stack;
 
-public class HashT {
-	Hashtable<>
+public class Table<R> {
+	private final HashMap<Symbol, LinkedList<R>> table = new HashMap<>();
+	private final Stack<Symbol> scope = new Stack<>();
 
-	final int SIZE = 256;
-	Bucket[] table = new Bucket[SIZE];
-
-	public void insert(Symbol s, Binding b) {
-		int index = s.hashCode() % SIZE;
-		table[index] = new Bucket(s, b, table[index]);
+	public void put(String key, R value) {
+		Symbol s = Symbol.symbol(key);
+		table.computeIfAbsent(s, k -> new LinkedList());
+		table.get(s).add(value);
+		scope.push(s);
 	}
 
-	public Binding lookup(Symbol s) {
-		int index = s.hashCode() % SIZE;
-		for(Bucket b = table[index]; b != null; b = b.next) {
-			if(s.equals(b.key)) return b.binding;
-		}
-		return null;
+	public R get(String key) {
+		return table.get(Symbol.symbol(key)).peek();
 	}
 
-	void pop(Symbol s) {
-		int index = s.hashCode() % SIZE;
+	public boolean contains(String key) {
+		LinkedList<R> l = table.get(Symbol.symbol(key));
+		return l != null && l.contains(Symbol.symbol(key));
 	}
-}
 
-class Bucket {
-	Symbol key;
-	Binding binding;
-	Bucket next;
-
-	public Bucket(Symbol k, Binding b, Bucket n) {
-		key = k;
-		binding = b;
-		next = n;
+	public void beginScope() {
+		scope.push(null);
 	}
+
+	public void endScope() {
+		Symbol s;
+		while ((s = scope.pop()) != null) table.get(s).pop();
+	}
+
 }

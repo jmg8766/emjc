@@ -1,7 +1,7 @@
-package ast.statement;
+package oldast.statement;
 
-import ast.*;
-import ast.type.Type;
+import oldast.*;
+import oldast.type.Type;
 
 import java.util.ArrayList;
 

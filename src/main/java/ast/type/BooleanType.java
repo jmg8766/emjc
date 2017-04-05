@@ -1,7 +1,10 @@
 package ast.type;
 
-/**
- * Created by justin on 4/3/17.
- */
-public class BooleanType {
+import ast.Visitor;
+
+public class BooleanType extends Type {
+
+	<R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }

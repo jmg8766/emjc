@@ -1,7 +1,9 @@
 package ast.list;
 
-/**
- * Created by justin on 4/3/17.
- */
+import ast.ClassDeclaration.ClassDecl;
+
+import java.util.Vector;
+
 public class ClassDeclList {
+	public Vector<ClassDecl> list = new Vector();
 }

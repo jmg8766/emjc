@@ -1,6 +1,6 @@
-package ast.expression;
+package oldast.expression;
 
-import ast.Visitor;
+import oldast.Visitor;
 
 public interface Expression {
 	<R> R accept(Visitor<R> v);

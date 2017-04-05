@@ -1,11 +1,11 @@
-package ast;
+package oldast;
 
-import ast.expression.*;
-import ast.expression.operators.*;
-import ast.statement.*;
-import ast.type.*;
-import ast.type.Boolean;
-import ast.type.String;
+import oldast.expression.*;
+import oldast.expression.operators.*;
+import oldast.statement.*;
+import oldast.type.*;
+import oldast.type.Boolean;
+import oldast.type.String;
 
 public interface Visitor<R> {
 

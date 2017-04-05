@@ -1,6 +1,6 @@
-package ast.statement;
+package oldast.statement;
 
-import ast.Visitor;
+import oldast.Visitor;
 
 public interface Statement {
 	<R> R accept(Visitor<R> v);

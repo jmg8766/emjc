@@ -1,9 +1,9 @@
-package ast.statement;
+package oldast.statement;
 
-import ast.Binding;
-import ast.ID;
-import ast.Tree;
-import ast.Visitor;
+import oldast.Binding;
+import oldast.ID;
+import oldast.Tree;
+import oldast.Visitor;
 
 import java.util.ArrayList;
 

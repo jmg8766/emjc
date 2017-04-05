@@ -1,7 +1,9 @@
 package ast.type;
 
-/**
- * Created by justin on 4/3/17.
- */
-public class IdentifierType {
+public class IdentifierType extends Type {
+	public String s;
+
+	public IdentifierType(String s) {
+		this.s = s;
+	}
 }

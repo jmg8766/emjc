@@ -1,8 +1,8 @@
-package ast.expression.operators;
+package oldast.expression.operators;
 
-import ast.Tree;
-import ast.Visitor;
-import ast.expression.Expression;
+import oldast.Tree;
+import oldast.Visitor;
+import oldast.expression.Expression;
 
 public class LessThan extends Tree implements Expression {
 	public Expression lhs, rhs;

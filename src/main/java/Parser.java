@@ -1,12 +1,12 @@
-import ast.ID;
-import ast.SyntaxException;
-import ast.TypeIdList;
-import ast.expression.*;
-import ast.expression.operators.*;
-import ast.statement.*;
-import ast.type.Boolean;
-import ast.type.*;
-import ast.type.String;
+import oldast.ID;
+import oldast.SyntaxException;
+import oldast.TypeIdList;
+import oldast.expression.*;
+import oldast.expression.operators.*;
+import oldast.statement.*;
+import oldast.type.Boolean;
+import oldast.type.*;
+import oldast.type.String;
 import token.*;
 
 import java.io.BufferedWriter;
@@ -24,7 +24,7 @@ class Parser {
 	Parser(Lexer lexer) {
 		this.input = lexer;
 		currentToken = input.next();
-		outputFile = lexer.inputFile.substring(0, lexer.inputFile.indexOf('.')) + ".ast";
+		outputFile = lexer.inputFile.substring(0, lexer.inputFile.indexOf('.')) + ".oldast";
 	}
 
 	void genAstFile() {
@@ -460,7 +460,7 @@ class Parser {
 		return i;
 	}
 
-	private ast.type.String parseString() {
+	private oldast.type.String parseString() {
 		String i = new String(currentToken.row, currentToken.col);
 		currentToken = input.next();
 		return i;

@@ -1,10 +1,11 @@
-package ast.statement;
+package oldast.statement;
 
-import ast.ID;
-import ast.Tree;
-import ast.Visitor;
+import oldast.Binding;
+import oldast.ID;
+import oldast.Tree;
+import oldast.Visitor;
 
-public class MainClassDeclaration extends Tree implements Statement {
+public class MainClassDeclaration extends Tree implements Statement, Binding {
 	public ID id, args;
 	public Statement body;
 

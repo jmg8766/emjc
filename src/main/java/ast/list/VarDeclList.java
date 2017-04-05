@@ -1,7 +1,9 @@
 package ast.list;
 
-/**
- * Created by justin on 4/3/17.
- */
+import ast.VarDecl;
+
+import java.util.Vector;
+
 public class VarDeclList {
+	public Vector<VarDecl> list = new Vector();
 }

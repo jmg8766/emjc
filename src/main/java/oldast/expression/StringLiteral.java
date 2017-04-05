@@ -1,7 +1,7 @@
-package ast.expression;
+package oldast.expression;
 
-import ast.Tree;
-import ast.Visitor;
+import oldast.Tree;
+import oldast.Visitor;
 
 public class StringLiteral extends Tree implements Expression {
     public java.lang.String val;

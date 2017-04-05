@@ -1,7 +1,9 @@
 package ast.list;
 
-/**
- * Created by justin on 4/3/17.
- */
+import ast.MethodDecl;
+
+import java.util.Vector;
+
 public class MethodDeclList {
+	public Vector<MethodDecl> list = new Vector();
 }

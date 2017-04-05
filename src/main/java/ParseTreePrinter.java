@@ -1,13 +1,13 @@
-import ast.ID;
-import ast.TypeIdList;
-import ast.Visitor;
-import ast.expression.*;
-import ast.expression.operators.*;
-import ast.statement.*;
-import ast.type.Boolean;
-import ast.type.Int;
-import ast.type.IntArray;
-import ast.type.String;
+import oldast.ID;
+import oldast.TypeIdList;
+import oldast.Visitor;
+import oldast.expression.*;
+import oldast.expression.operators.*;
+import oldast.statement.*;
+import oldast.type.Boolean;
+import oldast.type.Int;
+import oldast.type.IntArray;
+import oldast.type.String;
 
 public class ParseTreePrinter implements Visitor<java.lang.String> {
 

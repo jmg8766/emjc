@@ -1,7 +1,10 @@
 package ast.expression;
 
-/**
- * Created by justin on 4/3/17.
- */
-public class LessThan {
+public class LessThan extends Exp {
+	public Exp e1, e2;
+
+	public LessThan(Exp e1, Exp e2) {
+		this.e1 = e1;
+		this.e2 = e2;
+	}
 }

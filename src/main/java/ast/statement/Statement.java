@@ -1,7 +1,8 @@
 package ast.statement;
 
-/**
- * Created by justin on 4/3/17.
- */
-public class Statement {
+import ast.Visitor;
+
+public abstract class Statement {
+
+	public abstract <R> R accept(Visitor<R> v);
 }

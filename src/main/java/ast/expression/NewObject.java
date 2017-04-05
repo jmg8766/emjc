@@ -1,7 +1,11 @@
 package ast.expression;
 
-/**
- * Created by justin on 4/3/17.
- */
+import ast.Identifier;
+
 public class NewObject {
+	public Identifier i;
+
+	public NewObject(Identifier i) {
+		this.i = i;
+	}
 }

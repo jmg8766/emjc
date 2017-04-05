@@ -1,7 +1,11 @@
 package ast.statement;
 
-/**
- * Created by justin on 4/3/17.
- */
-public class Print {
+import ast.expression.Exp;
+
+public class Print extends Statement {
+	public Exp e;
+
+	public Print(Exp e) {
+		this.e = e;
+	}
 }

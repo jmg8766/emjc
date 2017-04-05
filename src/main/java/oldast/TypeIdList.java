@@ -1,6 +1,6 @@
-package ast;
+package oldast;
 
-import ast.type.Type;
+import oldast.type.Type;
 
 import java.util.ArrayList;
 

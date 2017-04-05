@@ -1,8 +1,8 @@
-package ast.expression;
+package oldast.expression;
 
-import ast.ID;
-import ast.Tree;
-import ast.Visitor;
+import oldast.ID;
+import oldast.Tree;
+import oldast.Visitor;
 
 public class NewObject extends Tree implements Expression {
 
