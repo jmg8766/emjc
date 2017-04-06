@@ -1,214 +1,250 @@
-import oldast.Binding;
-import oldast.ID;
-import oldast.TypeIdList;
-import oldast.Visitor;
-import oldast.expression.*;
-import oldast.expression.operators.*;
-import oldast.statement.*;
-import oldast.type.Boolean;
-import oldast.type.Int;
-import oldast.type.IntArray;
-import oldast.type.String;
-import symbol.Symbol;
+import ast.ClassDeclaration.ClassDecl;
+import ast.ClassDeclaration.ClassDeclExtends;
+import ast.ClassDeclaration.ClassDeclSimple;
+import ast.*;
+import ast.expression.*;
+import ast.statement.*;
+import ast.type.BooleanType;
+import ast.type.IdentifierType;
+import ast.type.IntArrayType;
+import ast.type.IntegerType;
+import symbol.SymbolTable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class SymbolGenerator implements Visitor {
-	HashMap<Symbol, Binding> global, curClass, curMethod;
 
-	@Override
-	public Object visit(TypeIdList n) {
-		return null;
-	}
+	private SymbolTable<Decl> t = new SymbolTable();
+	private ArrayList<ClassDecl> inheritanceChain = new ArrayList<>();
 
-	@Override
 	public Object visit(Program n) {
-		global = new HashMap<>();
-		global.put(Symbol.symbol(n.main.id.id), n.main);
-		n.classDeclarations.forEach(c -> global.put(Symbol.symbol(c.id.id), c));
-		n.main.accept(this);
-		n.classDeclarations.forEach(c -> {
-			curClass = new HashMap<>();
+		// add the mainDecl to global scope
+		t.put(n.m.i, n.m);
+		// add all classDecl to global scope
+		n.cl.list.forEach(c -> t.put(c.i, c));
+		// visit the mainDecl
+		n.m.accept(this);
+		// visit each class
+		n.cl.list.forEach(c -> {
+			inheritanceChain.clear();
+			t.beginScope();
 			c.accept(this);
+			t.endScope();
 		});
 		return null;
 	}
 
-	@Override
-	public Object visit(Print n) {
+	public Object visit(MainClass n) {
+		// set the bindings
+		n.i.b = n;
+		n.i2.b = n;
+		// visit the main statement
+		n.s.accept(this);
 		return null;
 	}
 
-	@Override
-	public Object visit(Assign n) {
+	public Object visit(ClassDeclSimple n) {
+		// add n to the inheritance chain just so to handle "this"
+		inheritanceChain.add(n);
+		// assign class identifier to it's decl
+		n.i.b = n;
+		// add each varDecl to class scope
+		n.vl.list.forEach(v -> v.accept(this));
+		// add each methodDecl to class scope (because methods can reference each other)
+		n.ml.list.forEach(m -> t.put(m.i, m));
+		// visit each methodDecl
+		n.ml.list.forEach(m -> {
+			t.beginScope();
+			m.accept(this);
+			t.endScope();
+		});
 		return null;
 	}
 
-	@Override
+	public Object visit(ClassDeclExtends n) {
+		// check for cyclical inheritance
+		if(inheritanceChain.contains(n)); //error - cyclical inheritance
+		else inheritanceChain.add(n);
+		// add all parent varDecl and methodDecl to current scope
+		t.get(n.parent).accept(this);
+		// add all varDecl for current class
+		n.vl.list.forEach(v -> v.accept(this));
+		// add each methodDecl to class scope (because methods can reference each other)
+		n.ml.list.forEach(m -> {
+			MethodDecl last = (MethodDecl) t.put(m.i, m);
+			if (last != null && last.fl.list.size() != m.fl.list.size()); //error - method override with different args
+		});
+		// visit each methodDecl
+		n.ml.list.forEach(m -> {
+			t.beginScope();
+			m.accept(this);
+			t.endScope();
+		});
+		return null;
+	}
+
+	public Object visit(VarDecl n) {
+		// just add the decl to whatever the current scope is
+		if (t.put(n.i, n) != null) ; //error - var already defined in current scope
+		return null;
+	}
+
+	public Object visit(MethodDecl n) {
+		// visit each paramDecl
+		n.fl.list.forEach(f -> f.accept(this));
+		// visit each varDecl
+		n.vl.list.forEach(v -> v.accept(this));
+		// visit each statement
+		n.sl.list.forEach(s -> s.accept(this));
+		return null;
+	}
+
+	public Object visit(Formal n) {
+		// just add the decl to whatever the current scope is
+		if (t.put(n.i, n) != null) ; //error - formal already defined in current method
+		return null;
+	}
+
+	public Object visit(IntArrayType n) {
+		return null;
+	}
+
+	public Object visit(BooleanType n) {
+		return null;
+	}
+
+	public Object visit(IntegerType n) {
+		return null;
+	}
+
+	public Object visit(IdentifierType n) {
+		return null;
+	}
+
 	public Object visit(Block n) {
+		n.sl.list.forEach(s -> s.accept(this));
 		return null;
 	}
 
-	@Override
-	public Object visit(IfThenElse n) {
+	public Object visit(If n) {
+		n.e.accept(this);
+		n.s1.accept(this);
+		n.s2.accept(this);
 		return null;
 	}
 
-	@Override
 	public Object visit(While n) {
+		n.e.accept(this);
+		n.s.accept(this);
 		return null;
 	}
 
-	@Override
-	public Object visit(Sidef n) {
+	public Object visit(Print n) {
+		n.e.accept(this);
 		return null;
 	}
 
-	@Override
-	public Object visit(ClassDeclaration n) {
-		if(n.parent != null) n.a
+	public Object visit(Assign n) {
+		n.i.accept(this);
+		n.e.accept(this);
 		return null;
 	}
 
-	@Override
-	public Object visit(VarDeclaration n) {
+	public Object visit(ArrayAssign n) {
+		n.i.accept(this);
+		n.e1.accept(this);
+		n.e2.accept(this);
 		return null;
 	}
 
-	@Override
-	public Object visit(MethodDeclaration n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(MainClassDeclaration n) {
-		global.put(Symbol.symbol(n.id.id), n);
-		curMethod.clear(); curMethod.put(Symbol.symbol(n.args.id)):
-		return null;
-	}
-
-	@Override
-	public Object visit(Return n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Int n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Boolean n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(String n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(IntArray n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(NewObject n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(NewArray n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Precedence n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(ArrayIndex n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(This n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(BooleanLiteral n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(IntLiteral n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(StringLiteral n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Plus n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Minus n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Times n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Division n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Equals n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(LessThan n) {
-		return null;
-	}
-
-	@Override
 	public Object visit(And n) {
+		n.e1.accept(this);
+		n.e2.accept(this);
 		return null;
 	}
 
-	@Override
-	public Object visit(Or n) {
+	public Object visit(LessThan n) {
+		n.e1.accept(this);
+		n.e2.accept(this);
 		return null;
 	}
 
-	@Override
+	public Object visit(Plus n) {
+		n.e1.accept(this);
+		n.e2.accept(this);
+		return null;
+	}
+
+	public Object visit(Minus n) {
+		n.e1.accept(this);
+		n.e2.accept(this);
+		return null;
+	}
+
+	public Object visit(Times n) {
+		n.e1.accept(this);
+		n.e2.accept(this);
+		return null;
+	}
+
+	public Object visit(ArrayLookup n) {
+		n.e1.accept(this);
+		n.e2.accept(this);
+		return null;
+	}
+
+	public Object visit(ArrayLength n) {
+		n.e.accept(this);
+		return null;
+	}
+
+	public Object visit(Call n) {
+		n.e.accept(this);
+		// do not visit the identifier because it is out of scope //n.i.accept(this)
+		n.el.list.forEach(e -> e.accept(this));
+		return null;
+	}
+
+	public Object visit(IntegerLiteral n) {
+		return null;
+	}
+
+	public Object visit(True n) {
+		return null;
+	}
+
+	public Object visit(False n) {
+		return null;
+	}
+
+	@Override //TODO : should IdentifierExp be a subclass of Identifier?
+	public Object visit(IdentifierExp n) {
+		return null;
+	}
+
+	public Object visit(This n) {
+		if(inheritanceChain.isEmpty()); //error - reference from inside main method
+		return null;
+	}
+
+	public Object visit(NewArray n) {
+		n.e.accept(this);
+		return null;
+	}
+
+	public Object visit(NewObject n) {
+		n.i.accept(this);
+		return null;
+	}
+
 	public Object visit(Not n) {
+		n.e.accept(this);
 		return null;
 	}
 
-	@Override
-	public Object visit(ID n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(FunctionCall n) {
-		return null;
-	}
-
-	@Override
-	public Object visit(Length n) {
+	public Object visit(Identifier n) {
+		// assign this identifier to its deceleration
+		n = t.get(n).i;
 		return null;
 	}
 }

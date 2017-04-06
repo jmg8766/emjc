@@ -2,12 +2,15 @@ package ast;
 
 import ast.type.Type;
 
-public class VarDecl implements Binding {
+public class VarDecl extends Decl {
 	public Type t;
-	public Identifier i;
 
 	public VarDecl(Type t, Identifier i) {
 		this.t = t;
 		this.i = i;
+	}
+
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
 	}
 }

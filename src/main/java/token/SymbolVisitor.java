@@ -1,7 +1,6 @@
 package token;
 
 import ast.*;
-import ast.ClassDeclaration.ClassDecl;
 import ast.ClassDeclaration.ClassDeclExtends;
 import ast.ClassDeclaration.ClassDeclSimple;
 import ast.expression.*;
@@ -12,10 +11,8 @@ import ast.type.IntArrayType;
 import ast.type.IntegerType;
 import symbol.Table;
 
-import java.util.ArrayList;
-
 public class SymbolVisitor implements Visitor {
-	Table<Binding> t = new Table();
+	Table<Decl> t = new Table();
 
 	@Override
 	public Object visit(Program n) {
@@ -78,7 +75,7 @@ public class SymbolVisitor implements Visitor {
 	}
 
 	@Override
-	public Object visit(VarDecl n) {
+	public void visit(VarDecl n) {
 		if(t.contains(n.i.s)); //error
 		t.put(n.i.s, n);
 		return null;

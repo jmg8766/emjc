@@ -6,9 +6,8 @@ import ast.list.StatementList;
 import ast.list.VarDeclList;
 import ast.type.Type;
 
-public class MethodDecl implements Binding {
+public class MethodDecl extends Decl {
 	public Type t;
-	public Identifier i;
 	public FormalList fl;
 	public VarDeclList vl;
 	public StatementList sl;
@@ -23,4 +22,7 @@ public class MethodDecl implements Binding {
 		this.e = e;
 	}
 
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
+	}
 }
