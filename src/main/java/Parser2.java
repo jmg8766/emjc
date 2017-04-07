@@ -12,11 +12,11 @@ import static token.TokenType.*;
 
 public class Parser2 {
 
-	private Lexer l;
+	private final Lexer l;
 	private Token tok;
 
 	public Parser2(Lexer l) { this.l = l; tok = l.next(); }
-	private void eat(TokenType... t) { for (int i = 0; i < t.length; i++) if (tok.type == t[i]) tok = l.next(); else error(); }
+	private void eat(TokenType... t) { for (TokenType aT : t) if (tok.type == aT) tok = l.next(); else error(); }
 	private void error() { System.out.println(tok.col + ":" + tok.row + " error: ...");}
 
 	Program program() { return new Program(main(), classDeclList()); }
