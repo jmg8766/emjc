@@ -15,7 +15,19 @@ public class SymbolGenerator implements Visitor {
 	private SymbolTable<Decl> t = new SymbolTable();
 	private HashSet<ClassDecl> inheritanceChain = new HashSet<>();
 
-	private TreeSet<String> errors = new TreeSet<>();
+	private TreeSet<String> errors = new TreeSet<>((s1, s2) -> {
+		String[] s1loc = s1.substring(0, s1.indexOf(" ")).split(":");
+		String[] s2loc = s2.substring(0, s2.indexOf(" ")).split(":");
+		if(Integer.parseInt(s1loc[0]) < Integer.parseInt(s2loc[0])) {
+			return -1;
+		} else if(Integer.parseInt(s1loc[0]) > Integer.parseInt(s2loc[0])) {
+			return 1;
+		} else if(Integer.parseInt(s1loc[1]) < Integer.parseInt(s2loc[1])) {
+			return -1;
+		} else if(Integer.parseInt(s1loc[1]) > Integer.parseInt(s2loc[1])) {
+			return 1;
+		} else return 0;
+	});
 	private void error(String loc, String msg) { errors.add(loc +  " error: " + msg); }
 
 	public void visit(Program n) {
