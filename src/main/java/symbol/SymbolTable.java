@@ -8,23 +8,23 @@ import java.util.Objects;
 
 public class SymbolTable<V> {
 
-	private final LinkedList<HashMap<String, V>> symbols = new LinkedList<>();
+	private final LinkedList<HashMap<String, V>> inScope = new LinkedList<>();
 
 	public SymbolTable(){
-		symbols.addFirst(new HashMap<String, V>());
+		inScope.addFirst(new HashMap<String, V>());
 	}
 	/**
 	 * @return the previous value associated with the key
 	 */
 	public V put(Identifier key, V value) {
-		return symbols.getFirst().put(key.s.intern(), value);
+		return inScope.getFirst().put(key.s.intern(), value);
 	}
 
 	/**
 	 * @return the value associated with a key, or null if the key doesn't exist
 	 */
 	public V get(Identifier key) {
-		return symbols.stream()
+		return inScope.stream()
 			.map(m -> m.get(key.s.intern()))
 			.filter(Objects::nonNull)
 			.findFirst()
@@ -32,10 +32,10 @@ public class SymbolTable<V> {
 	}
 
 	public void beginScope() {
-		symbols.addFirst(new HashMap<>());
+		inScope.addFirst(new HashMap<>());
 	}
 
 	public void endScope() {
-		symbols.remove();
+		inScope.remove();
 	}
 }
