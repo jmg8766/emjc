@@ -14,7 +14,7 @@ public class SymbolGenerator implements Visitor {
 	private SymbolTable<Decl> t = new SymbolTable();
 	private ArrayList<ClassDecl> inheritanceChain = new ArrayList<>();
 
-	private void error(Identifier id, String msg) { System.out.println(id.position+  " error: " + msg);}
+	private void error(String position, String msg) { System.out.println(position+ " error: " + msg);}
 
 	public void visit(Program n) {
 		// add the mainDecl to global scope
@@ -59,7 +59,7 @@ public class SymbolGenerator implements Visitor {
 
 	public void visit(ClassDeclExtends n) {
 		// check for cyclical inheritance
-		if(inheritanceChain.contains(n)); //error - cyclical inheritance
+		if(inheritanceChain.contains(n)) error(n.i.position, "Class has cyclic inheritance");//error - cyclical inheritance
 		else inheritanceChain.add(n);
 		// add all parent varDecl and methodDecl to current scope
 		t.get(n.parent).accept(this);
@@ -70,7 +70,7 @@ public class SymbolGenerator implements Visitor {
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
 			MethodDecl last = (MethodDecl) t.get(m.i);
-			if (last != null && last.fl.list.size() != m.fl.list.size()) error(m.i, "method override with different args");
+			if (last != null && last.fl.list.size() != m.fl.list.size()) error(m.i.position, "method override with different args");
 			else t.put(m.i, m);
 		});
 		// visit each methodDecl
@@ -83,7 +83,7 @@ public class SymbolGenerator implements Visitor {
 
 	public void visit(VarDecl n) {
 		// just add the decl to whatever the current scope is
-		if (t.put(n.i, n) != null) error(n.i, "var already defined in current scope");
+		if (t.put(n.i, n) != null) error(n.i.position, "var already defined in current scope");
 		n.i.b = n;
 	}
 
@@ -100,7 +100,7 @@ public class SymbolGenerator implements Visitor {
 
 	public void visit(Formal n) {
 		// just add the decl to whatever the current scope is
-		if (t.put(n.i, n) != null) ; //error - formal already defined in current method
+		if (t.put(n.i, n) != null) ; error(n.i.position,"parameter already defined in scope");
 		n.i.b = n;
 	}
 
@@ -216,19 +216,21 @@ public class SymbolGenerator implements Visitor {
 	}
 
 	public void visit(This n) {
-		if(inheritanceChain.isEmpty()); //error - reference from inside main method
+		if(inheritanceChain.isEmpty()); error(n.pos,"Cannot access static class in non static way");//error - reference from inside main method
 	}
 
 	public void visit(NewArray n) { n.e.accept(this); }
 
-	public void visit(NewObject n) { n.i.accept(this); }
+	public void visit(NewObject n) {
+		n.i = t.get(n.i).i;
+	}
 
 	public void visit(Not n) { n.e.accept(this);}
 
 	public void visit(Identifier n) {
 		// assign this identifier to its deceleration
 		Decl d = t.get(n);
-		if(d == null) error(n, "identifier not found in symbole table");
+		if(d == null) error(n.position, "identifier not found in symbole table");
 		else n.b = d;
 	}
 }

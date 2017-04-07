@@ -28,7 +28,7 @@ public class PrettyPrinter implements Visitor {
         n.i.accept(this);
         sb.append(" {\n\tpublic static void main(String [] ");
         n.i2.accept(this);
-        sb.append(") {");
+        sb.append(") {\n");
         n.s.accept(this);
         sb.append("\t} \n }\n");
     }
@@ -37,10 +37,10 @@ public class PrettyPrinter implements Visitor {
     public void visit(ClassDeclSimple n) {
         sb.append("class ");
         n.i.accept(this);
-        sb.append(" {\n");
-        n.vl.list.forEach(v-> {sb.append("\t"); v.accept(this); sb.append(";\n"); });
-        n.ml.list.forEach(m -> {sb.append("\t"); m.accept(this);});
-        sb.append("\t} \n}");
+        sb.append(" {");
+        n.vl.list.forEach(v-> {sb.append("\n");v.accept(this);});
+        n.ml.list.forEach(m ->{sb.append("\n"); m.accept(this);});
+        sb.append("\n}\n");
     }
 
     @Override
@@ -49,37 +49,42 @@ public class PrettyPrinter implements Visitor {
         n.i.accept(this);
         sb.append(" extends ");
         n.parent.accept(this);
-        sb.append(" {\n");
-        n.vl.list.forEach(v-> {sb.append("\t"); v.accept(this); sb.append(";\n"); });
-        n.ml.list.forEach(m -> {sb.append("\t"); m.accept(this);});
-        sb.append("\t} \n}");
+        sb.append(" {");
+        n.vl.list.forEach(v-> {sb.append("\n\t");v.accept(this);});
+        n.ml.list.forEach(m ->  {sb.append("\n\t"); m.accept(this);});
+        sb.append("\n}\n");
     }
 
     @Override
     public void visit(VarDecl n) {
+        sb.append("\t");
         n.t.accept(this);
         n.i.accept(this);
+        sb.append(";");
     }
 
     @Override
     public void visit(MethodDecl n) {
-        sb.append("public ");
+        sb.append("\tpublic ");
         n.t.accept(this);
         n.i.accept(this);
         visit(n.fl);
-        n.vl.list.forEach(v-> {sb.append("\n\t\t"); v.accept(this); sb.append(";\n"); });
+        n.vl.list.forEach(v-> {sb.append("\n\t"); v.accept(this);});
         n.sl.list.forEach(s->{sb.append("\n\t\t"); s.accept(this);});
-        sb.append("return");
+        sb.append("\n\t\treturn ");
         n.e.accept(this);
+        sb.append("\n\t}");
     }
 
     public void visit(FormalList l) {
         sb.append("(");
         Iterator<Formal> itr = l.list.iterator();
-        if(itr.hasNext()) itr.next().accept(this);
-        while(itr.hasNext()){
-            sb.append(", ");
+        if(itr.hasNext()) {
             itr.next().accept(this);
+            while (itr.hasNext()) {
+                sb.append(", ");
+                itr.next().accept(this);
+            }
         }
         sb.append(") {");
 
@@ -97,7 +102,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(BooleanType n) {
-        sb.append("boolean");
+        sb.append("boolean ");
     }
 
     @Override
@@ -118,17 +123,19 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void visit(Block n) {
         sb.append("{");
-        n.sl.list.forEach(s->{sb.append("\n\t");s.accept(this);});
+        n.sl.list.forEach(s->{sb.append("\n\t\t");s.accept(this);});
         sb.append("\n}");
     }
 
     @Override
     public void visit(If n) {
+        sb.append("\t\t");
         sb.append("if ("); n.e.accept(this); sb.append(") \n");
-        sb.append("\t");
+        sb.append("\t\t\t");
         n.s1.accept(this);
-        sb.append("\n else ");
+        sb.append("\n\t\telse \n\t\t\t");
         n.s2.accept(this);
+        sb.append(";");
     }
 
     @Override
@@ -139,7 +146,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(Print n) {
-        sb.append("System.out.println("); n.e.accept(this);sb.append(");");
+        sb.append("System.out.println("); n.e.accept(this);sb.append("); \n");
     }
 
     @Override
@@ -147,6 +154,7 @@ public class PrettyPrinter implements Visitor {
         n.i.accept(this);
         sb.append(" = ");
         n.e.accept(this);
+        sb.append(";");
     }
 
     @Override
@@ -155,6 +163,7 @@ public class PrettyPrinter implements Visitor {
         n.e1.accept(this);
         sb.append(" = ");
         n.e2.accept(this);
+        sb.append(";");
     }
 
     @Override
@@ -203,7 +212,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void visit(Times n) {
         n.e1.accept(this);
-        sb.append(" *");
+        sb.append(" * ");
         n.e2.accept(this);
     }
 
@@ -239,10 +248,12 @@ public class PrettyPrinter implements Visitor {
 
     public void visit(ExpList l){
         Iterator<Exp> itr = l.list.iterator();
-        if(itr.hasNext()) itr.next().accept(this);
-        while(itr.hasNext()){
-            sb.append(", ");
+        if(itr.hasNext()) {
             itr.next().accept(this);
+            while (itr.hasNext()) {
+                sb.append(", ");
+                itr.next().accept(this);
+            }
         }
     }
 
@@ -273,7 +284,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(This n) {
-        sb.append("this ");
+        sb.append("this");
     }
 
     @Override

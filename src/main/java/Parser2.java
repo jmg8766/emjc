@@ -254,7 +254,7 @@ public class Parser2 {
 		case ID:
 			return new IdentifierExp(identifier());
 		case THIS:
-			eat(THIS); return new This();
+			eat(THIS); return new This(tok.row+":"+tok.col);
 		case NEW:
 			eat(NEW);
 			if(tok.type == TokenType.ID) {
