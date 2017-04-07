@@ -36,17 +36,17 @@ public class Parser2 {
 	}
 
 	private ClassDecl classDecl() {
-		eat(CLASS);
-		Identifier i1 = identifier();
-		eat(LPAREN);
+		eat(CLASS); Identifier i1 = identifier();
 		ClassDecl c = null;
 		switch(tok.type) {
 			case EXTENDS:
+				eat(EXTENDS);
 				Identifier i2 = identifier();
 				eat(LBRACE);
 				c = new ClassDeclExtends(i1, i2, varDeclList(), methodDeclList());
 				break;
 			case LBRACE:
+				eat(LBRACE);
 				c = new ClassDeclSimple(i1, varDeclList(), methodDeclList());
 				break;
 			default: error(); return null;
@@ -92,7 +92,7 @@ public class Parser2 {
 			case STRING: eat(STRING); return new StringType();
 			case INT: eat(TokenType.INT);
 				switch (tok.type) {
-					case LBRACKET: eat(RBRACKET); return new IntArrayType();
+					case LBRACKET: eat(LBRACKET, RBRACKET); return new IntArrayType();
 					default: return new IntegerType();
 				}
 			case ID: return new IdentifierType(identifier());
@@ -231,6 +231,9 @@ public class Parser2 {
 			} else {
 				eat(LENGTH); return new ArrayLength(e);
 			}
+		case LBRACKET:
+			eat(LBRACKET); Exp e2 = exp(); eat(RBRACKET);
+			return new ArrayLookup(e, e2);
 		default: return e;
 	}}
 
@@ -247,6 +250,7 @@ public class Parser2 {
 		case FALSE:
 			eat(FALSE); return new False();
 		case ID:
+
 			return new IdentifierExp(identifier());
 		case THIS:
 			eat(THIS); return new This();
@@ -276,7 +280,7 @@ public class Parser2 {
 
 	StatementList statementList() {
 		StatementList s = new StatementList();
-		while(tok.type != RBRACE) s.list.add(statement());
+		while(tok.type != RETURN) s.list.add(statement());
 		return s;
 	}
 

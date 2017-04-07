@@ -13,7 +13,7 @@ public class ParserTest {
 
 	@Test(enabled = true)
 	void testAstSingleFile() {
-		File f = new File("src/test/benchmarks/Simple.emj");
+		File f = new File("src/test/benchmarks/BinarySearch.emj");
 		System.out.println("Generating ast file for " + f.getName());
 		Emjc.main(new String[] {"--ast", f.getPath()});
 	}
