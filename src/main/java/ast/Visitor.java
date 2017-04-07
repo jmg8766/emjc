@@ -16,6 +16,7 @@ public interface Visitor {
 	void visit(IntArrayType n);
 	void visit(BooleanType n);
 	void visit(IntegerType n);
+	void visit(StringType n);
 	void visit(IdentifierType n);
 	void visit(Block n);
 	void visit(If n);
@@ -34,6 +35,7 @@ public interface Visitor {
 	void visit(ArrayLength n);
 	void visit(Call n);
 	void visit(IntegerLiteral n);
+	void visit(StringLiteral n);
 	void visit(True n);
 	void visit(False n);
 	void visit(IdentifierExp n);

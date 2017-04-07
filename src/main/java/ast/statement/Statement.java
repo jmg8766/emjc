@@ -4,5 +4,5 @@ import ast.Visitor;
 
 public abstract class Statement {
 
-	public abstract <R> R accept(Visitor<R> v);
+	public abstract void accept(Visitor v);
 }

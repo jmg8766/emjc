@@ -3,14 +3,9 @@ import ast.ClassDeclaration.ClassDeclExtends;
 import ast.ClassDeclaration.ClassDeclSimple;
 import ast.*;
 import ast.expression.*;
-import ast.list.ExpList;
-import ast.list.FormalList;
-import ast.list.StatementList;
-import ast.list.VarDeclList;
+import ast.list.*;
 import ast.statement.*;
 import ast.type.*;
-import com.sun.org.apache.xpath.internal.operations.Div;
-import oldast.expression.IntLiteral;
 import token.*;
 
 import static token.TokenType.*;
@@ -78,14 +73,35 @@ public class Parser2 {
 
 	Type type() { switch (tok.type) {
 			case BOOLEAN: eat(BOOLEAN); return new BooleanType();
-			case STRING: eat(STRING); return new IdentifierType("String");
+			case STRING: eat(STRING); return new StringType();
 			case INT: eat(TokenType.INT);
 				switch (tok.type) {
 					case LBRACKET: eat(RBRACKET); return new IntArrayType();
 					default: return new IntegerType();
 				}
-			case ID: return new IdentifierType(identifier().s);
+			case ID: return new IdentifierType(identifier());
 			default: error(); return null;
+	}}
+
+	Identifier identifier() { switch (tok.type) {
+		case ID:
+			Identifier i = new Identifier(((IdentifierToken)tok).value);
+			eat(ID); return i;
+		default: error(); return null;
+	}}
+
+	// ===== STATEMENTS =========
+
+	Statement statement() { switch(tok.type) {
+		case LBRACE: return block();
+		case IF: return ifStmnt();
+		case WHILE: return whileStmnt();
+		case PRINTLN: return print();
+		case ID: return assign(identifier());
+		case SIDEF:
+			eat(SIDEF, LPAREN); Exp e = exp();
+			eat(RPAREN, SEMICOLON); return e;
+		default: error(); return null;
 	}}
 
 	Block block() {
@@ -118,50 +134,52 @@ public class Parser2 {
 		return new Print(e);
 	}
 
-	Assign assign() {
-		Identifier i = identifier();
-		eat(EQSIGN);
-		Exp e = exp();
-		eat(SEMICOLON);
-		return new Assign(i, e);
-	}
+	Statement assign(Identifier i) { switch (tok.type) {
+		case EQSIGN:
+			eat(EQSIGN);
+			Exp e = exp();
+			eat(SEMICOLON);
+			return new Assign(i, e);
+		case LBRACKET:
+			eat(LBRACKET); Exp e1 = exp();
+			eat(RBRACKET, EQSIGN); Exp e2 = exp();
+			eat(SEMICOLON); return new ArrayAssign(i, e1, e2);
+		default: error(); return null;
+	}}
 
-	ArrayAssign arrayAssign() {
-		Identifier i = identifier();
-		eat(LBRACKET);
-		Exp e1 = exp();
-		eat(RBRACKET, EQSIGN);
-		Exp e2 = exp();
-		eat(SEMICOLON);
-		return new ArrayAssign(i, e1, e2);
-	}
-
+	// ===== EXPRESSIONS =========
 	// Precedence (.) -> (!) -> (*,/) -> (+,-) -> (<,==) -> (&&) -> (||)
 
-	// CALL -> FACT _CALL
-	Exp call() { return _call(factor()); }
-	// _CALL -> . (length | identifier(expList)) | empty
-	Exp _call(Exp e) { switch(tok.type) {
-		eat(TokenType.DOT);
-		case LPAREN: eat(LPAREN);
-			Identifier i = identifier();
-			ExpList el = expList();
-			eat(RPAREN); return new Call(e, i, el);
-		case LENGTH: eat(LENGTH); return new ArrayLength(e);
+	// EXP -> OR _OR
+	Exp exp() { return _or(or());}
+
+	// OR -> AND _OR
+	Exp or() { return _or(and()); }
+	// _OR -> || OR | empty
+	Exp _or(Exp e) { switch (tok.type) {
+		case OR: eat(TokenType.OR); return new Or(e, or());
 		default: return e;
 	}}
 
-	// FACT -> TERM _FACT
-	Exp factor() { return _factor(term()); }
-	// _FACT -> (*|/) FACT | empty
-	Exp _factor(Exp e) { switch (tok.type) {
-		case TIMES: eat(TokenType.TIMES); return new Times(e, factor());
-		case DIV: eat(TokenType.DIV); return new Divide(e, factor());
+	// AND -> LTEQ _AND
+	Exp and() { return _and(ltEq()); }
+	// _AND -> && AND | empty
+	Exp _and(Exp e) { switch (tok.type) {
+		case AND: eat(TokenType.AND); return new And(e, and());
 		default: return e;
 	}}
 
-	// TERM -> AND _TERM
-	Exp term() { return _term(and()); }
+	// LTEQ -> TERM _LTEQ
+	Exp ltEq() { return _ltEq(term()); }
+	// _LTEQ -> (< LTEQ) | (== LTEQ) | empty
+	Exp _ltEq(Exp e) { switch(tok.type) { //TODO
+		case LESSTHAN:
+		case EQUALS:
+		default: error(); return null;
+	}}
+
+	// TERM -> FACT _TERM
+	Exp term() { return _term(factor()); }
 	// _TERM -> (+|-) TERM | empty
 	Exp _term(Exp e) { switch(tok.type) {
 		case PLUS: eat(TokenType.PLUS); return new Plus(e, term());
@@ -169,59 +187,97 @@ public class Parser2 {
 		default: return e;
 	}}
 
-	// AND -> OR _AND
-	Exp and() { return _and(or()); }
-	// _AND -> && AND | empty
-	Exp _and(Exp e) { switch (tok.type) {
-		case AND: eat(TokenType.AND); return new And(e, and());
+	// FACT -> CALL _FACT
+	Exp factor() { return _factor(call()); }
+	// _FACT -> (* | /) FACT | empty
+	Exp _factor(Exp e) { switch (tok.type) {
+		case TIMES: eat(TokenType.TIMES); return new Times(e, factor());
+		case DIV: eat(TokenType.DIV); return new Divide(e, factor());
 		default: return e;
 	}}
 
-	// OR -> UNARY _OR
-	Exp or() { return _or(unary()); }
-	// _OR -> || OR | empty
-	Exp _or(Exp e) { switch (tok.type) {
-		case OR: eat(TokenType.OR); return new Or(e, or());
+	// NOT -> (! EXP) | EXP
+	Exp not() { switch (tok.type) {
+		case BANG: eat(BANG); return new Not(exp());
+		default: return call();
+	}}
+
+	// CALL -> UNARY _EXP
+	Exp call() { return _call(factor()); }
+	// _CALL -> . (length | identifier(expList)) | empty
+	Exp _call(Exp e) { switch(tok.type) {
+		case DOT: eat(DOT);
+			if(tok.type == LPAREN) {
+				eat(LPAREN); Identifier i = identifier();
+				ExpList el = expList(); eat(RPAREN);
+				return new Call(e, i, el);
+			} else {
+				eat(LENGTH); return new ArrayLength(e);
+			}
 		default: return e;
 	}}
 
+	// UNARY -> (! EXP) | (new identifier()) | (new int[EXP]) | (this) | identifier | false | true | StringLit | IntLit
 	Exp unary() { switch (tok.type) {
 		case INTLIT:
-			int i = ((IntLiteralToken)tok).value;
-			eat(INTLIT);return new IntegerLiteral(i);
+			int val = ((IntLiteralToken)tok).value;
+			eat(INTLIT);return new IntegerLiteral(val);
 		case STRINGLIT:
 			String s = ((StringLiteralToken)tok).value;
-			eat(STRINGLIT); return new IdentifierExp(s);
-		case TRUE: eat(TRUE); return new True();
-		case FALSE: eat(FALSE); return new False();
-		case ID: return new IdentifierExp(identifier().s);
-		case THIS: eat(THIS); return new This();
-		case NEW: eat(NEW);
+			eat(STRINGLIT); return new StringLiteral(s);
+		case TRUE:
+			eat(TRUE); return new True();
+		case FALSE:
+			eat(FALSE); return new False();
+		case ID:
+			return new IdentifierExp(identifier());
+		case THIS:
+			eat(THIS); return new This();
+		case NEW:
+			eat(NEW);
 			if(tok.type == TokenType.ID) {
 				Identifier i = identifier();
-				eat(LPAREN, RPAREN);
-				return new NewObject(i);
+				eat(LPAREN, RPAREN); return new NewObject(i);
 			} else {
-				eat(INT, LBRACKET);
-				Exp e = exp();
-				eat(RBRACKET);
-				return new NewArray(e);
+				eat(INT, LBRACKET); Exp e = exp();
+				eat(RBRACKET); return new NewArray(e);
 			}
-		case BANG:
 		case LPAREN:
+			eat(LPAREN); Exp e = exp();
+			eat(RPAREN); return e;
+		default:
+			error(); return null;
 	}}
 
-	Identifier identifier() { switch (tok.type) {
-		case ID:
-			Identifier i = new Identifier(((IdentifierToken)tok).value);
-			eat(ID);
-			return i;
-		default: error(); return null;
-	}}
+
+
+	// ===== LISTS =========
 
 	ExpList expList() {
-
+		ExpList e = new ExpList();
+		while(tok.type != RPAREN) e.list.add(exp());
+		return e;
 	}
 
+	StatementList statementList() {
+		StatementList s = new StatementList();
+		while(tok.type != RBRACE) s.list.add(statement());
+		return s;
+	}
 
+	ClassDeclList classDeclList() {
+		ClassDeclList cl = new ClassDeclList();
+		while(tok.type != EOF) cl.list.add(classDecl());
+		return cl;
+	}
+
+	FormalList formalList() {
+		FormalList fl = new FormalList();
+		while(tok.type != RPAREN) fl.list.add(formal());
+		return fl;
+	}
+
+	VarDeclList varDeclList() {
+
+	}
 }

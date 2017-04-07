@@ -1,9 +1,9 @@
 package ast.list;
 
-import ast.ClassDeclaration.ClassDecl;
+import ast.expression.Exp;
 
 import java.util.Vector;
 
 public class ExpList {
-	public Vector<ClassDecl> list = new Vector();
+	public Vector<Exp> list = new Vector();
 }
