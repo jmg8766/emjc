@@ -1,0 +1,9 @@
+class Main {
+    public static void main(String[] args) { sidef(9999); }
+}
+
+class A {
+    int b;
+    public int a(){return 0;}
+    public int a(int b, int c){return 0;}
+}

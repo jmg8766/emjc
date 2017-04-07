@@ -304,7 +304,7 @@ public class Parser2 {
 	// only works when called from ClassDecl
 	VarDeclList varDeclList() {
 		VarDeclList vl = new VarDeclList();
-		while(tok.type != PUBLIC) vl.list.add(varDecl());
+		while(tok.type != PUBLIC && tok.type != RBRACE) vl.list.add(varDecl());
 		return vl;
 	}
 

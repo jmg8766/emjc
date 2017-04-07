@@ -1,0 +1,16 @@
+class Main {
+    public static void main(String[] args) { sidef(this); }
+}
+
+class A {
+    public int a(int a, String a){return 0;}
+    public int b(int b, int c, int c){return 0;}
+    public int c(String a, String b){
+        String b;
+        f = 10;
+        return new B();
+    }
+}
+
+class AA extends BB {}
+class BB extends AA {}
