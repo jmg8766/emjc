@@ -5,23 +5,26 @@ import ast.*;
 import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
-import org.testng.Assert;
 import symbol.SymbolTable;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 public class SymbolGenerator implements Visitor {
 
 	private SymbolTable<Decl> t = new SymbolTable();
-	private ArrayList<ClassDecl> inheritanceChain = new ArrayList<>();
+	private HashSet<ClassDecl> inheritanceChain = new HashSet<>();
 
-	private void error(String loc, String msg) { System.out.println(loc +  " error: " + msg); Assert.fail(); }
+	private TreeSet<String> errors = new TreeSet<>();
+	private void error(String loc, String msg) { errors.add(loc +  " error: " + msg); }
 
 	public void visit(Program n) {
 		// add the mainDecl to global scope
 		t.put(n.m.i, n.m);
 		// add all classDecl to global scope
-		n.cl.list.forEach(c -> t.put(c.i, c));
+		n.cl.list.forEach(c -> {
+			if(t.put(c.i, c) != null) error(c.i.pos, "class is defined more than once");
+		});
 		// visit the mainDecl
 		n.m.accept(this);
 		// visit each class
@@ -31,6 +34,7 @@ public class SymbolGenerator implements Visitor {
 			c.accept(this);
 			t.endScope();
 		});
+		errors.forEach(System.out::println);
 	}
 
 	public void visit(MainClass n) {
@@ -66,21 +70,18 @@ public class SymbolGenerator implements Visitor {
 
 	public void visit(ClassDeclExtends n) {
 		// check for cyclical inheritance
-		if(inheritanceChain.contains(n)) error(n.i.pos, "cyclical inheritance");
-		else inheritanceChain.add(n);
 		// add all parent varDecl and methodDecl to current scope
-		t.get(n.parent).accept(this);
+		if(!inheritanceChain.add(n)) error(n.i.pos, "cyclical inheritance");
+		else t.get(n.parent).accept(this);
 		// Set the binding for this classDecl and it's parent
 		n.i.b = t.get(n.i); n.parent.b = t.get(n.parent);
 		// add all varDecl for current class
-		n.vl.list.forEach(v -> {
-			if(t.put(v.i, v) != null) error(v.i.pos, "Variable declared multiple times in the same scope");
-			v.i.b = v;
-		});
+		n.vl.list.forEach(v -> v.accept(this));
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
-			MethodDecl last = (MethodDecl) t.put(m.i, m);
+			MethodDecl last = (MethodDecl) t.get(m.i);
 			if (last != null && last.fl.list.size() != m.fl.list.size()) error(m.i.pos, "method override with different args");
+			else t.put(m.i, m);
 			m.i.b = m;
 		});
 		// visit each methodDecl
@@ -237,7 +238,7 @@ public class SymbolGenerator implements Visitor {
 	public void visit(Identifier n) {
 		// assign this identifier to its deceleration
 		Decl d = t.get(n);
-		if(d == null) error(n.pos, "identifier not found in symbole table");
+		if(d == null) error(n.pos, "identifier not found in symbol table");
 		else n.b = d;
 	}
 }

@@ -9,6 +9,7 @@ public class NameAnalysisTest {
 	void testGenAstFile(File f) {
 		System.out.println("Performing name analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--name", f.getPath()});
+		System.out.println("Finished name analysis");
 	}
 
 	@Test(enabled = false)
@@ -16,5 +17,6 @@ public class NameAnalysisTest {
 		File f = new File("src/test/benchmarks/Gottshall, Justin - MergeSort.emj");
 		System.out.println("Performing name analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--name", f.getPath()});
+		System.out.println("Finished name analysis");
 	}
 }
