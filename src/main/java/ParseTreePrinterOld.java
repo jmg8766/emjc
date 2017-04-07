@@ -9,7 +9,7 @@ import oldast.type.Int;
 import oldast.type.IntArray;
 import oldast.type.String;
 
-public class ParseTreePrinter implements Visitor<java.lang.String> {
+public class ParseTreePrinterOld implements Visitor<java.lang.String> {
 
 	@Override
 	public java.lang.String visit(TypeIdList n) {

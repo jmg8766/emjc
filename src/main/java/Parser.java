@@ -31,7 +31,7 @@ class Parser {
 		try {
 			Program p = parseProgram();
 			BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile));
-			out.write(p.accept(new ParseTreePrinter()));
+			out.write(p.accept(new ParseTreePrinterOld()));
 			out.flush();
 			out.close();
 		} catch (IOException e) {

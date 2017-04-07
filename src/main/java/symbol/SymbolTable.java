@@ -14,17 +14,21 @@ public class SymbolTable<V> {
 		symbols.addFirst(new HashMap<String, V>());
 	}
 	/**
-	 * @param key
-	 * @param value
 	 * @return the previous value associated with the key
 	 */
 	public V put(Identifier key, V value) {
 		return symbols.getFirst().put(key.s.intern(), value);
 	}
 
+	/**
+	 * @return the value associated with a key, or null if the key doesn't exist
+	 */
 	public V get(Identifier key) {
-		System.out.println(key.s.intern());
-		return symbols.stream().map(m -> m.get(key.s.intern())).filter(Objects::nonNull).findFirst().orElseGet(() -> null);
+		return symbols.stream()
+			.map(m -> m.get(key.s.intern()))
+			.filter(Objects::nonNull)
+			.findFirst()
+			.orElseGet(() -> null);
 	}
 
 	public void beginScope() {
