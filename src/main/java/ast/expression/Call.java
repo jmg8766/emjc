@@ -16,7 +16,7 @@ public class Call extends Exp {
 	}
 
 	@Override
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
 	}
 }

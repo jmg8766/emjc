@@ -25,6 +25,7 @@ public class Emjc {
                     return;
             }
         }
+
         //print --help info
         System.out.println("Usage: emjc [option] [source file]");
         System.out.println("\nOptions:\n\t--lex\t\tgenerates output from lexical analysis");

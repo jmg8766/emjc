@@ -1,0 +1,11 @@
+class Main {
+    public static void main(String[] args) { sidef(9999); }
+}
+
+class A {}
+class B {}
+class C {}
+class A {}
+class B {}
+class C {}
+
