@@ -9,7 +9,7 @@ public class ArrayLength extends Exp {
 		this.e = e;
 	}
 
-	public <R> R accept(Visitor<R> v) {
-		return null;
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }

@@ -4,7 +4,7 @@ import ast.Visitor;
 
 public class BooleanType extends Type {
 
-	<R> R accept(Visitor<R> v) {
-		return v.visit(this);
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }

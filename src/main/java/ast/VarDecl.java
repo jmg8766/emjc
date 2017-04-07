@@ -10,7 +10,7 @@ public class VarDecl extends Decl {
 		this.i = i;
 	}
 
-	public <R> R accept(Visitor<R> v) {
-		return v.visit(this);
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }

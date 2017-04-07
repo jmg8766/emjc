@@ -22,7 +22,7 @@ public class MethodDecl extends Decl {
 		this.e = e;
 	}
 
-	public <R> R accept(Visitor<R> v) {
-		return v.visit(this);
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }
