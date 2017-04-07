@@ -13,7 +13,7 @@ import java.util.Iterator;
 public class PrettyPrinter implements Visitor {
     StringBuilder sb = new StringBuilder();
     int idCount = 0;
-    HashMap<Identifier, String> id = new HashMap<>();
+    HashMap<Decl, String> id = new HashMap<>();
 
     @Override
     public void visit(Program n) {
@@ -75,7 +75,7 @@ public class PrettyPrinter implements Visitor {
     public void visit(FormalList l) {
         sb.append("(");
         Iterator<Formal> itr = l.list.iterator();
-        itr.next().accept(this);
+        if(itr.hasNext()) itr.next().accept(this);
         while(itr.hasNext()){
             sb.append(", ");
             itr.next().accept(this);
@@ -238,7 +238,7 @@ public class PrettyPrinter implements Visitor {
 
     public void visit(ExpList l){
         Iterator<Exp> itr = l.list.iterator();
-        itr.next().accept(this);
+        if(itr.hasNext()) itr.next().accept(this);
         while(itr.hasNext()){
             sb.append(", ");
             itr.next().accept(this);
@@ -295,7 +295,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void visit(Identifier n) {
-        if (!id.containsKey(n)) { id.put(n, n.s + '_' + (idCount++) + "_"); }
-        sb.append(id.get(n));
+        if (!id.containsKey(n.b)) { id.put(n.b, n.s + '_' + (idCount++) + "_"); }
+        sb.append(id.get(n.b));
     }
 }

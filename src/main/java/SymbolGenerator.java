@@ -35,7 +35,7 @@ public class SymbolGenerator implements Visitor {
 	public void visit(MainClass n) {
 		// set the bindings
 		n.i.b = n;
-		n.i2.b = n;
+		n.i2.b = new Formal(new StringType(), n.i2);
 		// visit the main statement
 		n.s.accept(this);
 	}
@@ -43,8 +43,8 @@ public class SymbolGenerator implements Visitor {
 	public void visit(ClassDeclSimple n) {
 		// add n to the inheritance chain just so to handle "this"
 		inheritanceChain.add(n);
-		// assign class identifier to it's decl
-		n.i.b = n;
+		// Set the binding for this classDecl
+		n.i.b = t.get(n.i);
 		// add each varDecl to class scope
 		n.vl.list.forEach(v -> v.accept(this));
 		// add each methodDecl to class scope (because methods can reference each other)
@@ -63,12 +63,14 @@ public class SymbolGenerator implements Visitor {
 		else inheritanceChain.add(n);
 		// add all parent varDecl and methodDecl to current scope
 		t.get(n.parent).accept(this);
+		// Set the binding for this classDecl and it's parent
+		n.i.b = t.get(n.i); n.parent.b = t.get(n.parent);
 		// add all varDecl for current class
 		n.vl.list.forEach(v -> v.accept(this));
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
 			MethodDecl last = (MethodDecl) t.put(m.i, m);
-			if (last != null && last.fl.list.size() != m.fl.list.size()); //error - method override with different args
+			if (last != null && last.fl.list.size() != m.fl.list.size()); error(m.i, "method override with different args");
 		});
 		// visit each methodDecl
 		n.ml.list.forEach(m -> {
@@ -220,6 +222,8 @@ public class SymbolGenerator implements Visitor {
 
 	public void visit(Identifier n) {
 		// assign this identifier to its deceleration
-		n = t.get(n).i;
+		Decl d = t.get(n);
+		if(d == null) error(n, "identifier not found in symbole table");
+		else n.b = d;
 	}
 }
