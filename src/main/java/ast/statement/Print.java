@@ -1,5 +1,6 @@
 package ast.statement;
 
+import ast.Visitor;
 import ast.expression.Exp;
 
 public class Print extends Statement {
@@ -7,5 +8,10 @@ public class Print extends Statement {
 
 	public Print(Exp e) {
 		this.e = e;
+	}
+
+	@Override
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }

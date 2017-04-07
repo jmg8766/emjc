@@ -9,8 +9,8 @@ public class Emjc {
                 case"--lex":
                     new Lexer(args[1]).genLexFile();
                     return;
-                case"--oldast":
-                    new Parser(new Lexer(args[1])).genAstFile();
+                case"--parser2":
+                    new Parser2(new Lexer(args[1]));
                     return;
             }
         }

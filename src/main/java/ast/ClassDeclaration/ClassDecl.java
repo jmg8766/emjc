@@ -16,5 +16,5 @@ public abstract class ClassDecl extends Decl {
 		this.ml = m;
 	}
 
-	public abstract <R> R accept(Visitor<R> v);
+	public abstract void accept(Visitor v);
 }

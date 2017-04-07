@@ -11,9 +11,7 @@ public class ClassDeclSimple extends ClassDecl {
 		super(i, v, m);
 	}
 
-
-
-	public <R> R accept(Visitor<R> v) {
-		return v.visit(this);
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }

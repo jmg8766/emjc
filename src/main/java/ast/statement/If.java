@@ -1,5 +1,6 @@
 package ast.statement;
 
+import ast.Visitor;
 import ast.expression.Exp;
 
 public class If extends Statement {
@@ -11,5 +12,10 @@ public class If extends Statement {
 		this.e = e;
 		this.s1 = s1;
 		this.s2 = s2;
+	}
+
+	@Override
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }

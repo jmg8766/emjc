@@ -2,6 +2,8 @@ package ast;
 
 import ast.ClassDeclaration.*;
 import ast.expression.*;
+import ast.list.ExpList;
+import ast.list.FormalList;
 import ast.statement.*;
 import ast.type.*;
 

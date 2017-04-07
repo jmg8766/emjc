@@ -1,6 +1,7 @@
 package ast.expression;
 
 import ast.Identifier;
+import ast.Visitor;
 import ast.list.ExpList;
 
 public class Call extends Exp {
@@ -12,5 +13,10 @@ public class Call extends Exp {
 		this.e = e;
 		this.i = i;
 		this.el = el;
+	}
+
+	@Override
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }

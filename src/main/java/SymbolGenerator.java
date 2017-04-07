@@ -4,10 +4,7 @@ import ast.ClassDeclaration.ClassDeclSimple;
 import ast.*;
 import ast.expression.*;
 import ast.statement.*;
-import ast.type.BooleanType;
-import ast.type.IdentifierType;
-import ast.type.IntArrayType;
-import ast.type.IntegerType;
+import ast.type.*;
 import symbol.SymbolTable;
 
 import java.util.ArrayList;
@@ -84,7 +81,7 @@ public class SymbolGenerator implements Visitor {
 		if (t.put(n.i, n) != null) ; //error - var already defined in current scope
 	}
 
-	public void visit(MethodDecl n) {
+	public void visit(MethodDecl n){
 		// visit each paramDecl
 		n.fl.list.forEach(f -> f.accept(this));
 		// visit each varDecl
@@ -103,6 +100,9 @@ public class SymbolGenerator implements Visitor {
 	public void visit(BooleanType n) {}
 
 	public void visit(IntegerType n) {}
+
+	@Override
+	public void visit(StringType n) {}
 
 	public void visit(IdentifierType n) {
 		n.i.accept(this);
@@ -189,6 +189,9 @@ public class SymbolGenerator implements Visitor {
 	}
 
 	public void visit(IntegerLiteral n) {}
+
+	@Override
+	public void visit(StringLiteral n) {}
 
 	public void visit(True n) {}
 
