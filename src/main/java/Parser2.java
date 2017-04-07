@@ -21,7 +21,7 @@ public class Parser2 {
 
 	Program program() { return new Program(main(), classDeclList()); }
 
-	MainClass main() {
+	private MainClass main() {
 		eat(CLASS);
 		Identifier i1 = identifier();
 		eat(LBRACE, PUBLIC, STATIC, VOID, MAIN, LPAREN, STRING, LBRACKET, RBRACKET);
@@ -32,7 +32,7 @@ public class Parser2 {
 		return new MainClass(i1, i2, s);
 	}
 
-	ClassDecl classDecl() {
+	private ClassDecl classDecl() {
 		eat(CLASS);
 		Identifier i1 = identifier();
 		eat(LPAREN);
@@ -52,19 +52,32 @@ public class Parser2 {
 		return c;
 	}
 
-	VarDecl varDecl() { return new VarDecl(type(), identifier()); }
+	private VarDecl varDecl() { return _varDecl(type()); }
+	private VarDecl _varDecl(Type t) {
+		VarDecl v = new VarDecl(t, identifier());
+		eat(SEMICOLON); return v;
+	}
 
-	MethodDecl methodDecl() {
-		eat(PUBLIC);
-		Type t = type();
-		Identifier i = identifier();
-		eat(LPAREN);
-		FormalList fl = formalList();
-		eat(LBRACE);
-		VarDeclList vl = varDeclList();
-		StatementList sl = statementList();
-		eat(RETURN);
-		Exp e = exp();
+	private MethodDecl methodDecl() {
+		eat(PUBLIC); Type t = type(); Identifier i = identifier();
+		eat(LPAREN); FormalList fl = formalList(); eat(RPAREN, LBRACE);
+			VarDeclList vl = new VarDeclList();
+			StatementList sl = new StatementList();
+			while(true) { switch(tok.type) {
+				case INT: case BOOLEAN: case STRING:
+					vl.list.add(varDecl());
+					continue;
+				case ID:
+					Identifier id = identifier();
+					if(tok.type != ID) {
+						sl.list.add(_assign(id)); break;
+					}
+					vl.list.add(_varDecl(new IdentifierType(id)));
+					continue;
+				default: break;
+			} break; }
+			sl.list.addAll(statementList().list);
+			eat(RETURN); Exp e = exp();
 		eat(SEMICOLON, RBRACE);
 		return new MethodDecl(t, i, fl, vl, sl, e);
 	}
@@ -97,7 +110,7 @@ public class Parser2 {
 		case IF: return ifStmnt();
 		case WHILE: return whileStmnt();
 		case PRINTLN: return print();
-		case ID: return assign(identifier());
+		case ID: return assign();
 		case SIDEF:
 			eat(SIDEF, LPAREN); Exp e = exp();
 			eat(RPAREN, SEMICOLON); return e;
@@ -134,7 +147,8 @@ public class Parser2 {
 		return new Print(e);
 	}
 
-	Statement assign(Identifier i) { switch (tok.type) {
+	Statement assign() { return _assign(identifier()); }
+	Statement _assign(Identifier i) { switch (tok.type) {
 		case EQSIGN:
 			eat(EQSIGN);
 			Exp e = exp();
@@ -249,8 +263,6 @@ public class Parser2 {
 			error(); return null;
 	}}
 
-
-
 	// ===== LISTS =========
 
 	ExpList expList() {
@@ -277,7 +289,17 @@ public class Parser2 {
 		return fl;
 	}
 
+	// only works when called from ClassDecl
 	VarDeclList varDeclList() {
-
+		VarDeclList vl = new VarDeclList();
+		while(tok.type != PUBLIC) vl.list.add(varDecl());
+		return vl;
 	}
+
+	MethodDeclList methodDeclList() {
+		MethodDeclList ml = new MethodDeclList();
+		while(tok.type != RBRACE) ml.list.add(methodDecl());
+		return ml;
+	}
+
 }
