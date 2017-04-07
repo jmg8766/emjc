@@ -38,7 +38,7 @@ public class PrettyPrinter implements Visitor {
         sb.append("class ");
         n.i.accept(this);
         sb.append(" {\n");
-        n.vl.list.forEach(v-> {sb.append("\t"); v.accept(this);});
+        n.vl.list.forEach(v-> {sb.append("\t"); v.accept(this); sb.append(";\n"); });
         n.ml.list.forEach(m -> {sb.append("\t"); m.accept(this);});
         sb.append("\t} \n}");
     }
@@ -50,7 +50,7 @@ public class PrettyPrinter implements Visitor {
         sb.append(" extends ");
         n.parent.accept(this);
         sb.append(" {\n");
-        n.vl.list.forEach(v-> {sb.append("\t"); v.accept(this);});
+        n.vl.list.forEach(v-> {sb.append("\t"); v.accept(this); sb.append(";\n"); });
         n.ml.list.forEach(m -> {sb.append("\t"); m.accept(this);});
         sb.append("\t} \n}");
     }
@@ -67,8 +67,9 @@ public class PrettyPrinter implements Visitor {
         n.t.accept(this);
         n.i.accept(this);
         visit(n.fl);
-        n.vl.list.forEach(v-> {sb.append("\n\t\t"); v.accept(this);});
+        n.vl.list.forEach(v-> {sb.append("\n\t\t"); v.accept(this); sb.append(";\n"); });
         n.sl.list.forEach(s->{sb.append("\n\t\t"); s.accept(this);});
+        sb.append("return");
         n.e.accept(this);
     }
 

@@ -69,8 +69,9 @@ public class SymbolGenerator implements Visitor {
 		n.vl.list.forEach(v -> v.accept(this));
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
-			MethodDecl last = (MethodDecl) t.put(m.i, m);
-			if (last != null && last.fl.list.size() != m.fl.list.size()); error(m.i, "method override with different args");
+			MethodDecl last = (MethodDecl) t.get(m.i);
+			if (last != null && last.fl.list.size() != m.fl.list.size()) error(m.i, "method override with different args");
+			else t.put(m.i, m);
 		});
 		// visit each methodDecl
 		n.ml.list.forEach(m -> {
@@ -82,10 +83,13 @@ public class SymbolGenerator implements Visitor {
 
 	public void visit(VarDecl n) {
 		// just add the decl to whatever the current scope is
-		if (t.put(n.i, n) != null) ; //error - var already defined in current scope
+		if (t.put(n.i, n) != null) error(n.i, "var already defined in current scope");
+		n.i.b = n;
 	}
 
 	public void visit(MethodDecl n){
+		// set the binding for this methodDecl
+		n.i.b = n;
 		// visit each paramDecl
 		n.fl.list.forEach(f -> f.accept(this));
 		// visit each varDecl
@@ -97,6 +101,7 @@ public class SymbolGenerator implements Visitor {
 	public void visit(Formal n) {
 		// just add the decl to whatever the current scope is
 		if (t.put(n.i, n) != null) ; //error - formal already defined in current method
+		n.i.b = n;
 	}
 
 	public void visit(IntArrayType n) {}
