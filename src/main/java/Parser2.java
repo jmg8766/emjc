@@ -17,7 +17,10 @@ public class Parser2 {
 
 	public Parser2(Lexer l) { this.l = l; tok = l.next(); }
 	private void eat(TokenType... t) { for (TokenType aT : t) if (tok.type == aT) tok = l.next(); else error(); }
-	private void error() { System.out.println(tok.col + ":" + tok.row + " error: ...");}
+	private void error() {
+		System.out.println(tok.row + ":" + tok.col + " error: ...");
+		System.exit(0);
+	}
 
 	Program program() { return new Program(main(), classDeclList()); }
 
@@ -46,7 +49,7 @@ public class Parser2 {
 			case LBRACE:
 				c = new ClassDeclSimple(i1, varDeclList(), methodDeclList());
 				break;
-			default: error();
+			default: error(); return null;
 		}
 		eat(RBRACE);
 		return c;
@@ -187,9 +190,9 @@ public class Parser2 {
 	Exp ltEq() { return _ltEq(term()); }
 	// _LTEQ -> (< LTEQ) | (== LTEQ) | empty
 	Exp _ltEq(Exp e) { switch(tok.type) { //TODO
-		case LESSTHAN:
-		case EQUALS:
-		default: error(); return null;
+		case LESSTHAN: eat(LESSTHAN); return new LessThan(e, exp());
+		case EQUALS: eat(EQUALS); return new Equals(e, exp());
+		default: return e;
 	}}
 
 	// TERM -> FACT _TERM
@@ -216,14 +219,14 @@ public class Parser2 {
 		default: return call();
 	}}
 
-	// CALL -> FACTOR _EXP
-	Exp call() { return _call(factor()); }
+	// CALL -> UNARY _EXP
+	Exp call() { return _call(unary()); }
 	// _CALL -> . (length | identifier(expList)) | empty
 	Exp _call(Exp e) { switch(tok.type) {
 		case DOT: eat(DOT);
-			if(tok.type == LPAREN) {
-				eat(LPAREN); Identifier i = identifier();
-				ExpList el = expList(); eat(RPAREN);
+			if(tok.type == ID) {
+				Identifier i = identifier();
+				eat(LPAREN); ExpList el = expList(); eat(RPAREN);
 				return new Call(e, i, el);
 			} else {
 				eat(LENGTH); return new ArrayLength(e);
@@ -235,7 +238,7 @@ public class Parser2 {
 	Exp unary() { switch (tok.type) {
 		case INTLIT:
 			int val = ((IntLiteralToken)tok).value;
-			eat(INTLIT);return new IntegerLiteral(val);
+			eat(INTLIT); return new IntegerLiteral(val);
 		case STRINGLIT:
 			String s = ((StringLiteralToken)tok).value;
 			eat(STRINGLIT); return new StringLiteral(s);

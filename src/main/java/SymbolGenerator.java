@@ -153,6 +153,11 @@ public class SymbolGenerator implements Visitor {
 		n.e2.accept(this);
 	}
 
+	public void visit(Equals n) {
+		n.e1.accept(this);
+		n.e2.accept(this);
+	}
+
 	public void visit(Plus n) {
 		n.e1.accept(this);
 		n.e2.accept(this);

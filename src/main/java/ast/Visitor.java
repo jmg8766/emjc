@@ -1,9 +1,8 @@
 package ast;
 
-import ast.ClassDeclaration.*;
+import ast.ClassDeclaration.ClassDeclExtends;
+import ast.ClassDeclaration.ClassDeclSimple;
 import ast.expression.*;
-import ast.list.ExpList;
-import ast.list.FormalList;
 import ast.statement.*;
 import ast.type.*;
 
@@ -29,6 +28,7 @@ public interface Visitor {
 	void visit(And n);
 	void visit(Or n);
 	void visit(LessThan n);
+	void visit(Equals n);
 	void visit(Plus n);
 	void visit(Minus n);
 	void visit(Times n);
