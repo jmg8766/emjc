@@ -6,6 +6,7 @@ import ast.expression.*;
 import ast.list.*;
 import ast.statement.*;
 import ast.type.*;
+import org.testng.Assert;
 import token.*;
 
 import static token.TokenType.*;
@@ -19,6 +20,7 @@ public class Parser2 {
 	private void eat(TokenType... t) { for (TokenType aT : t) if (tok.type == aT) tok = l.next(); else error(); }
 	private void error() {
 		System.out.println(tok.row + ":" + tok.col + " error: ...");
+		Assert.fail();
 		System.exit(0);
 	}
 
@@ -204,8 +206,8 @@ public class Parser2 {
 		default: return e;
 	}}
 
-	// FACT -> CALL _FACT
-	Exp factor() { return _factor(call()); }
+	// FACT -> NOT _FACT
+	Exp factor() { return _factor(not()); }
 	// _FACT -> (* | /) FACT | empty
 	Exp _factor(Exp e) { switch (tok.type) {
 		case TIMES: eat(TokenType.TIMES); return new Times(e, factor());
@@ -227,9 +229,9 @@ public class Parser2 {
 			if(tok.type == ID) {
 				Identifier i = identifier();
 				eat(LPAREN); ExpList el = expList(); eat(RPAREN);
-				return new Call(e, i, el);
+				return _call(new Call(e, i, el));
 			} else {
-				eat(LENGTH); return new ArrayLength(e);
+				eat(LENGTH); return _call(new ArrayLength(e));
 			}
 		case LBRACKET:
 			eat(LBRACKET); Exp e2 = exp(); eat(RBRACKET);
@@ -250,7 +252,6 @@ public class Parser2 {
 		case FALSE:
 			eat(FALSE); return new False();
 		case ID:
-
 			return new IdentifierExp(identifier());
 		case THIS:
 			eat(THIS); return new This();
@@ -274,13 +275,15 @@ public class Parser2 {
 
 	ExpList expList() {
 		ExpList e = new ExpList();
-		while(tok.type != RPAREN) e.list.add(exp());
+		while(tok.type != RPAREN) {
+			e.list.add(exp()); if(tok.type == COMMA) eat(COMMA);
+		}
 		return e;
 	}
 
 	StatementList statementList() {
 		StatementList s = new StatementList();
-		while(tok.type != RETURN) s.list.add(statement());
+		while(tok.type != RETURN && tok.type != RBRACE) s.list.add(statement());
 		return s;
 	}
 
@@ -292,7 +295,9 @@ public class Parser2 {
 
 	FormalList formalList() {
 		FormalList fl = new FormalList();
-		while(tok.type != RPAREN) fl.list.add(formal());
+		while(tok.type != RPAREN) {
+			fl.list.add(formal()); if(tok.type == COMMA) eat(COMMA);
+		}
 		return fl;
 	}
 
