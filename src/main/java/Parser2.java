@@ -103,7 +103,7 @@ public class Parser2 {
 
 	Identifier identifier() { switch (tok.type) {
 		case ID:
-			Identifier i = new Identifier(((IdentifierToken)tok).value);
+			Identifier i = new Identifier(tok.row+":"+tok.col,((IdentifierToken)tok).value);
 			eat(ID); return i;
 		default: error(); return null;
 	}}

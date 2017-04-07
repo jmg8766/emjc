@@ -10,6 +10,9 @@ public class SymbolTable<V> {
 
 	private final LinkedList<HashMap<String, V>> symbols = new LinkedList<>();
 
+	public SymbolTable(){
+		symbols.addFirst(new HashMap<String, V>());
+	}
 	/**
 	 * @return the previous value associated with the key
 	 */

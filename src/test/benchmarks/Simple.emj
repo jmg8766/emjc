@@ -1,5 +1,0 @@
-class TranslateFieldsAndLocals {
-	public static void main(String[] a){
-	System.out.println(new Driver().start(2));
-    }
-}
