@@ -216,7 +216,7 @@ public class Parser2 {
 		default: return call();
 	}}
 
-	// CALL -> UNARY _EXP
+	// CALL -> FACTOR _EXP
 	Exp call() { return _call(factor()); }
 	// _CALL -> . (length | identifier(expList)) | empty
 	Exp _call(Exp e) { switch(tok.type) {
