@@ -1,3 +1,6 @@
+import ast.Program;
+import sun.awt.Symbol;
+
 /**
  * Contains the main method for the E mini Java Compiler.
  */
@@ -13,6 +16,10 @@ public class Emjc {
 //                    new Parser(new Lexer(args[1])).genAstFile();
 	                new Parser2(new Lexer(args[1])).program();
                     return;
+                case "--name":
+                    Program p = new Parser2(new Lexer(args[1])).program();
+                    new SymbolGenerator().visit(p);
+                    new PrettyPrinter().visit(p);
             }
         }
         //print --help info

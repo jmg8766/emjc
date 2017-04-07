@@ -10,6 +10,9 @@ public class SymbolTable<V> {
 
 	private final LinkedList<HashMap<String, V>> symbols = new LinkedList<>();
 
+	public SymbolTable(){
+		symbols.addFirst(new HashMap<String, V>());
+	}
 	/**
 	 * @param key
 	 * @param value
@@ -20,8 +23,8 @@ public class SymbolTable<V> {
 	}
 
 	public V get(Identifier key) {
-		return symbols.stream().map(m -> m.get(key.s.intern())).filter(Objects::nonNull).findFirst().orElseGet(() ->
-				null);
+		System.out.println(key.s.intern());
+		return symbols.stream().map(m -> m.get(key.s.intern())).filter(Objects::nonNull).findFirst().orElseGet(() -> null);
 	}
 
 	public void beginScope() {

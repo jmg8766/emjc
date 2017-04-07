@@ -14,6 +14,8 @@ public class SymbolGenerator implements Visitor {
 	private SymbolTable<Decl> t = new SymbolTable();
 	private ArrayList<ClassDecl> inheritanceChain = new ArrayList<>();
 
+	private void error(Identifier id, String msg) { System.out.println(id.position+  " error: " + msg);}
+
 	public void visit(Program n) {
 		// add the mainDecl to global scope
 		t.put(n.m.i, n.m);
