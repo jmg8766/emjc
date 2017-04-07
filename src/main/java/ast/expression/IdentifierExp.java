@@ -1,9 +1,16 @@
 package ast.expression;
 
-public class IdentifierExp {
-	public String s;
+import ast.Identifier;
+import ast.Visitor;
 
-	public IdentifierExp(String s) {
-		this.s = s;
+public class IdentifierExp extends Exp {
+	public Identifier i;
+
+	public IdentifierExp(Identifier i) {
+		this.i = i;
+	}
+
+	public void accept(Visitor v) {
+		v.visit(this);
 	}
 }
