@@ -10,7 +10,7 @@ import symbol.SymbolTable;
 import java.util.HashSet;
 import java.util.TreeSet;
 
-public class SymbolGenerator implements Visitor {
+public class SymbolGenerator implements Visitor<Object> {
 
 	private SymbolTable<Decl> t = new SymbolTable();
 	private HashSet<ClassDecl> inheritanceChain = new HashSet<>();
@@ -30,7 +30,7 @@ public class SymbolGenerator implements Visitor {
 	});
 	private void error(String loc, String msg) { errors.add(loc +  " error: " + msg); }
 
-	public void visit(Program n) {
+	public Object visit(Program n) {
 		// add the mainDecl to global scope
 		t.put(n.m.i, n.m);
 		// add all classDecl to global scope
@@ -47,17 +47,19 @@ public class SymbolGenerator implements Visitor {
 			t.endScope();
 		});
 		errors.forEach(System.out::println);
+		return null;
 	}
 
-	public void visit(MainClass n) {
+	public Object visit(MainClass n) {
 		// set the bindings
 		n.i.b = n;
 		n.i2.b = new Formal(new StringType(), n.i2);
 		// visit the main statement
 		n.s.accept(this);
+		return null;
 	}
 
-	public void visit(ClassDeclSimple n) {
+	public Object visit(ClassDeclSimple n) {
 		// add n to the inheritance chain just so to handle "this"
 		inheritanceChain.add(n);
 		// Set the binding for this classDecl
@@ -78,9 +80,10 @@ public class SymbolGenerator implements Visitor {
 			m.accept(this);
 			t.endScope();
 		});
+		return null;
 	}
 
-	public void visit(ClassDeclExtends n) {
+	public Object visit(ClassDeclExtends n) {
 		// check for cyclical inheritance
 		// add all parent varDecl and methodDecl to current scope
 		if(!inheritanceChain.add(n)) error(n.i.pos, "cyclical inheritance");
@@ -102,15 +105,17 @@ public class SymbolGenerator implements Visitor {
 			m.accept(this);
 			t.endScope();
 		});
+		return null;
 	}
 
-	public void visit(VarDecl n) {
+	public Object visit(VarDecl n) {
 		// just add the decl to whatever the current scope is
 		if(t.put(n.i, n) != null) error(n.i.pos, "var already defined in current scope");
 		n.i.b = n;
+		return null;
 	}
 
-	public void visit(MethodDecl n){
+	public Object visit(MethodDecl n){
 		// visit each paramDecl
 		n.fl.list.forEach(f -> f.accept(this));
 		// visit each varDecl
@@ -118,139 +123,164 @@ public class SymbolGenerator implements Visitor {
 		// visit each statement
 		n.sl.list.forEach(s -> s.accept(this));
 		n.e.accept(this);
+		return null;
 	}
 
-	public void visit(Formal n) {
+	public Object visit(Formal n) {
 		// just add the decl to whatever the current scope is
 		if (t.put(n.i, n) != null) error(n.i.pos, "formal already defined in current method");
 		n.i.b = n;
+		return null;
 	}
 
-	public void visit(IntArrayType n) {}
+	public Object visit(IntArrayType n) { return null;}
 
-	public void visit(BooleanType n) {}
+	public Object visit(BooleanType n) { return null;}
 
-	public void visit(IntegerType n) {}
+	public Object visit(IntegerType n) { return null;}
 
 	@Override
-	public void visit(StringType n) {}
+	public Object visit(StringType n) { return null;}
 
-	public void visit(IdentifierType n) {
+	public Object visit(IdentifierType n) {
 		n.i.accept(this);
+		return null;
 	}
 
-	public void visit(Block n) {
+	public Object visit(Block n) {
 		n.sl.list.forEach(s -> s.accept(this));
+		return null;
 	}
 
-	public void visit(If n) {
+	public Object visit(If n) {
 		n.e.accept(this);
 		n.s1.accept(this);
 		if(n.s2 != null) n.s2.accept(this);
+		return null;
 	}
 
-	public void visit(While n) {
+	public Object visit(While n) {
 		n.e.accept(this);
 		n.s.accept(this);
+		return null;
 	}
 
-	public void visit(Print n) {
+	public Object visit(Print n) {
 		n.e.accept(this);
+		return null;
 	}
 
-	public void visit(Assign n) {
+	public Object visit(Assign n) {
 		n.i.accept(this);
 		n.e.accept(this);
+		return null;
 	}
 
-	public void visit(ArrayAssign n) {
+	public Object visit(ArrayAssign n) {
 		n.i.accept(this);
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(And n) {
+	public Object visit(And n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(Or n) {
+	public Object visit(Or n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(LessThan n) {
+	public Object visit(LessThan n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(Equals n) {
+	public Object visit(Equals n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(Plus n) {
+	public Object visit(Plus n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(Minus n) {
+	public Object visit(Minus n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(Times n) {
+	public Object visit(Times n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
-
-	public void visit(Divide n) {
+t
+	public Object visit(Divide n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(ArrayLookup n) {
+	public Object visit(ArrayLookup n) {
 		n.e1.accept(this);
 		n.e2.accept(this);
+		return null;
 	}
 
-	public void visit(ArrayLength n) {
+	public Object visit(ArrayLength n) {
 		n.e.accept(this);
+		return null;
 	}
 
-	public void visit(Call n) {
+	public Object visit(Call n) {
 		n.e.accept(this);
 		// do not visit the identifier because it is out of scope //n.i.accept(this)
 		n.el.list.forEach(e -> e.accept(this));
+		return null;
 	}
 
-	public void visit(IntegerLiteral n) {}
+	public Object visit(IntegerLiteral n) { return null; }
 
 	@Override
-	public void visit(StringLiteral n) {}
+	public Object visit(StringLiteral n) {return null;}
 
-	public void visit(True n) {}
+	public Object visit(True n) {return null;}
 
-	public void visit(False n) {}
+	public Object visit(False n) {return null;}
 
-	public void visit(IdentifierExp n) {
+	public Object visit(IdentifierExp n) {
 		n.i.accept(this);
+		return null;
 	}
 
-	public void visit(This n) {
-		if(inheritanceChain.isEmpty()) error(n.pos,  "reference this from inside main method");
+	public Object visit(This n) {
+		if(inheritanceChain.isEmpty()) error(n.pos,  "reference this from inside main method");return null;
 	}
 
-	public void visit(NewArray n) { n.e.accept(this); }
+	public Object visit(NewArray n) { n.e.accept(this); return null;}
 
-	public void visit(NewObject n) { n.i.accept(this); }
+	public Object visit(NewObject n) {
+		n.i = t.get(n.i).i;
+		return null;
+	}
 
-	public void visit(Not n) { n.e.accept(this);}
+	public Object visit(Not n) { n.e.accept(this); return null;}
 
-	public void visit(Identifier n) {
+	public Object visit(Identifier n) {
 		// assign this identifier to its deceleration
 		Decl d = t.get(n);
 		if(d == null) error(n.pos, "identifier not found in symbol table");
 		else n.b = d;
+		return null;
 	}
 }

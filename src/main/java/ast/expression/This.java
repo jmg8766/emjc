@@ -9,8 +9,7 @@ public class This extends Exp {
 		this.pos = pos;
 	}
 
-	@Override
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
 	}
 }

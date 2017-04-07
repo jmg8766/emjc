@@ -13,7 +13,8 @@ public class ClassDeclExtends extends ClassDecl {
 		this.parent = parent;
 	}
 
-	public void accept(Visitor v) {
-		 v.visit(this);
+	@Override
+	public <R> R accept(Visitor<R> v) {
+		 return v.visit(this);
 	}
 }

@@ -5,201 +5,199 @@ import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 
-public class ASTPrinter implements Visitor {
-	StringBuilder b = new StringBuilder();
-
+public class ASTPrinter implements Visitor<Object> {
 	@Override
-	public void visit(Program n) {
-
+	public Object visit(Program n) {
+		return null;
 	}
 
 	@Override
-	public void visit(MainClass n) {
-
+	public Object visit(MainClass n) {
+		return null;
 	}
 
 	@Override
-	public void visit(ClassDeclSimple n) {
-
+	public Object visit(ClassDeclSimple n) {
+		return null;
 	}
 
 	@Override
-	public void visit(ClassDeclExtends n) {
-
+	public Object visit(ClassDeclExtends n) {
+		return null;
 	}
 
 	@Override
-	public void visit(VarDecl n) {
-
+	public Object visit(VarDecl n) {
+		return null;
 	}
 
 	@Override
-	public void visit(MethodDecl n) {
-
+	public Object visit(MethodDecl n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Formal n) {
-
+	public Object visit(Formal n) {
+		return null;
 	}
 
 	@Override
-	public void visit(IntArrayType n) {
-
+	public Object visit(IntArrayType n) {
+		return null;
 	}
 
 	@Override
-	public void visit(BooleanType n) {
-
+	public Object visit(BooleanType n) {
+		return null;
 	}
 
 	@Override
-	public void visit(IntegerType n) {
-
+	public Object visit(IntegerType n) {
+		return null;
 	}
 
 	@Override
-	public void visit(StringType n) {
-
+	public Object visit(StringType n) {
+		return null;
 	}
 
 	@Override
-	public void visit(IdentifierType n) {
-
+	public Object visit(IdentifierType n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Block n) {
-
+	public Object visit(Block n) {
+		return null;
 	}
 
 	@Override
-	public void visit(If n) {
-
+	public Object visit(If n) {
+		return null;
 	}
 
 	@Override
-	public void visit(While n) {
-
+	public Object visit(While n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Print n) {
-
+	public Object visit(Print n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Assign n) {
-
+	public Object visit(Assign n) {
+		return null;
 	}
 
 	@Override
-	public void visit(ArrayAssign n) {
-
+	public Object visit(ArrayAssign n) {
+		return null;
 	}
 
 	@Override
-	public void visit(And n) {
-
+	public Object visit(And n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Or n) {
-
+	public Object visit(Or n) {
+		return null;
 	}
 
 	@Override
-	public void visit(LessThan n) {
-
+	public Object visit(LessThan n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Equals n) {
-
+	public Object visit(Equals n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Plus n) {
-
+	public Object visit(Plus n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Minus n) {
-
+	public Object visit(Minus n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Times n) {
-
+	public Object visit(Times n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Divide n) {
-
+	public Object visit(Divide n) {
+		return null;
 	}
 
 	@Override
-	public void visit(ArrayLookup n) {
-
+	public Object visit(ArrayLookup n) {
+		return null;
 	}
 
 	@Override
-	public void visit(ArrayLength n) {
-
+	public Object visit(ArrayLength n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Call n) {
-
+	public Object visit(Call n) {
+		return null;
 	}
 
 	@Override
-	public void visit(IntegerLiteral n) {
-
+	public Object visit(IntegerLiteral n) {
+		return null;
 	}
 
 	@Override
-	public void visit(StringLiteral n) {
-
+	public Object visit(StringLiteral n) {
+		return null;
 	}
 
 	@Override
-	public void visit(True n) {
-
+	public Object visit(True n) {
+		return null;
 	}
 
 	@Override
-	public void visit(False n) {
-
+	public Object visit(False n) {
+		return null;
 	}
 
 	@Override
-	public void visit(IdentifierExp n) {
-
+	public Object visit(IdentifierExp n) {
+		return null;
 	}
 
 	@Override
-	public void visit(This n) {
-
+	public Object visit(This n) {
+		return null;
 	}
 
 	@Override
-	public void visit(NewArray n) {
-
+	public Object visit(NewArray n) {
+		return null;
 	}
 
 	@Override
-	public void visit(NewObject n) {
-
+	public Object visit(NewObject n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Not n) {
-
+	public Object visit(Not n) {
+		return null;
 	}
 
 	@Override
-	public void visit(Identifier n) {
-
+	public Object visit(Identifier n) {
+		return null;
 	}
 }

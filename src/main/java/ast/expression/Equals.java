@@ -10,7 +10,7 @@ public class Equals extends Exp {
 		this.e2 = e2;
 	}
 
-	public void accept(Visitor v) {
-		v.visit(this);
+	public <R> R accept(Visitor<R> v) {
+		return v.visit(this);
 	}
 }
