@@ -1,203 +1,201 @@
-import ast.*;
 import ast.ClassDeclaration.ClassDeclExtends;
 import ast.ClassDeclaration.ClassDeclSimple;
+import ast.*;
 import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 
-public class ASTPrinter implements Visitor<Object> {
-	@Override
-	public Object visit(Program n) {
-		return null;
+public class ASTPrinter implements Visitor<String> {
+
+	public String visit(Program n) {
+		StringBuilder b = new StringBuilder(n.m.accept(this));
+		n.cl.list.forEach(c -> b.append(c.accept(this)));
+		return b.toString();
 	}
 
-	@Override
-	public Object visit(MainClass n) {
-		return null;
+	public String visit(MainClass n) {
+		return new StringBuilder("(MAIN-CLASS ").append(n.i.accept(this)).append("\n")
+				.append("(MAIN-MTD-DECLR ").append(n.i2.accept(this)).append("\n")
+				.append(n.s.accept(this)).append("\n")
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(ClassDeclSimple n) {
-		return null;
+	public String visit(ClassDeclSimple n) {
+		StringBuilder b = new StringBuilder("(CLASS ").append(n.i.accept(this));
+		n.vl.list.forEach(v -> b.append(v.accept(this)));
+		n.ml.list.forEach(m -> b.append(m.accept(this)));
+		return b.append(")").toString();
 	}
 
-	@Override
-	public Object visit(ClassDeclExtends n) {
-		return null;
+	public String visit(ClassDeclExtends n) {
+		StringBuilder b = new StringBuilder("(CLASS ").append(n.i.accept(this))
+				.append("EXTENDS ").append(n.parent.accept(this));
+		n.vl.list.forEach(v -> b.append(v.accept(this)));
+		n.ml.list.forEach(m -> b.append(m.accept(this)));
+		return b.append(")").toString();
 	}
 
-	@Override
-	public Object visit(VarDecl n) {
-		return null;
+	public String visit(VarDecl n) {
+		return new StringBuilder("(VAR-DECL ").append(n.t.accept(this)).append(" ")
+				.append(n.i.accept(this)).append(")").toString();
 	}
 
-	@Override
-	public Object visit(MethodDecl n) {
-		return null;
+	public String visit(MethodDecl n) {
+		StringBuilder b = new StringBuilder("(MTD-DECL ").append(n.t.accept(this)).append(" ")
+				.append(n.i.accept(this)).append(" ").append("(TY-ID-LIST ");
+		n.vl.list.forEach(f -> b.append(f.accept(this)));
+		b.append(")\n");
+		n.sl.list.forEach(s -> b.append(s.accept(this)));
+		return b.append(")").toString();
 	}
 
-	@Override
-	public Object visit(Formal n) {
-		return null;
+	public String visit(Formal n) {
+		return new StringBuilder("(").append(n.t.accept(this)).append(" ").append(n.i.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(IntArrayType n) {
-		return null;
+	public String visit(IntArrayType n) {
+		return "INT[]";
 	}
 
-	@Override
-	public Object visit(BooleanType n) {
-		return null;
+	public String visit(BooleanType n) {
+		return "BOOLEAN";
 	}
 
-	@Override
-	public Object visit(IntegerType n) {
-		return null;
+	public String visit(IntegerType n) {
+		return "INT";
 	}
 
-	@Override
-	public Object visit(StringType n) {
-		return null;
+	public String visit(StringType n) {
+		return "STRING";
 	}
 
-	@Override
-	public Object visit(IdentifierType n) {
-		return null;
+	public String visit(IdentifierType n) {
+		return n.i.accept(this);
 	}
 
-	@Override
-	public Object visit(Block n) {
-		return null;
+	public String visit(Block n) {
+		StringBuilder b = new StringBuilder("(BLOCK");
+		n.sl.list.forEach(s -> b.append(s.accept(this)).append("\n"));
+		return b.append(")").toString();
 	}
 
-	@Override
-	public Object visit(If n) {
-		return null;
+	public String visit(If n) {
+		return new StringBuilder("(IF ").append(n.e.accept(this)).append("\n\t").append(n.s1.accept(this))
+				.append("\n\t").append(n.s2 == null ? "" : n.s2.accept(this)).append("\n)").toString();
 	}
 
-	@Override
-	public Object visit(While n) {
-		return null;
+	public String visit(While n) {
+		return new StringBuilder("(WHILE ").append(n.e.accept(this)).append("\n\t").append(n.s.accept(this))
+				.append("\n)").toString();
 	}
 
-	@Override
-	public Object visit(Print n) {
-		return null;
+	public String visit(Print n) {
+		return new StringBuilder("(PRINT ").append(n.e.accept(this)).append(")").toString();
 	}
 
-	@Override
-	public Object visit(Assign n) {
-		return null;
+	public String visit(Assign n) {
+		return new StringBuilder("(EQSIGN ").append(n.i.accept(this)).append(" ").append(n.e.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(ArrayAssign n) {
-		return null;
+	public String visit(ArrayAssign n) {
+		return new StringBuilder("(EQSIGN ").append(n.i.accept(this)).append("[").append(n.e1.accept(this))
+				.append("] ").append(" ").append(n.e2.accept(this)).append(")").toString();
 	}
 
-	@Override
-	public Object visit(And n) {
-		return null;
+	public String visit(And n) {
+		return new StringBuilder("(&& ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(Or n) {
-		return null;
+	public String visit(Or n) {
+		return new StringBuilder("(|| ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(LessThan n) {
-		return null;
+	public String visit(LessThan n) {
+		return new StringBuilder("(< ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(Equals n) {
-		return null;
+	public String visit(Equals n) {
+		return new StringBuilder("(== ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(Plus n) {
-		return null;
+	public String visit(Plus n) {
+		return new StringBuilder("(+ ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(Minus n) {
-		return null;
+	public String visit(Minus n) {
+		return new StringBuilder("(- ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(Times n) {
-		return null;
+	public String visit(Times n) {
+		return new StringBuilder("(* ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(Divide n) {
-		return null;
+	public String visit(Divide n) {
+		return new StringBuilder("(/ ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
+				.append(")").toString();
 	}
 
-	@Override
-	public Object visit(ArrayLookup n) {
-		return null;
+	public String visit(ArrayLookup n) {
+		return new StringBuilder("(ARRAY-LOOKUP ").append(n.e1.accept(this)).append("[")
+				.append(n.e2.accept(this)).append("]").toString();
 	}
 
-	@Override
-	public Object visit(ArrayLength n) {
-		return null;
+	public String visit(ArrayLength n) {
+		return new StringBuilder("(LENGTH ").append(n.e.accept(this)).append(")").toString();
 	}
 
-	@Override
-	public Object visit(Call n) {
-		return null;
+	public String visit(Call n) {
+		StringBuilder b = new StringBuilder("(DOT ").append(n.e.accept(this)).append(" (FUN-CALL");
+		n.el.list.forEach(f -> b.append(" ").append(f.accept(this)));
+		return b.append("))").toString();
 	}
 
-	@Override
-	public Object visit(IntegerLiteral n) {
-		return null;
+	public String visit(IntegerLiteral n) {
+		return new StringBuilder("(INTLIT ").append(n.i).append(")").toString();
 	}
 
-	@Override
-	public Object visit(StringLiteral n) {
-		return null;
+	public String visit(StringLiteral n) {
+		return new StringBuilder("(STRINGLIT ").append(n.val).append(")").toString();
 	}
 
-	@Override
-	public Object visit(True n) {
-		return null;
+	public String visit(True n) {
+		return "TRUE";
 	}
 
-	@Override
-	public Object visit(False n) {
-		return null;
+	public String visit(False n) {
+		return "FALSE";
 	}
 
-	@Override
-	public Object visit(IdentifierExp n) {
-		return null;
+	public String visit(IdentifierExp n) {
+		return n.accept(this);
 	}
 
-	@Override
-	public Object visit(This n) {
-		return null;
+	public String visit(This n) {
+		return "THIS";
 	}
 
-	@Override
-	public Object visit(NewArray n) {
-		return null;
+	public String visit(NewArray n) {
+		return new StringBuilder("(NEW-INT[] ").append(n.e.accept(this)).append(")").toString();
 	}
 
-	@Override
-	public Object visit(NewObject n) {
-		return null;
+	public String visit(NewObject n) {
+		return new StringBuilder("(NEW-OBJECT ").append(n.i.accept(this)).append(")").toString();
 	}
 
-	@Override
-	public Object visit(Not n) {
-		return null;
+	public String visit(Not n) {
+		return new StringBuilder("(NOT ").append(n.e.accept(this)).append(")").toString();
 	}
 
-	@Override
-	public Object visit(Identifier n) {
-		return null;
+	public String visit(Identifier n) {
+		return new StringBuilder("(ID ").append(n.s).append(")").toString();
 	}
 }

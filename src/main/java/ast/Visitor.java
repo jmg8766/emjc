@@ -43,7 +43,6 @@ public interface Visitor<R> {
 	R visit(IdentifierExp n);
 	R visit(This n);
 	R visit(NewArray n);
-	R visit(NewObject n);
-	R visit(Not n);
+	R visit(NewObject n); R visit(Not n);
 	R visit(Identifier n);
 }

@@ -46,7 +46,8 @@ public class SymbolGenerator implements Visitor<Object> {
 			c.accept(this);
 			t.endScope();
 		});
-		errors.forEach(System.out::println);
+		if(errors.isEmpty()) System.out.println("Valid eMiniJava Program");
+		else errors.forEach(System.out::println);
 		return null;
 	}
 

@@ -1,468 +1,317 @@
-import oldast.ID;
-import oldast.SyntaxException;
-import oldast.TypeIdList;
-import oldast.expression.*;
-import oldast.expression.operators.*;
-import oldast.statement.*;
-import oldast.type.Boolean;
-import oldast.type.*;
-import oldast.type.String;
+import ast.ClassDeclaration.ClassDecl;
+import ast.ClassDeclaration.ClassDeclExtends;
+import ast.ClassDeclaration.ClassDeclSimple;
+import ast.*;
+import ast.expression.*;
+import ast.list.*;
+import ast.statement.*;
+import ast.type.*;
+import org.testng.Assert;
 import token.*;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import static token.TokenType.*;
 
-class Parser {
+public class Parser {
 
-	private Lexer input;
-	private Token currentToken;
-	private java.lang.String outputFile;
+	private final Lexer l;
+	private Token tok;
 
-	Parser(Lexer lexer) {
-		this.input = lexer;
-		currentToken = input.next();
-		outputFile = lexer.inputFile.substring(0, lexer.inputFile.indexOf('.')) + ".oldast";
+	public Parser(Lexer l) { this.l = l; tok = l.next(); }
+	private void eat(TokenType... t) { for (TokenType aT : t) if (tok.type == aT) tok = l.next(); else error(); }
+	private void error() {
+		System.out.println(tok.row + ":" + tok.col + " error: ...");
+		Assert.fail();
+		System.exit(0);
 	}
 
-	void genAstFile() {
-		try {
-			Program p = parseProgram();
-			BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile));
-			out.write(p.accept(new ParseTreePrinterOld()));
-			out.flush();
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SyntaxException e) {
-			System.out.println("\t" + e.getMessage());
-		}
+	Program program() { return new Program(main(), classDeclList()); }
+
+	private MainClass main() {
+		eat(CLASS);
+		Identifier i1 = identifier();
+		eat(LBRACE, PUBLIC, STATIC, VOID, MAIN, LPAREN, STRING, LBRACKET, RBRACKET);
+		Identifier i2 = identifier();
+		eat(RPAREN, LBRACE);
+		Statement s = statement();
+		eat(RBRACE, RBRACE);
+		return new MainClass(i1, i2, s);
 	}
 
-	private void checkType(TokenType t) throws SyntaxException {
-		if (!(currentToken.type == t))
-			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " + t + " instead " +
-					"" + "" + "" + "" + "" + "" + "" + "" + "" + "of " + currentToken.type);
-		currentToken = input.next();
-	}
-
-	private boolean assertType(TokenType type) {
-		if (currentToken.type == type) {
-			currentToken = input.next();
-			return true;
-		} else return false;
-	}
-
-	private Program parseProgram() throws SyntaxException {
-		MainClassDeclaration main = parseMain();
-		ArrayList<ClassDeclaration> classes = new ArrayList<>();
-		while (currentToken.type != TokenType.EOF) {
-			classes.add(parseClass());
-		}
-		return new Program(main, classes);
-	}
-
-	private TypeIdList parseTypeIdList() throws SyntaxException {
-		int row = currentToken.row;
-		int col = currentToken.col;
-
-		ArrayList<Type> types = new ArrayList<>();
-		ArrayList<ID> ids = new ArrayList<>();
-
-		while (currentToken.type != TokenType.RPAREN) {
-			types.add(parseType());
-			ids.add(parseID());
-			if (assertType(TokenType.COMMA)) {
-				if (assertType(TokenType.RPAREN))
-					throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected " +
-							"Parameters" + " after , found none");
-			}
-		}
-
-		TypeIdList param = new TypeIdList(types, ids);
-		param.row = row;
-		param.col = col;
-
-		return param;
-	}
-
-	// ================== EXPRESSIONS =================================================================================
-	private Expression parseExpression() throws SyntaxException {
-		Expression e;
-		switch (currentToken.type) {
-			case INTLIT:
-				e = parseIntLiteral();
-				break;
-			case STRINGLIT:
-				e = parseStringLiteral();
-				break;
-			case TRUE:
-				e = parseTrue();
-				break;
-			case FALSE:
-				e = parseFalse();
-				break;
-			case ID:
-				e = parseID();
-				break;
-			case THIS:
-				e = parseThis();
-				break;
-			case NEW:
-				int row = currentToken.row;
-				int col = currentToken.col;
-				currentToken = input.next();
-				if (currentToken.type == TokenType.INT) {
-					currentToken = input.next();
-					checkType(TokenType.LBRACKET);
-					Expression length = parseExpression();
-					checkType(TokenType.RBRACKET);
-					e = new NewArray(row, col, length);
-				} else {
-					ID i = parseID();
-					checkType(TokenType.LPAREN);
-					checkType(TokenType.RPAREN);
-					e = new NewObject(row, col, i);
-				}
-				break;
-			case BANG:
-				e = parseNot();
-				break;
-			case LPAREN:
-				e = parsePrecedence();
-				break;
-			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected an " +
-						"Expression instead of " + currentToken.type);
-		}
-		return parseOperator(e);
-	}
-
-	private Expression parseOperator(Expression lhs) {
-		switch (currentToken.type) {
-			case AND:
-				currentToken = input.next();
-				return new And(currentToken.row, currentToken.col, lhs, parseExpression());
-			case OR:
-				currentToken = input.next();
-				return new Or(currentToken.row, currentToken.col, lhs, parseExpression());
-			case EQUALS:
-				currentToken = input.next();
-				return new Equals(currentToken.row, currentToken.col, lhs, parseExpression());
-			case LESSTHAN:
-				currentToken = input.next();
-				return new LessThan(currentToken.row, currentToken.col, lhs, parseExpression());
-			case PLUS:
-				currentToken = input.next();
-				return new Plus(currentToken.row, currentToken.col, lhs, parseExpression());
-			case MINUS:
-				currentToken = input.next();
-				return new Minus(currentToken.row, currentToken.col, lhs, parseExpression());
-			case TIMES:
-				currentToken = input.next();
-				return new Times(currentToken.row, currentToken.col, lhs, parseExpression());
-			case DIV:
-				currentToken = input.next();
-				return new Division(currentToken.row, currentToken.col, lhs, parseExpression());
-			case LBRACKET:
-				currentToken = input.next();
-				Expression indexExpression = parseExpression();
-				checkType(TokenType.RBRACKET);
-				return parseOperator(new ArrayIndex(currentToken.row, currentToken.col, lhs, indexExpression));
-			case DOT:
-				currentToken = input.next();
-				if (assertType(TokenType.LENGTH)) { //.length
-					return parseOperator(new Length(currentToken.row, currentToken.col, lhs));
-				}
-				else { //.method(arg1, arg2...)
-					ID id = parseID();
-					checkType(TokenType.LPAREN);
-					ArrayList<Expression> params = new ArrayList<>();
-					while (currentToken.type != TokenType.RPAREN) {
-						params.add(parseExpression());
-						assertType(TokenType.COMMA);
-					}
-					checkType(TokenType.RPAREN);
-					lhs = new FunctionCall(lhs, id, params);
-				}
-				return parseOperator(lhs);
-			default:
-				return lhs;
-		}
-	}
-
-	private ID parseID() throws SyntaxException {
-		if (currentToken.type != TokenType.ID)
-			throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: expected an ID intead of "
-					+ currentToken.type);
-		ID id = new ID(currentToken.row, currentToken.col, ((IdentifierToken) currentToken).value);
-		currentToken = input.next();
-		return id;
-	}
-
-	private IntLiteral parseIntLiteral() {
-		IntLiteral i = new IntLiteral(currentToken.row, currentToken.col, ((IntLiteralToken) currentToken).value);
-		currentToken = input.next();
-		return i;
-	}
-
-	private StringLiteral parseStringLiteral() {
-		StringLiteral i = new StringLiteral(currentToken.row, currentToken.col, ((StringLiteralToken) currentToken)
-				.value);
-		currentToken = input.next();
-		return i;
-	}
-
-	private BooleanLiteral parseTrue() {
-		BooleanLiteral i = new BooleanLiteral(currentToken.row, currentToken.col, true);
-		currentToken = input.next();
-		return i;
-	}
-
-	private BooleanLiteral parseFalse() {
-		BooleanLiteral i = new BooleanLiteral(currentToken.row, currentToken.col, false);
-		currentToken = input.next();
-		return i;
-	}
-
-	private This parseThis() {
-		This i = new This(currentToken.row, currentToken.col);
-		currentToken = input.next();
-		return i;
-	}
-
-	private Not parseNot() throws SyntaxException {
-		checkType(TokenType.BANG);
-		return new Not(currentToken.row, currentToken.col, parseExpression());
-	}
-
-	private Precedence parsePrecedence() throws SyntaxException {
-		checkType(TokenType.LPAREN);
-		Precedence i = new Precedence(currentToken.row, currentToken.col, parseExpression());
-		checkType(TokenType.RPAREN);
-		return i;
-	}
-
-	// ================== STATEMENTS ==================================================================================
-	private Statement parseStatement(Assignable a) throws SyntaxException {
-		int row = currentToken.row;
-		int col = currentToken.col;
-		switch (currentToken.type) {
-			case LBRACE: //BLOCK
-				currentToken = input.next();
-				ArrayList<Statement> stmts = new ArrayList<>();
-				while (!assertType(TokenType.RBRACE)) stmts.add(parseStatement(null));
-				return new Block(stmts);
-			case IF:
-				currentToken = input.next();
-				checkType(TokenType.LPAREN);
-				Expression expr = parseExpression();
-				checkType(TokenType.RPAREN);
-				Statement then = parseStatement(null);
-				Statement elze = null;
-				if (assertType(TokenType.ELSE)) {
-					elze = parseStatement(null);
-				}
-				IfThenElse ifThenElse = new IfThenElse(expr, then, elze);
-				ifThenElse.row = row;
-				ifThenElse.col = col;
-				return ifThenElse;
-			case WHILE:
-				currentToken = input.next();
-				Expression whileExpr = parseExpression();
-				Statement whileStmt = parseStatement(null);
-				return new While(whileExpr, whileStmt);
-			case PRINTLN:
-				currentToken = input.next();
-				checkType(TokenType.LPAREN);
-				Expression printExpression = parseExpression();
-				checkType(TokenType.RPAREN);
-				checkType(TokenType.SEMICOLON);
-				return new Print(printExpression);
-			case ID:
-				a = parseID();
-			case EQSIGN:
-			case LBRACKET:
-				if (currentToken.type == TokenType.LBRACKET) {
-					currentToken = input.next();
-					a = new ArrayIndex(currentToken.row, currentToken.col, a, parseExpression());
-					checkType(TokenType.RBRACKET);
-				}
-				checkType(TokenType.EQSIGN);
-				Expression idExpr = parseExpression();
-				checkType(TokenType.SEMICOLON);
-				return new Assign(a, idExpr);
-			case SIDEF:
-				currentToken = input.next();
-				checkType(TokenType.LPAREN);
-				Expression sidefExpr = parseExpression();
-				checkType(TokenType.RPAREN);
-				checkType(TokenType.SEMICOLON);
-				return new Sidef(sidefExpr);
-
-			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Statement " +
-						"instead of " + currentToken.type);
-		}
-	}
-
-	private MethodDeclaration parseMethodDeclarations() throws SyntaxException {
-		int row = currentToken.row;
-		int col = currentToken.col;
-		checkType(TokenType.PUBLIC);
-		Type type = parseType();
-		ID id = parseID();
-		checkType(TokenType.LPAREN);
-
-		TypeIdList params = parseTypeIdList();
-
-		checkType(TokenType.RPAREN);
-		checkType(TokenType.LBRACE);
-
-		ArrayList<VarDeclaration> variables = new ArrayList<>();
-		ArrayList<Statement> statements = new ArrayList<>();
-
-		while ((currentToken.type != TokenType.RBRACE && currentToken.type != TokenType.RETURN) && (currentToken.type
-				== TokenType.INT || currentToken.type == TokenType.STRING || currentToken.type == TokenType.BOOLEAN ||
-				currentToken.type == TokenType.ID)) {
-
-			if (currentToken.type == TokenType.ID) {
-				ID i = parseID();
-				if (currentToken.type == TokenType.ID) {
-					variables.add(new VarDeclaration(i, parseID()));
-				} else {
-					statements.add(parseStatement(i));
-					break;
-				}
-			} else {
-				variables.add(new VarDeclaration(parseType(), parseID()));
-			}
-			checkType(TokenType.SEMICOLON);
-		}
-
-		while (currentToken.type != TokenType.RETURN) {
-			statements.add(parseStatement(null));
-		}
-
-		checkType(TokenType.RETURN);
-		Return returnExpression = new Return(parseExpression());
-		checkType(TokenType.SEMICOLON);
-		MethodDeclaration method = new MethodDeclaration(type, id, params, variables, statements, returnExpression);
-		checkType(TokenType.RBRACE);
-
-		method.row = row;
-		method.col = col;
-		return method;
-	}
-
-	private VarDeclaration parseVarDeclarations() throws SyntaxException {
-		int row = currentToken.row;
-		int col = currentToken.col;
-		VarDeclaration variable = new VarDeclaration(parseType(), parseID());
-		variable.row = row;
-		variable.col = col;
-		checkType(TokenType.SEMICOLON);
-		return variable;
-	}
-
-	private ClassDeclaration parseClass() throws SyntaxException {
-		checkType(TokenType.CLASS);
-		int row = currentToken.row;
-		int col = currentToken.col;
-		ID className = parseID();
-		ID parentName = null;
-		switch (currentToken.type) {
+	private ClassDecl classDecl() {
+		eat(CLASS); Identifier i1 = identifier();
+		ClassDecl c = null;
+		switch(tok.type) {
 			case EXTENDS:
-				currentToken = input.next();
-				parentName = parseID();
+				eat(EXTENDS);
+				Identifier i2 = identifier();
+				eat(LBRACE);
+				c = new ClassDeclExtends(i1, i2, varDeclList(), methodDeclList());
 				break;
 			case LBRACE:
+				eat(LBRACE);
+				c = new ClassDeclSimple(i1, varDeclList(), methodDeclList());
 				break;
-			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected Block instead " +
-						"" + "" + "" + "" + "" + "of " + currentToken.type);
+			default: error(); return null;
 		}
-		checkType(TokenType.LBRACE);
-
-		ArrayList<VarDeclaration> variables = new ArrayList<>();
-		while (currentToken.type != TokenType.PUBLIC && currentToken.type != TokenType.RBRACE) {
-			variables.add(parseVarDeclarations());
-		}
-
-		ArrayList<MethodDeclaration> methods = new ArrayList<>();
-		while (currentToken.type != TokenType.RBRACE) {
-			methods.add(parseMethodDeclarations());
-		}
-		ClassDeclaration claz = new ClassDeclaration(className, parentName, variables, methods);
-		claz.row = row;
-		claz.col = col;
-
-		currentToken = input.next();
-		return claz;
+		eat(RBRACE);
+		return c;
 	}
 
-	private MainClassDeclaration parseMain() throws SyntaxException {
-		checkType(TokenType.CLASS);
-		int row = currentToken.row;
-		int col = currentToken.col;
-
-		ID className = parseID();
-		checkType(TokenType.LBRACE);
-		checkType(TokenType.PUBLIC);
-		checkType(TokenType.STATIC);
-		checkType(TokenType.VOID);
-		checkType(TokenType.MAIN);
-		checkType(TokenType.LPAREN);
-		checkType(TokenType.STRING);
-		checkType(TokenType.LBRACKET);
-		checkType(TokenType.RBRACKET);
-
-		ID paramName = parseID();
-		checkType(TokenType.RPAREN);
-		checkType(TokenType.LBRACE);
-		Statement body = parseStatement(null);
-		checkType(TokenType.RBRACE);
-		checkType(TokenType.RBRACE);
-
-		MainClassDeclaration main = new MainClassDeclaration(className, paramName, body);
-		main.col = col;
-		main.row = row;
-		return main;
+	private VarDecl varDecl() { return _varDecl(type()); }
+	private VarDecl _varDecl(Type t) {
+		VarDecl v = new VarDecl(t, identifier());
+		eat(SEMICOLON); return v;
 	}
 
-	// ================== TYPES =======================================================================================
-	private Type parseType() throws SyntaxException {
-		switch (currentToken.type) {
-			case INT:
-				if ((currentToken = input.next()).type == TokenType.LBRACKET) {
-					currentToken = input.next();
-					checkType(TokenType.RBRACKET);
-					return new IntArray();
+	private MethodDecl methodDecl() {
+		eat(PUBLIC); Type t = type(); Identifier i = identifier();
+		eat(LPAREN); FormalList fl = formalList(); eat(RPAREN, LBRACE);
+			VarDeclList vl = new VarDeclList();
+			StatementList sl = new StatementList();
+			while(true) { switch(tok.type) {
+				case INT: case BOOLEAN: case STRING:
+					vl.list.add(varDecl());
+					continue;
+				case ID:
+					Identifier id = identifier();
+					if(tok.type != ID) {
+						sl.list.add(_assign(id)); break;
+					}
+					vl.list.add(_varDecl(new IdentifierType(id)));
+					continue;
+				default: break;
+			} break; }
+			sl.list.addAll(statementList().list);
+			eat(RETURN); Exp e = exp();
+		eat(SEMICOLON, RBRACE);
+		return new MethodDecl(t, i, fl, vl, sl, e);
+	}
+
+	Formal formal() { return new Formal(type(), identifier()); }
+
+	Type type() { switch (tok.type) {
+			case BOOLEAN: eat(BOOLEAN); return new BooleanType();
+			case STRING: eat(STRING); return new StringType();
+			case INT: eat(TokenType.INT);
+				switch (tok.type) {
+					case LBRACKET: eat(LBRACKET, RBRACKET); return new IntArrayType();
+					default: return new IntegerType();
 				}
-				return new Int();
-			case BOOLEAN:
-				return parseBoolean();
-			case STRING:
-				return parseString();
-			case ID:
-				return parseID();
-			default:
-				throw new SyntaxException(currentToken.row + ":" + currentToken.col + " error: Expected type: Type " +
-						"instead " + "of " + currentToken.type);
+			case ID: return new IdentifierType(identifier());
+			default: error(); return null;
+	}}
+
+	Identifier identifier() { switch (tok.type) {
+		case ID:
+			Identifier i = new Identifier(tok.row+":"+tok.col,((IdentifierToken)tok).value);
+			eat(ID); return i;
+		default: error(); return null;
+	}}
+
+	// ===== STATEMENTS =========
+
+	Statement statement() { switch(tok.type) {
+		case LBRACE: return block();
+		case IF: return ifStmnt();
+		case WHILE: return whileStmnt();
+		case PRINTLN: return print();
+		case ID: return assign();
+		case SIDEF:
+			eat(SIDEF, LPAREN); Exp e = exp();
+			eat(RPAREN, SEMICOLON); return e;
+		default: error(); return null;
+	}}
+
+	Block block() {
+		eat(LBRACE);
+		StatementList sl = statementList();
+		eat(RBRACE);
+		return new Block(sl);
+	}
+
+	If ifStmnt() {
+		eat(IF, LPAREN);
+		Exp e = exp();
+		eat(RPAREN);
+		Statement s1 = statement();
+		if(tok.type != ELSE) return new If(e, s1, null);
+		eat(ELSE); return new If(e, s1, statement());
+	}
+
+	While whileStmnt() {
+		eat(WHILE, LPAREN);
+		Exp e = exp();
+		eat(RPAREN);
+		return new While(e, statement());
+	}
+
+	Print print() {
+		eat(PRINTLN, LPAREN);
+		Exp e = exp();
+		eat(RPAREN, SEMICOLON);
+		return new Print(e);
+	}
+
+	Statement assign() { return _assign(identifier()); }
+	Statement _assign(Identifier i) { switch (tok.type) {
+		case EQSIGN:
+			eat(EQSIGN);
+			Exp e = exp();
+			eat(SEMICOLON);
+			return new Assign(i, e);
+		case LBRACKET:
+			eat(LBRACKET); Exp e1 = exp();
+			eat(RBRACKET, EQSIGN); Exp e2 = exp();
+			eat(SEMICOLON); return new ArrayAssign(i, e1, e2);
+		default: error(); return null;
+	}}
+
+	// ===== EXPRESSIONS =========
+	// Precedence (.) -> (!) -> (*,/) -> (+,-) -> (<,==) -> (&&) -> (||)
+
+	// EXP -> OR _OR
+	Exp exp() { return _or(or());}
+
+	// OR -> AND _OR
+	Exp or() { return _or(and()); }
+	// _OR -> || OR | empty
+	Exp _or(Exp e) { switch (tok.type) {
+		case OR: eat(TokenType.OR); return new Or(e, or());
+		default: return e;
+	}}
+
+	// AND -> LTEQ _AND
+	Exp and() { return _and(ltEq()); }
+	// _AND -> && AND | empty
+	Exp _and(Exp e) { switch (tok.type) {
+		case AND: eat(TokenType.AND); return new And(e, and());
+		default: return e;
+	}}
+
+	// LTEQ -> TERM _LTEQ
+	Exp ltEq() { return _ltEq(term()); }
+	// _LTEQ -> (< LTEQ) | (== LTEQ) | empty
+	Exp _ltEq(Exp e) { switch(tok.type) { //TODO
+		case LESSTHAN: eat(LESSTHAN); return new LessThan(e, exp());
+		case EQUALS: eat(EQUALS); return new Equals(e, exp());
+		default: return e;
+	}}
+
+	// TERM -> FACT _TERM
+	Exp term() { return _term(factor()); }
+	// _TERM -> (+|-) TERM | empty
+	Exp _term(Exp e) { switch(tok.type) {
+		case PLUS: eat(TokenType.PLUS); return new Plus(e, term());
+		case MINUS: eat(TokenType.MINUS); return new Minus(e, term());
+		default: return e;
+	}}
+
+	// FACT -> NOT _FACT
+	Exp factor() { return _factor(not()); }
+	// _FACT -> (* | /) FACT | empty
+	Exp _factor(Exp e) { switch (tok.type) {
+		case TIMES: eat(TokenType.TIMES); return new Times(e, factor());
+		case DIV: eat(TokenType.DIV); return new Divide(e, factor());
+		default: return e;
+	}}
+
+	// NOT -> (! EXP) | EXP
+	Exp not() { switch (tok.type) {
+		case BANG: eat(BANG); return new Not(exp());
+		default: return call();
+	}}
+
+	// CALL -> UNARY _EXP
+	Exp call() { return _call(unary()); }
+	// _CALL -> . (length | identifier(expList)) | empty
+	Exp _call(Exp e) { switch(tok.type) {
+		case DOT: eat(DOT);
+			if(tok.type == ID) {
+				Identifier i = identifier();
+				eat(LPAREN); ExpList el = expList(); eat(RPAREN);
+				return _call(new Call(e, i, el));
+			} else {
+				eat(LENGTH); return _call(new ArrayLength(e));
+			}
+		case LBRACKET:
+			eat(LBRACKET); Exp e2 = exp(); eat(RBRACKET);
+			return new ArrayLookup(e, e2);
+		default: return e;
+	}}
+
+	// UNARY -> (! EXP) | (new identifier()) | (new int[EXP]) | (this) | identifier | false | true | StringLit | IntLit
+	Exp unary() { switch (tok.type) {
+		case INTLIT:
+			int val = ((IntLiteralToken)tok).value;
+			eat(INTLIT); return new IntegerLiteral(val);
+		case STRINGLIT:
+			String s = ((StringLiteralToken)tok).value;
+			eat(STRINGLIT); return new StringLiteral(s);
+		case TRUE:
+			eat(TRUE); return new True();
+		case FALSE:
+			eat(FALSE); return new False();
+		case ID:
+			return new IdentifierExp(identifier());
+		case THIS:
+			eat(THIS); return new This(tok.row+":"+tok.col);
+		case NEW:
+			eat(NEW);
+			if(tok.type == TokenType.ID) {
+				Identifier i = identifier();
+				eat(LPAREN, RPAREN); return new NewObject(i);
+			} else {
+				eat(INT, LBRACKET); Exp e = exp();
+				eat(RBRACKET); return new NewArray(e);
+			}
+		case LPAREN:
+			eat(LPAREN); Exp e = exp();
+			eat(RPAREN); return e;
+		default:
+			error(); return null;
+	}}
+
+	// ===== LISTS =========
+
+	ExpList expList() {
+		ExpList e = new ExpList();
+		while(tok.type != RPAREN) {
+			e.list.add(exp()); if(tok.type == COMMA) eat(COMMA);
 		}
+		return e;
 	}
 
-	private Boolean parseBoolean() {
-		Boolean i = new Boolean(currentToken.row, currentToken.col);
-		currentToken = input.next();
-		return i;
+	StatementList statementList() {
+		StatementList s = new StatementList();
+		while(tok.type != RETURN && tok.type != RBRACE) s.list.add(statement());
+		return s;
 	}
 
-	private oldast.type.String parseString() {
-		String i = new String(currentToken.row, currentToken.col);
-		currentToken = input.next();
-		return i;
+	ClassDeclList classDeclList() {
+		ClassDeclList cl = new ClassDeclList();
+		while(tok.type != EOF) cl.list.add(classDecl());
+		return cl;
 	}
+
+	FormalList formalList() {
+		FormalList fl = new FormalList();
+		while(tok.type != RPAREN) {
+			fl.list.add(formal()); if(tok.type == COMMA) eat(COMMA);
+		}
+		return fl;
+	}
+
+	// only works when called from ClassDecl
+	VarDeclList varDeclList() {
+		VarDeclList vl = new VarDeclList();
+		while(tok.type != PUBLIC && tok.type != RBRACE) vl.list.add(varDecl());
+		return vl;
+	}
+
+	MethodDeclList methodDeclList() {
+		MethodDeclList ml = new MethodDeclList();
+		while(tok.type != RBRACE) ml.list.add(methodDecl());
+		return ml;
+	}
+
 }
