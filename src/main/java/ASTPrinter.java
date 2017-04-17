@@ -7,51 +7,64 @@ import ast.type.*;
 
 public class ASTPrinter implements Visitor<String> {
 
+	private int tabs = 0;
+
+	private String tabs() {
+		StringBuilder b = new StringBuilder();
+		for (int i = tabs; i > 0; --i) b.append("\t");
+		return b.toString();
+	}
+
 	public String visit(Program n) {
 		StringBuilder b = new StringBuilder(n.m.accept(this));
-		n.cl.list.forEach(c -> b.append(c.accept(this)));
+		n.cl.list.forEach(c -> b.append("\n\n").append(c.accept(this)));
 		return b.toString();
 	}
 
 	public String visit(MainClass n) {
-		return new StringBuilder("(MAIN-CLASS ").append(n.i.accept(this)).append("\n")
-				.append("(MAIN-MTD-DECLR ").append(n.i2.accept(this)).append("\n")
-				.append(n.s.accept(this)).append("\n")
-				.append(")").toString();
+		StringBuilder b = new StringBuilder("(MAIN-CLASS ").append(n.i.accept(this)).append("\n(MAIN-MTD-DECLR ")
+				.append(n.i2.accept(this)).append(" (BLOCK\n");
+		++tabs;
+		b.append(n.s.accept(this)).append("\n))");
+		--tabs;
+		return b.toString();
 	}
 
 	public String visit(ClassDeclSimple n) {
 		StringBuilder b = new StringBuilder("(CLASS ").append(n.i.accept(this));
-		n.vl.list.forEach(v -> b.append(v.accept(this)));
-		n.ml.list.forEach(m -> b.append(m.accept(this)));
+		n.vl.list.forEach(v -> b.append("\n").append(v.accept(this)));
+		n.ml.list.forEach(m -> b.append("\n").append(m.accept(this)));
 		return b.append(")").toString();
 	}
 
 	public String visit(ClassDeclExtends n) {
-		StringBuilder b = new StringBuilder("(CLASS ").append(n.i.accept(this))
-				.append("EXTENDS ").append(n.parent.accept(this));
-		n.vl.list.forEach(v -> b.append(v.accept(this)));
-		n.ml.list.forEach(m -> b.append(m.accept(this)));
+		StringBuilder b = new StringBuilder("(CLASS ").append(n.i.accept(this)).append("EXTENDS ").append(n.parent
+				.accept(this));
+		n.vl.list.forEach(v -> b.append("\n").append(v.accept(this)));
+		n.ml.list.forEach(m -> b.append("\n").append(m.accept(this)));
 		return b.append(")").toString();
 	}
 
 	public String visit(VarDecl n) {
-		return new StringBuilder("(VAR-DECL ").append(n.t.accept(this)).append(" ")
-				.append(n.i.accept(this)).append(")").toString();
+		return tabs() + "(VAR-DECL " + n.t.accept(this) + " " + n.i.accept(this) + ")";
 	}
 
 	public String visit(MethodDecl n) {
-		StringBuilder b = new StringBuilder("(MTD-DECL ").append(n.t.accept(this)).append(" ")
-				.append(n.i.accept(this)).append(" ").append("(TY-ID-LIST ");
-		n.vl.list.forEach(f -> b.append(f.accept(this)));
-		b.append(")\n");
+		StringBuilder b = new StringBuilder("(MTD-DECL ").append(n.t.accept(this)).append(" ").append(n.i.accept(this)
+		).append(" ").append("(TY-ID-LIST ");
+		n.fl.list.forEach(f -> b.append(f.accept(this)));
+		b.append(")(BLOCK\n");
+		++tabs;
+		n.vl.list.forEach(v -> b.append(v.accept(this)));
+		b.append("\n");
 		n.sl.list.forEach(s -> b.append(s.accept(this)));
-		return b.append(")").toString();
+		b.append(tabs()).append("\n(RETURN ").append(n.e.accept(this)).append(")))");
+		--tabs;
+		return b.toString();
 	}
 
 	public String visit(Formal n) {
-		return new StringBuilder("(").append(n.t.accept(this)).append(" ").append(n.i.accept(this))
-				.append(")").toString();
+		return "(" + n.t.accept(this) + " " + n.i.accept(this) + ")";
 	}
 
 	public String visit(IntArrayType n) {
@@ -81,76 +94,69 @@ public class ASTPrinter implements Visitor<String> {
 	}
 
 	public String visit(If n) {
-		return new StringBuilder("(IF ").append(n.e.accept(this)).append("\n\t").append(n.s1.accept(this))
-				.append("\n\t").append(n.s2 == null ? "" : n.s2.accept(this)).append("\n)").toString();
+		StringBuilder b = new StringBuilder(tabs()).append("(IF ").append(n.e.accept(this)).append("\n");
+		++tabs;
+		b.append(tabs()).append(n.s1.accept(this)).append("\n").append(tabs()).append((n.s2 == null ? "" : n.s2.accept
+				(this))).append("\n");
+		--tabs;
+		b.append(tabs()).append(")");
+		return b.toString();
 	}
 
 	public String visit(While n) {
-		return new StringBuilder("(WHILE ").append(n.e.accept(this)).append("\n\t").append(n.s.accept(this))
-				.append("\n)").toString();
+		return "(WHILE " + n.e.accept(this) + "\n\t" + n.s.accept(this) + "\n)";
 	}
 
 	public String visit(Print n) {
-		return new StringBuilder("(PRINT ").append(n.e.accept(this)).append(")").toString();
+		return "(PRINT " + n.e.accept(this) + ")";
 	}
 
 	public String visit(Assign n) {
-		return new StringBuilder("(EQSIGN ").append(n.i.accept(this)).append(" ").append(n.e.accept(this))
-				.append(")").toString();
+		return "(EQSIGN " + n.i.accept(this) + " " + n.e.accept(this) + ")";
 	}
 
 	public String visit(ArrayAssign n) {
-		return new StringBuilder("(EQSIGN ").append(n.i.accept(this)).append("[").append(n.e1.accept(this))
-				.append("] ").append(" ").append(n.e2.accept(this)).append(")").toString();
+		return "(EQSIGN " + n.i.accept(this) + "[" + n.e1.accept(this) + "] " + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(And n) {
-		return new StringBuilder("(&& ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(&& " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(Or n) {
-		return new StringBuilder("(|| ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(|| " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(LessThan n) {
-		return new StringBuilder("(< ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(< " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(Equals n) {
-		return new StringBuilder("(== ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(== " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(Plus n) {
-		return new StringBuilder("(+ ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(+ " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(Minus n) {
-		return new StringBuilder("(- ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(- " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(Times n) {
-		return new StringBuilder("(* ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(* " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(Divide n) {
-		return new StringBuilder("(/ ").append(n.e1.accept(this)).append(" ").append(n.e2.accept(this))
-				.append(")").toString();
+		return "(/ " + n.e1.accept(this) + " " + n.e2.accept(this) + ")";
 	}
 
 	public String visit(ArrayLookup n) {
-		return new StringBuilder("(ARRAY-LOOKUP ").append(n.e1.accept(this)).append("[")
-				.append(n.e2.accept(this)).append("]").toString();
+		return "(ARRAY-LOOKUP " + n.e1.accept(this) + "[" + n.e2.accept(this) + "]";
 	}
 
 	public String visit(ArrayLength n) {
-		return new StringBuilder("(LENGTH ").append(n.e.accept(this)).append(")").toString();
+		return "(LENGTH " + n.e.accept(this) + ")";
 	}
 
 	public String visit(Call n) {
@@ -160,11 +166,11 @@ public class ASTPrinter implements Visitor<String> {
 	}
 
 	public String visit(IntegerLiteral n) {
-		return new StringBuilder("(INTLIT ").append(n.i).append(")").toString();
+		return "(INTLIT " + n.i + ")";
 	}
 
 	public String visit(StringLiteral n) {
-		return new StringBuilder("(STRINGLIT ").append(n.val).append(")").toString();
+		return "(STRINGLIT " + n.val + ")";
 	}
 
 	public String visit(True n) {
@@ -176,7 +182,7 @@ public class ASTPrinter implements Visitor<String> {
 	}
 
 	public String visit(IdentifierExp n) {
-		return n.accept(this);
+		return n.i.accept(this);
 	}
 
 	public String visit(This n) {
@@ -184,18 +190,18 @@ public class ASTPrinter implements Visitor<String> {
 	}
 
 	public String visit(NewArray n) {
-		return new StringBuilder("(NEW-INT[] ").append(n.e.accept(this)).append(")").toString();
+		return "(NEW-INT[] " + n.e.accept(this) + ")";
 	}
 
 	public String visit(NewObject n) {
-		return new StringBuilder("(NEW-OBJECT ").append(n.i.accept(this)).append(")").toString();
+		return "(NEW-OBJECT " + n.i.accept(this) + ")";
 	}
 
 	public String visit(Not n) {
-		return new StringBuilder("(NOT ").append(n.e.accept(this)).append(")").toString();
+		return "(NOT " + n.e.accept(this) + ")";
 	}
 
 	public String visit(Identifier n) {
-		return new StringBuilder("(ID ").append(n.s).append(")").toString();
+		return "(ID " + n.s + ")";
 	}
 }

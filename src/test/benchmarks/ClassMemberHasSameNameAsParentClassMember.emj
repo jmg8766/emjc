@@ -1,9 +1,0 @@
-class Main {
-    public static void main(String[] args) { sidef(9999); }
-}
-
-class A { int b; int c; ind d; }
-
-class B extends A { int c; int d; ind e; }
-
-class D extends B { int c; int d; ind e; }

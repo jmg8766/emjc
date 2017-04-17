@@ -8,8 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Lexer {
-    // the names of the file being lexed and the tokenized file
-    public String inputFile, outputFile;
+    public String inputFile;
     // an array of all characters in the inputFile
     private char[] cbuf;
     // the current row; the index in cbuf; the start of the current row; the number of tabs * 4
@@ -25,11 +24,9 @@ public class Lexer {
             // read the entire file into a char array
             cbuf = new char[(int)new File(fileName).length() + 1];
             file.read(cbuf);
-            file.close();
             // insert a 0 to represent the EOF
             cbuf[cbuf.length - 1] = (char)0;
             inputFile = fileName;
-            outputFile = fileName.substring(0, fileName.indexOf('.')) + ".lexed";
         } catch(Exception e) {
             System.out.println("An IO error occurred while attempting to read " + fileName);
         }
@@ -39,16 +36,16 @@ public class Lexer {
      *  Lexes a file by repeatedly calling the next() method until EOF is reached.
      */
     void genLexFile() {
-        try (BufferedWriter out = Files.newBufferedWriter(Paths.get(outputFile))) {
+        try (BufferedWriter out = Files.newBufferedWriter(Paths.get(inputFile.replace(".emj", ".lexed")))) {
             Token token = next();
             do {
                 out.write(token.toString() + '\n');
             } while((token = next()).type != TokenType.EOF);
 
             out.write(token.toString() + '\n');
-            out.flush(); out.close();
+            out.flush();
         } catch(IOException e ) {
-            System.out.println("An IO error occurred while attempting to write to " + outputFile);
+            System.out.println("An IO error occurred while attempting to write to " + inputFile.replace(".emj", ".lexed"));
         }
     }
 

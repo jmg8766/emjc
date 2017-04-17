@@ -16,7 +16,7 @@ public class Emjc {
 					new Lexer(args[1]).genLexFile();
 					return;
 				case "--ast":
-					try (BufferedWriter b = Files.newBufferedWriter(Paths.get(args[1]))) {
+					try (BufferedWriter b = Files.newBufferedWriter(Paths.get(args[1].replace(".emj", ".ast")))) {
 						b.write(new Parser(new Lexer(args[1])).program().accept(new ASTPrinter()));
 						b.flush();
 					} catch (Exception e) {
