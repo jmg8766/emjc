@@ -19,4 +19,11 @@ public class NameAnalysisTest {
 		Emjc.main(new String[] {"--name", f.getPath()});
 		System.out.println("Finished name analysis");
 	}
+
+	@Test
+	void testNonExistentInputFile() {
+		System.out.println("Performing name analysis on non-existent file");
+		Emjc.main(new String[] {"--name", "not a file"});
+		System.out.println("Finished name analysis");
+	}
 }

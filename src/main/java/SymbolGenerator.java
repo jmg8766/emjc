@@ -140,7 +140,6 @@ public class SymbolGenerator implements Visitor<Object> {
 
 	public Object visit(IntegerType n) { return null;}
 
-	@Override
 	public Object visit(StringType n) { return null;}
 
 	public Object visit(IdentifierType n) {

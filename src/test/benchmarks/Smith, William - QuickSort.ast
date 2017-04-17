@@ -1,14 +1,14 @@
 (MAIN-CLASS (ID QuickSort)
 (MAIN-MTD-DECLR (ID args) (BLOCK
-	(PRINT (DOT (NEW-OBJECT (ID TestSuite)) (FUN-CALL)))
+(PRINT (DOT (NEW-OBJECT (ID TestSuite)) (FUN-CALL)))
 ))
 
 (CLASS (ID TestSuite)
 (MTD-DECL INT (ID start) (TY-ID-LIST )(BLOCK
 	(VAR-DECL (ID SortClass) (ID sort))	(VAR-DECL INT[] (ID input))	(VAR-DECL INT[] (ID results))	(VAR-DECL INT (ID i))
 (EQSIGN (ID input) (NEW-INT[] (INTLIT 10)))(EQSIGN (ID sort) (NEW-OBJECT (ID SortClass)))(EQSIGN (ID input)[(INTLIT 0)]  (INTLIT 25))(EQSIGN (ID input)[(INTLIT 1)]  (INTLIT 14))(EQSIGN (ID input)[(INTLIT 2)]  (INTLIT 57))(EQSIGN (ID input)[(INTLIT 3)]  (INTLIT 23))(EQSIGN (ID input)[(INTLIT 4)]  (INTLIT 0))(EQSIGN (ID input)[(INTLIT 5)]  (INTLIT 24))(EQSIGN (ID input)[(INTLIT 6)]  (INTLIT 6))(EQSIGN (ID input)[(INTLIT 7)]  (INTLIT 24))(EQSIGN (ID input)[(INTLIT 8)]  (INTLIT 45))(EQSIGN (ID input)[(INTLIT 9)]  (INTLIT 130))(EQSIGN (ID results) (DOT (ID sort) (FUN-CALL (ID input))))(EQSIGN (ID i) (INTLIT 0))(WHILE (< (ID i) (INTLIT 10))
-	(BLOCK	(PRINT (+ (STRINGLIT I = ) (ID i)))
-	(PRINT (+ (STRINGLIT X = ) (ARRAY-LOOKUP (ID results)[(ID i)]))
+	(BLOCK(PRINT (+ (STRINGLIT I = ) (ID i)))
+(PRINT (+ (STRINGLIT X = ) (ARRAY-LOOKUP (ID results)[(ID i)]))
 (EQSIGN (ID i) (+ (ID i) (INTLIT 1)))
 )
 )	

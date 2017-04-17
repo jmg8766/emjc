@@ -17,9 +17,14 @@ public class Parser {
 	private Token tok;
 
 	public Parser(Lexer l) { this.l = l; tok = l.next(); }
-	private void eat(TokenType... t) { for (TokenType aT : t) if (tok.type == aT) tok = l.next(); else error(); }
-	private void error() {
-		System.out.println(tok.row + ":" + tok.col + " error: ...");
+	private void eat(TokenType... t) {
+		for (TokenType aT : t) {
+			if (tok.type == aT) tok = l.next();
+			else error("Unexpected Token: [" + tok.type + "] Expecting: [" + aT + "]");
+		}
+	}
+	private void error(String s) {
+		System.out.println(tok.row + ":" + tok.col + " error: " + s);
 		Assert.fail();
 		System.exit(0);
 	}
@@ -51,7 +56,7 @@ public class Parser {
 				eat(LBRACE);
 				c = new ClassDeclSimple(i1, varDeclList(), methodDeclList());
 				break;
-			default: error(); return null;
+			default: error("Unexpected token: [" + tok + "] Expected: [" + EXTENDS + "] or [" + LBRACE + "]"); return null;
 		}
 		eat(RBRACE);
 		return c;
@@ -98,14 +103,15 @@ public class Parser {
 					default: return new IntegerType();
 				}
 			case ID: return new IdentifierType(identifier());
-			default: error(); return null;
+			default: error("Unexpected token: [" + tok.type + "] Expected: [" + BOOLEAN + "] or [" + STRING + "] or ["
+					+ INT + "] or [" + ID + "]"); return null;
 	}}
 
 	Identifier identifier() { switch (tok.type) {
 		case ID:
 			Identifier i = new Identifier(tok.row+":"+tok.col,((IdentifierToken)tok).value);
 			eat(ID); return i;
-		default: error(); return null;
+		default: error("Unexpected token: [" + tok.type + " Expected: [" + ID + "]"); return null;
 	}}
 
 	// ===== STATEMENTS =========
@@ -119,7 +125,7 @@ public class Parser {
 		case SIDEF:
 			eat(SIDEF, LPAREN); Exp e = exp();
 			eat(RPAREN, SEMICOLON); return e;
-		default: error(); return null;
+		default: error("Unexpected token: [" + tok.type + "] Expected a Statement"); return null;
 	}}
 
 	Block block() {
@@ -163,7 +169,7 @@ public class Parser {
 			eat(LBRACKET); Exp e1 = exp();
 			eat(RBRACKET, EQSIGN); Exp e2 = exp();
 			eat(SEMICOLON); return new ArrayAssign(i, e1, e2);
-		default: error(); return null;
+		default: error("Unexpected Token: [" + tok.type + "] Expecting: [" + EQSIGN + "] or [" + LBRACKET + "]"); return null;
 	}}
 
 	// ===== EXPRESSIONS =========
@@ -191,7 +197,7 @@ public class Parser {
 	// LTEQ -> TERM _LTEQ
 	Exp ltEq() { return _ltEq(term()); }
 	// _LTEQ -> (< LTEQ) | (== LTEQ) | empty
-	Exp _ltEq(Exp e) { switch(tok.type) { //TODO
+	Exp _ltEq(Exp e) { switch(tok.type) {
 		case LESSTHAN: eat(LESSTHAN); return new LessThan(e, exp());
 		case EQUALS: eat(EQUALS); return new Equals(e, exp());
 		default: return e;
@@ -268,7 +274,7 @@ public class Parser {
 			eat(LPAREN); Exp e = exp();
 			eat(RPAREN); return e;
 		default:
-			error(); return null;
+			error("Unexpected Token: [" + tok.type + "] Expected an expression"); return null;
 	}}
 
 	// ===== LISTS =========

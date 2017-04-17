@@ -10,12 +10,12 @@ class CountSquares {
 
     public int countSquares(int a, int b) { // calculates number of squares between a and b - the very naive way
         int c ;
-	c = 0 ;
 	int i ;
 	int j ;
 	i = a ;
 	j = 1 ;
-        
+	c = 0 ;
+
 	while (i < (b + 1)) {
 	    while (j * j < (i + 1)) {
 		if (j * j == i)

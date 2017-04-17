@@ -1,12 +1,12 @@
 (MAIN-CLASS (ID MethodOverriding)
 (MAIN-MTD-DECLR (ID args) (BLOCK
-	(PRINT (DOT (NEW-OBJECT (ID TestSuite)) (FUN-CALL)))
+(PRINT (DOT (NEW-OBJECT (ID TestSuite)) (FUN-CALL)))
 ))
 
 (CLASS (ID TestSuite)
 (MTD-DECL INT (ID start) (TY-ID-LIST )(BLOCK
 	(VAR-DECL (ID Rectangle) (ID A))	(VAR-DECL (ID Square) (ID B))	(VAR-DECL INT (ID aArea))	(VAR-DECL INT (ID aPerim))	(VAR-DECL INT (ID bArea))	(VAR-DECL INT (ID bPerim))
-(EQSIGN (ID A) (NEW-OBJECT (ID Rectangle)))(EQSIGN (ID B) (NEW-OBJECT (ID Square)))(DOT (ID A) (FUN-CALL (INTLIT 5)))(DOT (ID A) (FUN-CALL (INTLIT 10)))(DOT (ID B) (FUN-CALL (INTLIT 5)))(DOT (ID B) (FUN-CALL (INTLIT 5)))(EQSIGN (ID aArea) (DOT (ID A) (FUN-CALL)))(EQSIGN (ID aPerim) (DOT (ID A) (FUN-CALL)))(EQSIGN (ID bArea) (DOT (ID B) (FUN-CALL)))(EQSIGN (ID bPerim) (DOT (ID B) (FUN-CALL)))	(PRINT (+ (STRINGLIT A Area: ) (ID aArea)))	(PRINT (+ (STRINGLIT A Perimeter: ) (ID aPerim)))	(PRINT (+ (STRINGLIT B Area: ) (ID bArea)))	(PRINT (+ (STRINGLIT B Perimeter: ) (ID bPerim)))	
+(EQSIGN (ID A) (NEW-OBJECT (ID Rectangle)))(EQSIGN (ID B) (NEW-OBJECT (ID Square)))(DOT (ID A) (FUN-CALL (INTLIT 5)))(DOT (ID A) (FUN-CALL (INTLIT 10)))(DOT (ID B) (FUN-CALL (INTLIT 5)))(DOT (ID B) (FUN-CALL (INTLIT 5)))(EQSIGN (ID aArea) (DOT (ID A) (FUN-CALL)))(EQSIGN (ID aPerim) (DOT (ID A) (FUN-CALL)))(EQSIGN (ID bArea) (DOT (ID B) (FUN-CALL)))(EQSIGN (ID bPerim) (DOT (ID B) (FUN-CALL)))(PRINT (+ (STRINGLIT A Area: ) (ID aArea)))(PRINT (+ (STRINGLIT A Perimeter: ) (ID aPerim)))(PRINT (+ (STRINGLIT B Area: ) (ID bArea)))(PRINT (+ (STRINGLIT B Perimeter: ) (ID bPerim)))	
 (RETURN (INTLIT 0)))))
 
 (CLASS (ID Rectangle)
@@ -32,9 +32,9 @@
 (CLASS (ID Square)EXTENDS (ID Rectangle)
 (MTD-DECL INT (ID area) (TY-ID-LIST )(BLOCK
 
-	(PRINT (STRINGLIT I'm a square!))	
+(PRINT (STRINGLIT I'm a square!))	
 (RETURN (* (ID l) (ID h)))))
 (MTD-DECL INT (ID perimeter) (TY-ID-LIST )(BLOCK
 
-	(PRINT (STRINGLIT My sides are all equal))	
+(PRINT (STRINGLIT My sides are all equal))	
 (RETURN (* (ID l) (INTLIT 4))))))

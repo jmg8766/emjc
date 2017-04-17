@@ -28,7 +28,8 @@ public class Lexer {
             cbuf[cbuf.length - 1] = (char)0;
             inputFile = fileName;
         } catch(Exception e) {
-            System.out.println("An IO error occurred while attempting to read " + fileName);
+            System.out.println("An IO error occurred while attempting to read \"" + fileName + "\"");
+            System.exit(0);
         }
     }
 
