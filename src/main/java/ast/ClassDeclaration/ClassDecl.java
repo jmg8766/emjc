@@ -7,6 +7,7 @@ import ast.list.MethodDeclList;
 import ast.list.VarDeclList;
 
 public abstract class ClassDecl extends Decl {
+
 	public VarDeclList vl;
 	public MethodDeclList ml;
 

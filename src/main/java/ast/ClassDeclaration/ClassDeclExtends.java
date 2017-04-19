@@ -17,4 +17,5 @@ public class ClassDeclExtends extends ClassDecl {
 	public <R> R accept(Visitor<R> v) {
 		 return v.visit(this);
 	}
+
 }

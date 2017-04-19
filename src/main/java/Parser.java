@@ -95,7 +95,7 @@ public class Parser {
 	Formal formal() { return new Formal(type(), identifier()); }
 
 	Type type() { switch (tok.type) {
-			case BOOLEAN: eat(BOOLEAN); return new BooleanType();
+			case BOOLEAN: eat(BOOLEAN); return BooleanType.getInstance();
 			case STRING: eat(STRING); return new StringType();
 			case INT: eat(TokenType.INT);
 				switch (tok.type) {
