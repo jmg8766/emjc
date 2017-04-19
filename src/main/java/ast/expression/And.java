@@ -1,8 +1,10 @@
 package ast.expression;
 
 import ast.Visitor;
+import ast.type.Type;
 
 public class And extends Exp {
+	public Type t;
 	public Exp e1, e2;
 
 	public And(Exp e1, Exp e2) {

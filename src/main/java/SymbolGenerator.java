@@ -17,6 +17,9 @@ public class SymbolGenerator implements Visitor<Object> {
 	public static PrintStream printStream = System.out;
 
 	private SymbolTable<Decl> t = new SymbolTable();
+
+	// Vars used for error reporting
+	private String mainClassName;
 	private HashSet<ClassDecl> inheritanceChain = new HashSet<>();
 
 	private TreeSet<String> errors = new TreeSet<>((s1, s2) -> {
@@ -37,21 +40,8 @@ public class SymbolGenerator implements Visitor<Object> {
 		errors.add(loc + " error: " + msg);
 	}
 
-	private boolean checkType(Type t1, Type t2) {
-		if (t1 instanceof IdentifierType && t2 instanceof IdentifierType) {
-			Decl subType = t.get(((IdentifierType) t2).i);
-			if (subType instanceof ClassDeclSimple) {
-
-			} else if (subType instanceof ClassDeclExtends) {
-				return checkType(t1, ((ClassDeclExtends) subType).parent.b.t);
-			}
-			return false;
-		} else return t1.getClass() == t2.getClass();
-	}
-
 	public Object visit(Program n) {
-		// add the mainDecl to global scope
-		t.put(n.m.i, n.m);
+		mainClassName = n.m.i.s;
 		// add all classDecl to global scope
 		n.cl.list.forEach(c -> {
 			if (t.put(c.i, c) != null) error(c.i.pos, "class is defined more than once");
@@ -66,17 +56,14 @@ public class SymbolGenerator implements Visitor<Object> {
 			t.endScope();
 		});
 		if (errors.isEmpty()) printStream.println("Valid eMiniJava Program");
-		else errors.forEach(e -> {
-			printStream.println(e);
-			System.out.println(e);
-		});
+		else errors.forEach(e -> printStream.println(e));
 		return null;
 	}
 
 	public Object visit(MainClass n) {
 		// set the bindings
 		n.i.b = n;
-		n.i2.b = new Formal(new StringType(), n.i2);
+		n.i2.b = new Formal(StringType.getInstance(), n.i2);
 		// visit the main statement
 		n.s.accept(this);
 		return null;
@@ -107,9 +94,10 @@ public class SymbolGenerator implements Visitor<Object> {
 	}
 
 	public Object visit(ClassDeclExtends n) {
-		// check for cyclical inheritance
-		// add all parent varDecl and methodDecl to current scope
-		if (!inheritanceChain.add(n)) error(n.i.pos, "cyclical inheritance");
+		// check for cyclical inheritance by adding all parent varDecl and methodDecl to current scope
+		if(n.parent.s.equals(mainClassName)) error(n.i.pos, "Cannot extend the main class: [" + mainClassName + "]");
+		else if (!inheritanceChain.add(n)) error(n.i.pos, "cyclical inheritance");
+		else if(t.get(n.parent) == null) error(n.i.pos, "Attempted to extend non-existant class: [" + n.parent.s + "]");
 		else t.get(n.parent).accept(this);
 		// Set the binding for this classDecl and it's parent
 		n.i.b = t.get(n.i);
@@ -119,18 +107,30 @@ public class SymbolGenerator implements Visitor<Object> {
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
 			Decl last = t.get(m.i);
+			// if there is a method with the same name in scope, then a method is being overridden
 			if (last != null && last instanceof MethodDecl) {
+				// Check for different number of arguments in the overriding method
 				if (((MethodDecl) last).fl.list.size() != m.fl.list.size()) {
 					error(m.i.pos, "method override with different args");
 				}
-				if (m.t instanceof IdentifierType && last.t instanceof IdentifierType) {
-					if(!((IdentifierType)last.t).types.contains(((IdentifierType)m.t).types.getFirst())) {
-						error(m.i.pos, "method override with different type");
+				// If both the overriding and overridden methods aren't Class types, and they not the same exact type
+				if ((!(last.t instanceof IdentifierType) || !(m.t instanceof IdentifierType)) && last.t != m.t) {
+					error(m.i.pos, "method override with different type, Expected type: [" + last.t + "] found: ["  + m.t + "]");
+				}
+				// Otherwise if both are Classes, check if the overriding method is a subtype of the overridden method
+				if (last.t instanceof IdentifierType && m.t instanceof IdentifierType) {
+					Type lastMethodReturnType = ((ClassDecl) t.get(((IdentifierType) last.t).i)).t;
+					ClassDecl newMethodReturnType = (ClassDecl) t.get(((IdentifierType) m.t).i);
+					// loop through the parents of the return type of the overriding method
+					while (newMethodReturnType instanceof ClassDeclExtends) {
+						// until one with the same type as the overridden method is found
+						if (newMethodReturnType.t == lastMethodReturnType) break;
+						newMethodReturnType = (ClassDecl) t.get(((ClassDeclExtends) newMethodReturnType).parent);
 					}
-
-//					if (!((ClassDecl) t.get(((IdentifierType) last.t).i)).types.contains(m.t)) {
-//						error(m.i.pos, "method override with different type");
-//					}
+					// if a parent with the same return type as overridden method isn't found, report an error
+					if (newMethodReturnType.t != lastMethodReturnType) {
+						error(m.i.pos, "method override with different type, Expected subtype of: [" + lastMethodReturnType + "]");
+					}
 				}
 			} else t.put(m.i, m);
 			m.i.b = m;
@@ -152,6 +152,7 @@ public class SymbolGenerator implements Visitor<Object> {
 	}
 
 	public Object visit(MethodDecl n) {
+		n.i.b.t = n.t;
 		// visit each paramDecl
 		n.fl.list.forEach(f -> f.accept(this));
 		// visit each varDecl

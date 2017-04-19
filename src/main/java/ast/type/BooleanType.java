@@ -6,13 +6,20 @@ public class BooleanType extends Type {
 
 	private static final BooleanType instance = new BooleanType();
 
-	private BooleanType() {}
+	private BooleanType() {
+	}
 
 	public static BooleanType getInstance() {
 		return instance;
 	}
 
+	@Override
 	public <R> R accept(Visitor<R> v) {
 		return v.visit(this);
+	}
+
+	@Override
+	public String toString() {
+		return "bool";
 	}
 }

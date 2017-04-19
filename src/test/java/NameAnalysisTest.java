@@ -18,9 +18,9 @@ public class NameAnalysisTest {
 
 		System.out.println("Performing name analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--name", f.getPath()});
-		System.out.println("Finished name analysis");
 
 		// fail if the symbol generator printed any errors
+		System.out.println(baos.toString());
 		Assert.assertSame(new String(baos.toByteArray(), UTF_8).trim().intern(), "Valid eMiniJava Program".intern());
 	}
 
@@ -39,11 +39,15 @@ public class NameAnalysisTest {
 		System.out.println("Finished name analysis");
 	}
 
-	@Test
+	@Test(enabled = false)
 	void testClassExtendingMainClass() {
-		System.out.println("Performing name analysis on non-existent file");
-		Emjc.main(new String[] {"--name", "not a file"});
-		System.out.println("Finished name analysis");
+		System.out.println("Performing name analysis on ClassExtendingMainClass.emj");
+		Emjc.main(new String[] {"--name", "src/test/benchmarks/ClassExtendingMainClass.emj"});
 	}
 
+	@Test(enabled = false)
+	void testOverridingMethodsWithDifferentType() {
+		System.out.println("Performing name analysis on OverrideingWithDifferentTypes.emj");
+		Emjc.main(new String[] {"--name", "src/test/benchmarks/OrerridingWithDifferentTypes.emj"});
+	}
 }

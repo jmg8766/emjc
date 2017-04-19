@@ -82,7 +82,7 @@ public class Parser {
 					if(tok.type != ID) {
 						sl.list.add(_assign(id)); break;
 					}
-					vl.list.add(_varDecl(new IdentifierType(id)));
+					vl.list.add(_varDecl(IdentifierType.getInstance(id)));
 					continue;
 				default: break;
 			} break; }
@@ -96,13 +96,13 @@ public class Parser {
 
 	Type type() { switch (tok.type) {
 			case BOOLEAN: eat(BOOLEAN); return BooleanType.getInstance();
-			case STRING: eat(STRING); return new StringType();
+			case STRING: eat(STRING); return StringType.getInstance();
 			case INT: eat(TokenType.INT);
 				switch (tok.type) {
-					case LBRACKET: eat(LBRACKET, RBRACKET); return new IntArrayType();
-					default: return new IntegerType();
+					case LBRACKET: eat(LBRACKET, RBRACKET); return IntArrayType.getInstance();
+					default: return IntegerType.getInstance();
 				}
-			case ID: return new IdentifierType(identifier());
+			case ID: return IdentifierType.getInstance(identifier());
 			default: error("Unexpected token: [" + tok.type + "] Expected: [" + BOOLEAN + "] or [" + STRING + "] or ["
 					+ INT + "] or [" + ID + "]"); return null;
 	}}
