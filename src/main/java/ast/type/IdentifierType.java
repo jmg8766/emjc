@@ -13,7 +13,7 @@ public class IdentifierType extends Type {
 	public Identifier i;
 	public ClassDecl decl;
 
-	private static HashMap<Identifier, IdentifierType> instances = new HashMap<>();
+	private static HashMap<String, IdentifierType> instances = new HashMap<>();
 
 	private IdentifierType(Identifier i) {
 		this.i = i;
@@ -21,8 +21,7 @@ public class IdentifierType extends Type {
 	}
 
 	public static IdentifierType getInstance(Identifier i) {
-		return instances.computeIfAbsent(i, id -> new IdentifierType(id));
-
+		return instances.computeIfAbsent(i.s.intern(), id -> new IdentifierType(i));
 	}
 
 	@Override

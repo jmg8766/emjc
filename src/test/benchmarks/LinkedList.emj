@@ -104,8 +104,8 @@ class List{
     
     // Update the the pointer to the next node
     public boolean SetNext(List v_next){
-	next = v_next ;
-	return true ;
+	    next = v_next ;
+	    return true ;
     }
     
     // Delete an element e from the list

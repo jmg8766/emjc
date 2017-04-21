@@ -66,10 +66,12 @@ public class TypeAnalysis implements Visitor<Type> {
         n.vl.list.forEach(v -> v.accept(this));
         n.sl.list.forEach(s -> s.accept(this));
         Type t1 = n.e.accept(this);
-        //TODO Tried to compare the declarations of the identifiers as the identifiers are not unique - check if they have to be modified in SymbolTable/Here.
-        if((n.t != t1 && !(n.t instanceof IdentifierType)) ||
-                (n.t instanceof IdentifierType && t1 instanceof IdentifierType && ((IdentifierType)n.t).decl != ((IdentifierType)t1).decl))
+        if(n.t != t1)
             error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
+        //TODO Tried to compare the declarations of the identifiers as the identifiers are not unique - check if they have to be modified in SymbolTable/Here.
+//        if((n.t != t1 && !(n.t instanceof IdentifierType)) ||
+//                (n.t instanceof IdentifierType && t1 instanceof IdentifierType && ((IdentifierType)n.t).decl != ((IdentifierType)t1).decl))
+//            error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
         return n.t;
     }
 
