@@ -13,9 +13,6 @@ import java.util.TreeSet;
 
 public class SymbolGenerator implements Visitor<Object> {
 
-    // Default output stream which can be changed by a test when testing the output
-    public static PrintStream printStream = System.out;
-
     private SymbolTable<Decl> t = new SymbolTable();
 
     // Vars used for error reporting
@@ -64,12 +61,9 @@ public class SymbolGenerator implements Visitor<Object> {
             c.parentSet = ps;
         });
 
-        if (errors.isEmpty()) return "Valid eMiniJava Program";
-        else {
-            StringBuilder b = new StringBuilder();
-            errors.forEach(e -> b.append(e).append("\n"));
-            return b.toString();
-        }
+        StringBuilder b = new StringBuilder();
+        errors.forEach(e -> b.append(e).append("\n"));
+        return b.toString();
     }
 
     public Object visit(MainClass n) {
@@ -90,14 +84,11 @@ public class SymbolGenerator implements Visitor<Object> {
         // Set the binding for this classDecl
         n.i.b = t.get(n.i);
 
-//		n.t = IdentifierType.getInstance(n.i);
-//		((IdentifierType)n.t).decl = n;
+		n.t = IdentifierType.getInstance(n.i);
+		((IdentifierType)n.t).decl = n;
 
         // add each varDecl to class scope
-        n.vl.list.forEach(v -> {
-            if (t.put(v.i, v) != null) error(v.i.pos, "Variable declared multiple times in the same scope");
-            v.accept(this);
-        });
+        n.vl.list.forEach(v -> v.accept(this));
 
         // add each methodDecl to class scope (because methods can reference each other)
         n.ml.list.forEach(m -> {
@@ -119,8 +110,7 @@ public class SymbolGenerator implements Visitor<Object> {
         // check for cyclical inheritance by adding all parent varDecl and methodDecl to current scope
         if (n.parent.s.equals(mainClassName)) error(n.i.pos, "Cannot extend the main class: [" + mainClassName + "]");
         else if (!inheritanceChain.add(n)) error(n.i.pos, "cyclical inheritance");
-        else if (t.get(n.parent) == null)
-            error(n.i.pos, "Attempted to extend non-existent class: [" + n.parent.s + "]");
+        else if (t.get(n.parent) == null) error(n.i.pos, "Attempted to extend non-existent class: [" + n.parent.s + "]");
         else t.get(n.parent).accept(this);
 
         // add information about all supertypes of this class to it's type
@@ -130,8 +120,8 @@ public class SymbolGenerator implements Visitor<Object> {
         n.i.b = t.get(n.i);
 
         // set information about the classDecl in the identifier type for this class
-//		n.t = IdentifierType.getInstance(n.i);
-//		((IdentifierType)n.t).decl = n;
+		n.t = IdentifierType.getInstance(n.i);
+		((IdentifierType)n.t).decl = n;
 
         n.parent.b = t.get(n.parent);
 
@@ -170,7 +160,7 @@ public class SymbolGenerator implements Visitor<Object> {
 
     public Object visit(VarDecl n) {
         // just add the decl to whatever the current scope is
-        if (t.put(n.i, n) != null) error(n.i.pos, "var already defined in current scope");
+        if (t.put(n.i, n) != null) error(n.i.pos, "Variable: [" + n.i.s + "] already defined in current scope");
         n.i.b = n;
         if (n.t instanceof IdentifierType) {
             Decl d = t.get(((IdentifierType) n.t).i);

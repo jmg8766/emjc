@@ -13,6 +13,7 @@ public class SymbolTable<V> {
 	public SymbolTable(){
 		inScope.addFirst(new HashMap<String, V>());
 	}
+
 	/**
 	 * @return the previous value associated with the key
 	 */

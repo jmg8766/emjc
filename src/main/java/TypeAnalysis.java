@@ -5,17 +5,15 @@ import ast.*;
 import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
-
-import java.io.PrintStream;
 import java.util.Vector;
 
 
 public class TypeAnalysis implements Visitor<Type> {
 
-    static PrintStream output = System.out;
+    public static StringBuffer output = new StringBuffer();
 
     private void error(String pos, String error) {
-        output.println(pos + " error: " + error);
+        output.append(pos + " error: " + error + "\n");
     }
 
     /**
@@ -25,7 +23,7 @@ public class TypeAnalysis implements Visitor<Type> {
      * @return
      */
     private boolean checkSubType(Type right, Type left) {
-        output.println("Checking type " + right + " " + left);
+        output.append("Checking type " + right + " " + left);
         if(right == left) return true;
         if (right instanceof IdentifierType && ((IdentifierType) right).decl.parentSet.contains(left)) return true;
         return false;
@@ -160,7 +158,7 @@ public class TypeAnalysis implements Visitor<Type> {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
         if (t1 != BooleanType.getInstance() || t2 != BooleanType.getInstance())
-            error(n.pos, "Operator && cannot be applied between types " + t1 + " and " + t2);
+            error(n.pos, "Operator && cannot be applied between types [" + t1 + "] and [" + t2 + "]");
         return (n.t = BooleanType.getInstance());
     }
 
@@ -169,7 +167,7 @@ public class TypeAnalysis implements Visitor<Type> {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
         if (t1 != BooleanType.getInstance() || t2 != BooleanType.getInstance())
-            error(n.pos, "Operator || cannot be applied between types " + t1 + " and " + t2);
+            error(n.pos, "Operator || cannot be applied between types [" + t1 + "] and [" + t2 + "]");
         return (n.t = BooleanType.getInstance());
     }
 
@@ -178,7 +176,7 @@ public class TypeAnalysis implements Visitor<Type> {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
         if (t1 != IntegerType.getInstance() || t2 != IntegerType.getInstance())
-            error(n.pos, "Operator < cannot be applied between types " + t1 + " and " + t2);
+            error(n.pos, "Operator < cannot be applied between types [" + t1 + "] and [" + t2 + "]");
         return (n.t = BooleanType.getInstance());
     }
 

@@ -14,7 +14,7 @@ public class NameAnalysisTest {
 	void testAllBenchmarks(File f) {
 		// make the symbol generator print results to a byte stream instead of the terminal
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SymbolGenerator.printStream = new PrintStream(baos);
+		Emjc.output = new PrintStream(baos);
 
 		System.out.println("Performing name analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--name", f.getPath()});
@@ -49,7 +49,7 @@ public class NameAnalysisTest {
 	void testOverridingMethodsWithDifferentType() {
 		// make the symbol generator print results to a byte stream instead of the terminal
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		SymbolGenerator.printStream = new PrintStream(baos);
+		Emjc.output = new PrintStream(baos);
 
 		System.out.println("Performing name analysis on OverrideingWithDifferentTypes.emj");
 		Emjc.main(new String[] {"--name", "src/test/benchmarks/OverridingWithDifferentTypes.emj-special"});

@@ -1,6 +1,7 @@
 import ast.Program;
 
 import java.io.BufferedWriter;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -8,6 +9,9 @@ import java.nio.file.Paths;
  * Contains the main method for the E mini Java Compiler.
  */
 public class Emjc {
+
+    static StringBuilder errors = new StringBuilder();
+	static PrintStream output = System.out;
 
 	public static void main(String[] args) {
 		if (args.length == 2) {
@@ -24,12 +28,16 @@ public class Emjc {
 					}
 					return;
 				case "--name":
-					System.out.println(new SymbolGenerator().visit(new Parser(new Lexer(args[1])).program()));
+					String s = new SymbolGenerator().visit(new Parser(new Lexer(args[1])).program());
+					if(s.isEmpty()) output.println("Valid eMiniJava Program");
 					return;
 				case "--type":
 					Program p1 = new Parser(new Lexer(args[1])).program();
-					new SymbolGenerator().visit(p1);
+					errors.append(new SymbolGenerator().visit(p1));
 					new TypeAnalysis().visit(p1);
+					errors.append(TypeAnalysis.output);
+					if(errors.toString().isEmpty()) output.println("Valid eMiniJava Program");
+					else output.println(errors.toString());
 					return;
 				case "--pp":
 					Program p = new Parser(new Lexer(args[1])).program();
