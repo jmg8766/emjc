@@ -4,6 +4,7 @@ import ast.*;
 import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
+import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 import symbol.SymbolTable;
 
 import java.io.PrintStream;
@@ -44,7 +45,8 @@ public class SymbolGenerator implements Visitor<Object> {
 		// add all classDecl to global scope
 		n.cl.list.forEach(c -> {
 			if (t.put(c.i, c) != null) error(c.i.pos, "class is defined more than once");
-		});
+			else {c.t = IdentifierType.getInstance(c.i); ((IdentifierType)c.t).decl = c; }});
+
 		// visit the mainDecl
 		n.m.accept(this);
 		// visit each class
@@ -57,6 +59,7 @@ public class SymbolGenerator implements Visitor<Object> {
 			ps.addAll(inheritanceChain);
 			c.parentSet = ps;
 		});
+
 		if (errors.isEmpty()) return "Valid eMiniJava Program";
 		else {
 		    StringBuilder b = new StringBuilder();
@@ -80,14 +83,11 @@ public class SymbolGenerator implements Visitor<Object> {
 		// add n to the inheritance chain just so to handle "this"
 		inheritanceChain.add(n);
 
-        // set the type of this classDecl
-        n.t = IdentifierType.getInstance(n.i);
-
 		// Set the binding for this classDecl
 		n.i.b = t.get(n.i);
 
-		n.t = IdentifierType.getInstance(n.i);
-		((IdentifierType)n.t).decl = n;
+//		n.t = IdentifierType.getInstance(n.i);
+//		((IdentifierType)n.t).decl = n;
 
 		// add each varDecl to class scope
 		n.vl.list.forEach(v -> {
@@ -118,17 +118,15 @@ public class SymbolGenerator implements Visitor<Object> {
 		else if(t.get(n.parent) == null) error(n.i.pos, "Attempted to extend non-existent class: [" + n.parent.s + "]");
 		else t.get(n.parent).accept(this);
 
-		// set the type of this classDecl
-        n.t = IdentifierType.getInstance(n.i);
-
 		// add information about all supertypes of this class to it's type
 		inheritanceChain.forEach(classDecl -> ((IdentifierType)n.t).superTypes.add(classDecl.t));
 
 		// Set the binding for this classDecl and it's parent
 		n.i.b = t.get(n.i);
 
-		n.t = IdentifierType.getInstance(n.i);
-		((IdentifierType)n.t).decl = n;
+		// set information about the classDecl in the identifier type for this class
+//		n.t = IdentifierType.getInstance(n.i);
+//		((IdentifierType)n.t).decl = n;
 
 		n.parent.b = t.get(n.parent);
 
@@ -356,11 +354,9 @@ public class SymbolGenerator implements Visitor<Object> {
 
 	public Object visit(NewObject n) {
 		if (t.get(n.i) == null) error(n.i.pos, "Cannot resolve symbol: [" + n.i.s + "]");
-		else n.i = t.get(n.i).i;
-
-		if(n.t instanceof IdentifierType) {
-			Decl d = t.get(((IdentifierType)n.t).i);
-			((IdentifierType)n.t).decl = (ClassDecl) d;
+		else {
+			n.i = t.get(n.i).i;
+			n.t = t.get(n.i).t;
 		}
 		return null;
 	}

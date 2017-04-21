@@ -29,16 +29,6 @@ public class TypeAnalysis implements Visitor<Type> {
         if(right == left) return true;
         if (right instanceof IdentifierType && ((IdentifierType) right).decl.parentSet.contains(left)) return true;
         return false;
-
-//        if (right instanceof PrimitiveType && left instanceof PrimitiveType)
-//            if(right == left)
-//                return true;
-//        else if (right instanceof IdentifierType && left instanceof IdentifierType);
-//        {   //There was a linked map for parents then we could check instantly for every rhs parent nodes
-//            if (((IdentifierType) right).decl.parentSet.contains(left)) //TODO
-//                return true;
-//        }
-//        return false;
     }
 
     @Override
@@ -75,7 +65,11 @@ public class TypeAnalysis implements Visitor<Type> {
     public Type visit(MethodDecl n) {
         n.vl.list.forEach(v -> v.accept(this));
         n.sl.list.forEach(s -> s.accept(this));
-        if(n.t != n.e.accept(this)) error(n.pos, "Expected Return type does not match the current return type");
+        Type t1 = n.e.accept(this);
+        //TODO Tried to compare the declarations of the identifiers as the identifiers are not unique - check if they have to be modified in SymbolTable/Here.
+        if((n.t != t1 && !(n.t instanceof IdentifierType)) ||
+                (n.t instanceof IdentifierType && t1 instanceof IdentifierType && ((IdentifierType)n.t).decl != ((IdentifierType)t1).decl))
+            error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
         return n.t;
     }
 
@@ -143,8 +137,10 @@ public class TypeAnalysis implements Visitor<Type> {
     @Override
     public Type visit(Assign n) {
         Type t1 = n.e.accept(this);
+        if(t1 instanceof IdentifierType && n.i.b.t instanceof IdentifierType && (((IdentifierType)n.i.b.t).decl == ((IdentifierType)t1).decl))
+            return null;
         if(n.i.b.t != t1 || (n.i.b.t instanceof IdentifierType && !checkSubType(t1, n.i.b.t)))
-            error(n.pos, "Right hand side " + t1+ " of Assign must be a subtype of the lefthand side " + n.i.b.t); //TODO pos
+            error(n.pos, "Right hand side " + t1 + " of Assign must be a subtype of the lefthand side " + n.i.b.t); //TODO pos
         return null;
     }
 
@@ -198,8 +194,8 @@ public class TypeAnalysis implements Visitor<Type> {
     public Type visit(Plus n) {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
-
-        if(t1 == t2) return (n.t = t1);
+        // Checks if the type is a string or a integer
+        if(t1 == IntegerType.getInstance() && t1 == t2) return (n.t = t1);
         else if ((t1 == IntegerType.getInstance() || t1 == StringType.getInstance()) &&
                  (t2 == IntegerType.getInstance() || t2 == StringType.getInstance())) {
                 return (n.t = StringType.getInstance());
@@ -278,9 +274,6 @@ public class TypeAnalysis implements Visitor<Type> {
                         Type e1 = e.get(i).accept(this);
                         if (e1 == f.get(i).t) continue;
                     }
-//                    if(n.t instanceof IdentifierType) {
-//                        return n.t = m.t = IdentifierType.getInstance(((IdentifierType)m.t).i);
-//                    }
                     return n.t = m.t;
                 }
             }

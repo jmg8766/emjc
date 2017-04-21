@@ -9,7 +9,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Test(dataProviderClass = Providers.class)
 public class TypeAnalysisTest {
-
 	private ByteArrayOutputStream baos;
 
 	public TypeAnalysisTest() {
@@ -20,7 +19,7 @@ public class TypeAnalysisTest {
 
     @Test(dataProvider = "benchmarkFiles", enabled = true)
     void testAllBenchmarks(File f) {
-		System.out.println("Performing name analysis on file: " + f.getName());
+		System.out.println("Performing type analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--type", f.getPath()});
 
 		// fail if the symbol generator printed any errors

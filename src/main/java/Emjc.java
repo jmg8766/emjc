@@ -29,7 +29,6 @@ public class Emjc {
 				case "--type":
 					Program p1 = new Parser(new Lexer(args[1])).program();
 					new SymbolGenerator().visit(p1);
-//					new PrettyPrinter().visit(p1);
 					new TypeAnalysis().visit(p1);
 					return;
 				case "--pp":

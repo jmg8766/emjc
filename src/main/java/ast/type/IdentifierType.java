@@ -22,6 +22,7 @@ public class IdentifierType extends Type {
 
 	public static IdentifierType getInstance(Identifier i) {
 		return instances.computeIfAbsent(i, id -> new IdentifierType(id));
+
 	}
 
 	@Override
