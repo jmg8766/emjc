@@ -45,9 +45,18 @@ public class NameAnalysisTest {
 		Emjc.main(new String[] {"--name", "src/test/benchmarks/ClassExtendingMainClass.emj"});
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	void testOverridingMethodsWithDifferentType() {
+		// make the symbol generator print results to a byte stream instead of the terminal
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		SymbolGenerator.printStream = new PrintStream(baos);
+
 		System.out.println("Performing name analysis on OverrideingWithDifferentTypes.emj");
-		Emjc.main(new String[] {"--name", "src/test/benchmarks/OrerridingWithDifferentTypes.emj"});
+		Emjc.main(new String[] {"--name", "src/test/benchmarks/OverridingWithDifferentTypes.emj-special"});
+
+		System.out.println(baos.toString());
+		Assert.assertSame(
+				new String(baos.toByteArray(), UTF_8).trim().intern(),
+				"74:19 error: method override with different type, Expected type: [int] found: [String]".intern());
 	}
 }

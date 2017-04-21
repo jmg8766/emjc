@@ -6,7 +6,8 @@ import ast.Visitor;
 public class NewObject extends Exp {
 	public Identifier i;
 
-	public NewObject(Identifier i) {
+	public NewObject(String pos, Identifier i) {
+	    this.pos = pos;
 		this.i = i;
 	}
 

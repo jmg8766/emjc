@@ -22,7 +22,7 @@ class PrimalityTester {
         retValue = true;
 		if (num < 1 || num == 1)
 			retValue = false ;
-		else if (n < 3 || n == 3)
+		else if (num < 3 || num == 3)
 			retValue = true ;
 		else if ( ( this.mod(num, 2) == 0 ) || ( this.mod(num, 3) == 0 ) )
 			retValue = false ;

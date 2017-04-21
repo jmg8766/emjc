@@ -7,7 +7,8 @@
 
 class Precedence {
     public static void main(String[] args){
-	   int operation1 = 4 + 6 * 2 - 4 + 8 / 2;         // 16
+	   int operation1;
+	   operation1 = 4 + 6 * 2 - 4 + 8 / 2;         // 16
        boolean operation2 = false || !false && true;   // true
        boolean operation3 = 4 * 2 - 5 == 10 / 5 + 1;   // true
        boolean operation4 = false && true == false;    // false
