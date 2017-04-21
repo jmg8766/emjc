@@ -2,7 +2,7 @@ package ast.type;
 
 import ast.Visitor;
 
-public class StringType extends Type {
+public class StringType extends PrimitiveType {
 
 	private final static StringType instance = new StringType();
 

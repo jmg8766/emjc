@@ -13,7 +13,8 @@ public class SemanticTest {
 
     @Test(enabled = true)
     void testAstSingleFile() {
-        File f = new File("src/test/benchmarks/Example.emj");
+//        File f = new File("src/test/benchmarks/Example.emj");
+        File f = new File("src/test/benchmarks/Simple.emj");
         System.out.println("Performing Name analysis: " + f.getName());
         Emjc.main(new String[] {"--pp", f.getPath()});
     }

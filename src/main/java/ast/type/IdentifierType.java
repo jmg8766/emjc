@@ -13,6 +13,8 @@ public class IdentifierType extends Type {
 	public Identifier i;
 	public ClassDecl classDecl;
 
+	public ClassDecl decl;
+
 	private static HashMap<Identifier, IdentifierType> instances = new HashMap<>();
 
 	private IdentifierType(Identifier i) {

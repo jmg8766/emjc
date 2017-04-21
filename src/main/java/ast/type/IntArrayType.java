@@ -2,7 +2,7 @@ package ast.type;
 
 import ast.Visitor;
 
-public class IntArrayType extends Type {
+public class IntArrayType extends PrimitiveType {
 
 	private final static IntArrayType instance = new IntArrayType();
 

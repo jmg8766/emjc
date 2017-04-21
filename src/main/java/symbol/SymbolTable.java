@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.Objects;
 
 public class SymbolTable<V> {
-	int a;
 
 	private final LinkedList<HashMap<String, V>> inScope = new LinkedList<>();
 
