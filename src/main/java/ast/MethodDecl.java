@@ -7,13 +7,15 @@ import ast.list.VarDeclList;
 import ast.type.Type;
 
 public class MethodDecl extends Decl {
+	public String pos;
 	public Type t;
 	public FormalList fl;
 	public VarDeclList vl;
 	public StatementList sl;
 	public Exp e;
 
-	public MethodDecl(Type t, Identifier i, FormalList fl, VarDeclList vl, StatementList sl, Exp e) {
+	public MethodDecl(String pos, Type t, Identifier i, FormalList fl, VarDeclList vl, StatementList sl, Exp e) {
+		this.pos = pos;
 		this.t = t;
 		this.i = i;
 		this.fl = fl;

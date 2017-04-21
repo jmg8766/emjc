@@ -24,7 +24,7 @@ public class Emjc {
 					}
 					return;
 				case "--name":
-					new SymbolGenerator().visit(new Parser(new Lexer(args[1])).program());
+					System.out.println(new SymbolGenerator().visit(new Parser(new Lexer(args[1])).program()));
 					return;
 				case "--type":
 					Program p1 = new Parser(new Lexer(args[1])).program();

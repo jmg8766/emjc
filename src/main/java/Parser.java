@@ -89,7 +89,7 @@ public class Parser {
 			sl.list.addAll(statementList().list);
 			eat(RETURN); Exp e = exp();
 		eat(SEMICOLON, RBRACE);
-		return new MethodDecl(t, i, fl, vl, sl, e);
+		return new MethodDecl(tok.row + ":" + tok.col, t, i, fl, vl, sl, e);
 	}
 
 	Formal formal() { return new Formal(type(), identifier()); }
@@ -140,31 +140,32 @@ public class Parser {
 		Exp e = exp();
 		eat(RPAREN);
 		Statement s1 = statement();
-		if(tok.type != ELSE) return new If(e, s1, null);
-		eat(ELSE); return new If(e, s1, statement());
+		if(tok.type != ELSE) return new If(tok.row + ":" + tok.col, e, s1, null);
+		eat(ELSE); return new If(tok.row + ":" + tok.col, e, s1, statement());
 	}
 
 	While whileStmnt() {
 		eat(WHILE, LPAREN);
 		Exp e = exp();
 		eat(RPAREN);
-		return new While(e, statement());
+		return new While(tok.row + ":" + tok.col, e, statement());
 	}
 
 	Print print() {
 		eat(PRINTLN, LPAREN);
 		Exp e = exp();
 		eat(RPAREN, SEMICOLON);
-		return new Print(e);
+		return new Print(tok.row + ":" + tok.col, e);
 	}
 
 	Statement assign() { return _assign(identifier()); }
 	Statement _assign(Identifier i) { switch (tok.type) {
 		case EQSIGN:
+			String pos = tok.row + ":" + tok.col;
 			eat(EQSIGN);
 			Exp e = exp();
 			eat(SEMICOLON);
-			return new Assign(i, e);
+			return new Assign(pos, i, e);
 		case LBRACKET:
 			eat(LBRACKET); Exp e1 = exp();
 			eat(RBRACKET, EQSIGN); Exp e2 = exp();

@@ -5,10 +5,12 @@ import ast.Visitor;
 import ast.expression.Exp;
 
 public class Assign extends Statement {
+	public String pos;
 	public Identifier i;
 	public Exp e;
 
-	public Assign(Identifier i, Exp e) {
+	public Assign(String pos, Identifier i, Exp e) {
+		this.pos = pos;
 		this.i = i;
 		this.e = e;
 	}

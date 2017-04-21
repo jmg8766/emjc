@@ -39,7 +39,7 @@ public class SymbolGenerator implements Visitor<Object> {
 		errors.add(loc + " error: " + msg);
 	}
 
-	public Object visit(Program n) {
+	public String visit(Program n) {
 		mainClassName = n.m.i.s;
 		// add all classDecl to global scope
 		n.cl.list.forEach(c -> {
@@ -57,16 +57,19 @@ public class SymbolGenerator implements Visitor<Object> {
 			ps.addAll(inheritanceChain);
 			c.parentSet = ps;
 		});
-		if (errors.isEmpty()) printStream.println("Valid eMiniJava Program");
-		else errors.forEach(e -> printStream.println(e));
-		return null;
+		if (errors.isEmpty()) return "Valid eMiniJava Program";
+		else {
+		    StringBuilder b = new StringBuilder();
+			errors.forEach(e -> b.append(e).append("\n"));
+			return b.toString();
+		}
 	}
 
 	public Object visit(MainClass n) {
 		// set the bindings
 		n.i.b = n;
 		// Set class type
-		n.t = new ClassType(n.i);
+		n.t = IdentifierType.getInstance(n.i);
 		n.i2.b = new Formal(StringType.getInstance(), n.i2);
 		// visit the main statement
 		n.s.accept(this);
@@ -80,14 +83,8 @@ public class SymbolGenerator implements Visitor<Object> {
         // set the type of this classDecl
         n.t = IdentifierType.getInstance(n.i);
 
-        // set information about the classDecl in the identifier type for this class
-        ((IdentifierType)n.t).classDecl = n;
-
 		// Set the binding for this classDecl
 		n.i.b = t.get(n.i);
-
-		// Set class type
-		n.t = new ClassType(n.i);
 
 		n.t = IdentifierType.getInstance(n.i);
 		((IdentifierType)n.t).decl = n;
@@ -95,7 +92,7 @@ public class SymbolGenerator implements Visitor<Object> {
 		// add each varDecl to class scope
 		n.vl.list.forEach(v -> {
 			if (t.put(v.i, v) != null) error(v.i.pos, "Variable declared multiple times in the same scope");
-			v.i.b = v; //TODO Map to the class declaration
+			v.accept(this);
 		});
 
 		// add each methodDecl to class scope (because methods can reference each other)
@@ -124,9 +121,6 @@ public class SymbolGenerator implements Visitor<Object> {
 		// set the type of this classDecl
         n.t = IdentifierType.getInstance(n.i);
 
-        // set information about the classDecl in the identifier type for this class
-        ((IdentifierType)n.t).classDecl = n;
-
 		// add information about all supertypes of this class to it's type
 		inheritanceChain.forEach(classDecl -> ((IdentifierType)n.t).superTypes.add(classDecl.t));
 
@@ -135,9 +129,6 @@ public class SymbolGenerator implements Visitor<Object> {
 
 		n.t = IdentifierType.getInstance(n.i);
 		((IdentifierType)n.t).decl = n;
-
-		// Set class type
-		n.t = new ClassType(n.i);
 
 		n.parent.b = t.get(n.parent);
 
@@ -178,6 +169,10 @@ public class SymbolGenerator implements Visitor<Object> {
 		// just add the decl to whatever the current scope is
 		if (t.put(n.i, n) != null) error(n.i.pos, "var already defined in current scope");
 		n.i.b = n;
+		if(n.t instanceof IdentifierType) {
+		    Decl d = t.get(((IdentifierType)n.t).i);
+			((IdentifierType)n.t).decl = (ClassDecl) d;
+		}
 		return null;
 	}
 
@@ -197,6 +192,10 @@ public class SymbolGenerator implements Visitor<Object> {
 		// just add the decl to whatever the current scope is
 		if (t.put(n.i, n) != null) error(n.i.pos, "formal already defined in current method");
 		n.i.b = n;
+		if(n.t instanceof IdentifierType) {
+			Decl d = t.get(((IdentifierType)n.t).i);
+			((IdentifierType)n.t).decl = (ClassDecl) d;
+		}
 		return null;
 	}
 
@@ -346,7 +345,7 @@ public class SymbolGenerator implements Visitor<Object> {
 
 	public Object visit(This n) {
 		if (inheritanceChain.isEmpty()) error(n.pos, "reference this from inside main method");
-		n.t = new ClassType(inheritanceChain.iterator().next().i);
+		n.t = IdentifierType.getInstance(inheritanceChain.iterator().next().i);
 		return null;
 	}
 
@@ -358,6 +357,11 @@ public class SymbolGenerator implements Visitor<Object> {
 	public Object visit(NewObject n) {
 		if (t.get(n.i) == null) error(n.i.pos, "Cannot resolve symbol: [" + n.i.s + "]");
 		else n.i = t.get(n.i).i;
+
+		if(n.t instanceof IdentifierType) {
+			Decl d = t.get(((IdentifierType)n.t).i);
+			((IdentifierType)n.t).decl = (ClassDecl) d;
+		}
 		return null;
 	}
 

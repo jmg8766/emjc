@@ -7,7 +7,6 @@ import ast.list.VarDeclList;
 import ast.type.Type;
 
 public class ClassDeclSimple extends ClassDecl {
-	public Type t;
 
 	public ClassDeclSimple(String pos, Identifier i, VarDeclList v, MethodDeclList m) {
 		super(pos, i, v, m);

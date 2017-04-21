@@ -4,9 +4,11 @@ import ast.Visitor;
 import ast.expression.Exp;
 
 public class Print extends Statement {
+	public String pos;
 	public Exp e;
 
-	public Print(Exp e) {
+	public Print(String pos, Exp e) {
+		this.pos = pos;
 		this.e = e;
 	}
 

@@ -11,8 +11,6 @@ public class IdentifierType extends Type {
 
 	public HashSet<Type> superTypes;
 	public Identifier i;
-	public ClassDecl classDecl;
-
 	public ClassDecl decl;
 
 	private static HashMap<Identifier, IdentifierType> instances = new HashMap<>();
