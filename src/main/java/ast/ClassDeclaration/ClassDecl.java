@@ -6,8 +6,11 @@ import ast.Visitor;
 import ast.list.MethodDeclList;
 import ast.list.VarDeclList;
 
+import java.util.LinkedHashSet;
+
 public abstract class ClassDecl extends Decl {
 
+	public LinkedHashSet parentSet;
 	public VarDeclList vl;
 	public MethodDeclList ml;
 

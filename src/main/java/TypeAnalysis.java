@@ -340,6 +340,7 @@ public class TypeAnalysis implements Visitor<Type> {
         if(t1 instanceof IdentifierType)
             t1 = IdentifierType.getInstance(n.i.b.i);
             n.t = t1;
+        System.out.println("ID: " + n.i.s + " -- " +n.t + n.i.pos);
         return n.t;
     }
 
@@ -373,6 +374,7 @@ public class TypeAnalysis implements Visitor<Type> {
 
     @Override
     public Type visit(Identifier n) {
+        System.out.println("ID: " + n.b.i.s + "--" + n.b.t);
         return n.b.t;
     }
 }

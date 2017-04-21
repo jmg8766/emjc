@@ -8,7 +8,7 @@ import ast.type.*;
 import symbol.SymbolTable;
 
 import java.io.PrintStream;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.TreeSet;
 
 public class SymbolGenerator implements Visitor<Object> {
@@ -20,7 +20,7 @@ public class SymbolGenerator implements Visitor<Object> {
 
 	// Vars used for error reporting
 	private String mainClassName;
-	private HashSet<ClassDecl> inheritanceChain = new HashSet<>();
+	private LinkedHashSet<ClassDecl> inheritanceChain = new LinkedHashSet<>(); //TODO
 
 	private TreeSet<String> errors = new TreeSet<>((s1, s2) -> {
 		String[] s1loc = s1.substring(0, s1.indexOf(" ")).split(":");
@@ -54,6 +54,9 @@ public class SymbolGenerator implements Visitor<Object> {
 			t.beginScope();
 			c.accept(this);
 			t.endScope();
+			LinkedHashSet ps = new LinkedHashSet();
+			ps.addAll(inheritanceChain);
+			c.parentSet = ps;
 		});
 		if (errors.isEmpty()) printStream.println("Valid eMiniJava Program");
 		else errors.forEach(e -> printStream.println(e));
@@ -63,6 +66,8 @@ public class SymbolGenerator implements Visitor<Object> {
 	public Object visit(MainClass n) {
 		// set the bindings
 		n.i.b = n;
+		// Set class type
+		n.t = new ClassType(n.i);
 		n.i2.b = new Formal(StringType.getInstance(), n.i2);
 		// visit the main statement
 		n.s.accept(this);
@@ -74,10 +79,17 @@ public class SymbolGenerator implements Visitor<Object> {
 		inheritanceChain.add(n);
 		// Set the binding for this classDecl
 		n.i.b = t.get(n.i);
+
+		// Set class type
+		n.t = new ClassType(n.i);
+
+		n.t = IdentifierType.getInstance(n.i);
+		((IdentifierType)n.t).decl = n;
+
 		// add each varDecl to class scope
 		n.vl.list.forEach(v -> {
 			if (t.put(v.i, v) != null) error(v.i.pos, "Variable declared multiple times in the same scope");
-			v.i.b = v;
+			v.i.b = v; //TODO Map to the class declaration
 		});
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
@@ -101,6 +113,13 @@ public class SymbolGenerator implements Visitor<Object> {
 		else t.get(n.parent).accept(this);
 		// Set the binding for this classDecl and it's parent
 		n.i.b = t.get(n.i);
+
+		n.t = IdentifierType.getInstance(n.i);
+		((IdentifierType)n.t).decl = n;
+
+		// Set class type
+		n.t = new ClassType(n.i);
+
 		n.parent.b = t.get(n.parent);
 		// add all varDecl for current class
 		n.vl.list.forEach(v -> v.accept(this));
@@ -316,6 +335,7 @@ public class SymbolGenerator implements Visitor<Object> {
 
 	public Object visit(This n) {
 		if (inheritanceChain.isEmpty()) error(n.pos, "reference this from inside main method");
+		n.t = new ClassType(inheritanceChain.iterator().next().i);
 		return null;
 	}
 

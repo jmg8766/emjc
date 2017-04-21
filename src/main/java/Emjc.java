@@ -26,13 +26,16 @@ public class Emjc {
 				case "--name":
 					new SymbolGenerator().visit(new Parser(new Lexer(args[1])).program());
 					return;
+				case "--type":
+					Program p1 = new Parser(new Lexer(args[1])).program();
+					new SymbolGenerator().visit(p1);
+//					new PrettyPrinter().visit(p1);
+					new TypeAnalysis().visit(p1);
+					return;
 				case "--pp":
 					Program p = new Parser(new Lexer(args[1])).program();
 					new SymbolGenerator().visit(p);
 					new PrettyPrinter().visit(p);
-					return;
-				case "--type":
-					//TODO
 					return;
 			}
 		}

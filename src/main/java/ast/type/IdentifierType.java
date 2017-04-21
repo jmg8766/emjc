@@ -1,5 +1,6 @@
 package ast.type;
 
+import ast.ClassDeclaration.ClassDecl;
 import ast.Identifier;
 import ast.Visitor;
 
@@ -8,6 +9,8 @@ import java.util.HashMap;
 public class IdentifierType extends Type {
 
 	public Identifier i;
+
+	public ClassDecl decl;
 
 	private static HashMap<Identifier, IdentifierType> instances = new HashMap<>();
 

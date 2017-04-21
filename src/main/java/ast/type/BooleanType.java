@@ -2,7 +2,7 @@ package ast.type;
 
 import ast.Visitor;
 
-public class BooleanType extends Type {
+public class BooleanType extends PrimitiveType {
 
 	private static final BooleanType instance = new BooleanType();
 
