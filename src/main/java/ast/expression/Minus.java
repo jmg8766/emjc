@@ -5,7 +5,8 @@ import ast.Visitor;
 public class Minus extends Exp {
 	public Exp e1, e2;
 
-	public Minus(Exp e1, Exp e2) {
+	public Minus(String pos, Exp e1, Exp e2) {
+		this.pos = pos;
 		this.e1 = e1;
 		this.e2 = e2;
 	}

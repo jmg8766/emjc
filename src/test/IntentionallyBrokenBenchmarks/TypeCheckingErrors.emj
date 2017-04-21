@@ -1,0 +1,11 @@
+class Main { public static void main(String[] args) { System.out.println(""); }}
+
+class A {
+    A a; String b; int[] c; int d;
+}
+
+class B extends A {
+    int method1(int e, String f) {
+        return
+    }
+}

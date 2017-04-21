@@ -9,7 +9,8 @@ public class Call extends Exp {
 	public Identifier i;
 	public ExpList el;
 
-	public Call(Exp e, Identifier i, ExpList el) {
+	public Call(String pos, Exp e, Identifier i, ExpList el) {
+		this.pos = pos;
 		this.e = e;
 		this.i = i;
 		this.el = el;

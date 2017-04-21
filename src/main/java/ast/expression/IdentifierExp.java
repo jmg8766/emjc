@@ -6,7 +6,8 @@ import ast.Visitor;
 public class IdentifierExp extends Exp {
 	public Identifier i;
 
-	public IdentifierExp(Identifier i) {
+	public IdentifierExp(String pos, Identifier i) {
+		this.pos = pos;
 		this.i = i;
 	}
 

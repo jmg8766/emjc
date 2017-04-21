@@ -2,7 +2,7 @@
 //Author Two : Akshay Kalbhor
 //Benchmark One : KSelect
 
-public class KSelect {
+class KSelect {
 	
 	//input array = [10, 4, 12, 15, 5, 8]
 	//positions of all elements after sorting = [4, 5, 8, 10, 12, 15]
@@ -18,18 +18,20 @@ class Select {
 	//here k goes from 0 to length of the array. Smallest element in the array is k = 0
 	//Biggest element in the array is at (k = array.length - 1)
 	public int start(int k, int left, int right) {
-		this.init();
+        int retValue;
+		sidef(this.init());
 		
 		if (k < left) {
 			System.out.println("Value of k is invalid");
-			return 0;
-		}
-		
-		if (right < k) {
+			retValue = 0;
+		} else if (right < k) {
 			System.out.println("Value of k is invalid");
-			return 0;
+			retValue = 0;
+		} else {
+		    retValue = this.select(inputArray, k, left, right);
 		}
-		return this.select(inputArray, k, left, right);
+
+		return retValue;
 	}
 	
 	public int init() {

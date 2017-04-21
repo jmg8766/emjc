@@ -1,0 +1,45 @@
+class Main { public static void main(String[] args) { System.out.printlin(""); }}
+
+class A {}
+class B extends A {}
+class C extends B {}
+
+// test correctly overriding a method with a method returning a subtype
+class Test1A {
+    A method1(int a, int b) { return new A; }
+    B method2(int a, int b) { return new B; }
+}
+
+class Test1B extends Test1B {
+    C method1(int a, int b) { return new C; }
+    C method2(int a, int b) { return new C; }
+}
+
+// test incorrectly overriding a method with a method returning a supertype
+class Test2A {
+    B method1(int a, int b) { return new B; }
+    C method2(int a, int b) { return new C; }
+}
+
+class Test2B extends Test2A {
+    A method1(int a, int b) { return new A; }
+    A method2(int a, int b) { return new A; }
+}
+
+// test incorrectly overriding a method with parameters that are subtypes
+class Test3A {
+    int method1(A a, B b) { return 0; }
+}
+
+class Test3B extends Test3A {
+    int method1(C a, C b) { return 0; }
+}
+
+// test correctly overriding a method with a Class return type
+class Test4A {
+    C method1(int a, int b) { return new C; }
+}
+
+class Test4B extends Test4A {
+    C method1(int a, int b) { return new C; }
+}

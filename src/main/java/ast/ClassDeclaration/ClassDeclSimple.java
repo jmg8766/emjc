@@ -4,11 +4,13 @@ import ast.Identifier;
 import ast.Visitor;
 import ast.list.MethodDeclList;
 import ast.list.VarDeclList;
+import ast.type.Type;
 
 public class ClassDeclSimple extends ClassDecl {
+	public Type t;
 
-	public ClassDeclSimple(Identifier i, VarDeclList v, MethodDeclList m) {
-		super(i, v, m);
+	public ClassDeclSimple(String pos, Identifier i, VarDeclList v, MethodDeclList m) {
+		super(pos, i, v, m);
 	}
 
 	@Override

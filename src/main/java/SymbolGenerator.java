@@ -1,5 +1,4 @@
-import ast.ClassDeclaration.ClassDecl;
-import ast.ClassDeclaration.ClassDeclExtends;
+import ast.ClassDeclaration.ClassDecl; import ast.ClassDeclaration.ClassDeclExtends;
 import ast.ClassDeclaration.ClassDeclSimple;
 import ast.*;
 import ast.expression.*;
@@ -77,6 +76,13 @@ public class SymbolGenerator implements Visitor<Object> {
 	public Object visit(ClassDeclSimple n) {
 		// add n to the inheritance chain just so to handle "this"
 		inheritanceChain.add(n);
+
+        // set the type of this classDecl
+        n.t = IdentifierType.getInstance(n.i);
+
+        // set information about the classDecl in the identifier type for this class
+        ((IdentifierType)n.t).classDecl = n;
+
 		// Set the binding for this classDecl
 		n.i.b = t.get(n.i);
 
@@ -91,17 +97,20 @@ public class SymbolGenerator implements Visitor<Object> {
 			if (t.put(v.i, v) != null) error(v.i.pos, "Variable declared multiple times in the same scope");
 			v.i.b = v; //TODO Map to the class declaration
 		});
+
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
 			if (t.put(m.i, m) != null) error(m.i.pos, "Method declared multiple times in same the scope");
 			m.i.b = m;
 		});
+
 		// visit each methodDecl
 		n.ml.list.forEach(m -> {
 			t.beginScope();
 			m.accept(this);
 			t.endScope();
 		});
+
 		return null;
 	}
 
@@ -109,8 +118,18 @@ public class SymbolGenerator implements Visitor<Object> {
 		// check for cyclical inheritance by adding all parent varDecl and methodDecl to current scope
 		if(n.parent.s.equals(mainClassName)) error(n.i.pos, "Cannot extend the main class: [" + mainClassName + "]");
 		else if (!inheritanceChain.add(n)) error(n.i.pos, "cyclical inheritance");
-		else if(t.get(n.parent) == null) error(n.i.pos, "Attempted to extend non-existant class: [" + n.parent.s + "]");
+		else if(t.get(n.parent) == null) error(n.i.pos, "Attempted to extend non-existent class: [" + n.parent.s + "]");
 		else t.get(n.parent).accept(this);
+
+		// set the type of this classDecl
+        n.t = IdentifierType.getInstance(n.i);
+
+        // set information about the classDecl in the identifier type for this class
+        ((IdentifierType)n.t).classDecl = n;
+
+		// add information about all supertypes of this class to it's type
+		inheritanceChain.forEach(classDecl -> ((IdentifierType)n.t).superTypes.add(classDecl.t));
+
 		// Set the binding for this classDecl and it's parent
 		n.i.b = t.get(n.i);
 
@@ -121,8 +140,10 @@ public class SymbolGenerator implements Visitor<Object> {
 		n.t = new ClassType(n.i);
 
 		n.parent.b = t.get(n.parent);
+
 		// add all varDecl for current class
 		n.vl.list.forEach(v -> v.accept(this));
+
 		// add each methodDecl to class scope (because methods can reference each other)
 		n.ml.list.forEach(m -> {
 			Decl last = t.get(m.i);
@@ -137,23 +158,13 @@ public class SymbolGenerator implements Visitor<Object> {
 					error(m.i.pos, "method override with different type, Expected type: [" + last.t + "] found: ["  + m.t + "]");
 				}
 				// Otherwise if both are Classes, check if the overriding method is a subtype of the overridden method
-				if (last.t instanceof IdentifierType && m.t instanceof IdentifierType) {
-					Type lastMethodReturnType = ((ClassDecl) t.get(((IdentifierType) last.t).i)).t;
-					ClassDecl newMethodReturnType = (ClassDecl) t.get(((IdentifierType) m.t).i);
-					// loop through the parents of the return type of the overriding method
-					while (newMethodReturnType instanceof ClassDeclExtends) {
-						// until one with the same type as the overridden method is found
-						if (newMethodReturnType.t == lastMethodReturnType) break;
-						newMethodReturnType = (ClassDecl) t.get(((ClassDeclExtends) newMethodReturnType).parent);
-					}
-					// if a parent with the same return type as overridden method isn't found, report an error
-					if (newMethodReturnType.t != lastMethodReturnType) {
-						error(m.i.pos, "method override with different type, Expected subtype of: [" + lastMethodReturnType + "]");
-					}
-				}
+				else if(last.t instanceof IdentifierType && m.t instanceof IdentifierType && !((IdentifierType)m.t).superTypes.contains(last.t)) {
+                    error(m.i.pos, "method override with different type, Expected subtype: [" + last.t + "] found: ["  + m.t + "]");
+                }
 			} else t.put(m.i, m);
 			m.i.b = m;
 		});
+
 		// visit each methodDecl
 		n.ml.list.forEach(m -> {
 			t.beginScope();

@@ -50,11 +50,11 @@ public class Parser {
 				eat(EXTENDS);
 				Identifier i2 = identifier();
 				eat(LBRACE);
-				c = new ClassDeclExtends(i1, i2, varDeclList(), methodDeclList());
+				c = new ClassDeclExtends(tok.row + ":" + tok.col,i1, i2, varDeclList(), methodDeclList());
 				break;
 			case LBRACE:
 				eat(LBRACE);
-				c = new ClassDeclSimple(i1, varDeclList(), methodDeclList());
+				c = new ClassDeclSimple(tok.row + ":" + tok.col, i1, varDeclList(), methodDeclList());
 				break;
 			default: error("Unexpected token: [" + tok + "] Expected: [" + EXTENDS + "] or [" + LBRACE + "]"); return null;
 		}
@@ -182,7 +182,7 @@ public class Parser {
 	Exp or() { return _or(and()); }
 	// _OR -> || OR | empty
 	Exp _or(Exp e) { switch (tok.type) {
-		case OR: eat(TokenType.OR); return new Or(e, or());
+		case OR: eat(TokenType.OR); return new Or(tok.row + ":" + tok.col, e, or());
 		default: return e;
 	}}
 
@@ -190,7 +190,7 @@ public class Parser {
 	Exp and() { return _and(ltEq()); }
 	// _AND -> && AND | empty
 	Exp _and(Exp e) { switch (tok.type) {
-		case AND: eat(TokenType.AND); return new And(e, and());
+		case AND: eat(TokenType.AND); return new And(tok.row + ":" + tok.col, e, and());
 		default: return e;
 	}}
 
@@ -198,8 +198,8 @@ public class Parser {
 	Exp ltEq() { return _ltEq(term()); }
 	// _LTEQ -> (< LTEQ) | (== LTEQ) | empty
 	Exp _ltEq(Exp e) { switch(tok.type) {
-		case LESSTHAN: eat(LESSTHAN); return new LessThan(e, exp());
-		case EQUALS: eat(EQUALS); return new Equals(e, exp());
+		case LESSTHAN: eat(LESSTHAN); return new LessThan(tok.row + ":" + tok.col, e, exp());
+		case EQUALS: eat(EQUALS); return new Equals(tok.row + ":" + tok.col, e, exp());
 		default: return e;
 	}}
 
@@ -207,8 +207,8 @@ public class Parser {
 	Exp term() { return _term(factor()); }
 	// _TERM -> (+|-) TERM | empty
 	Exp _term(Exp e) { switch(tok.type) {
-		case PLUS: eat(TokenType.PLUS); return new Plus(e, term());
-		case MINUS: eat(TokenType.MINUS); return new Minus(e, term());
+		case PLUS: eat(TokenType.PLUS); return new Plus(tok.row + ":" + tok.col, e, term());
+		case MINUS: eat(TokenType.MINUS); return new Minus(tok.row + ":" + tok.col, e, term());
 		default: return e;
 	}}
 
@@ -216,14 +216,14 @@ public class Parser {
 	Exp factor() { return _factor(not()); }
 	// _FACT -> (* | /) FACT | empty
 	Exp _factor(Exp e) { switch (tok.type) {
-		case TIMES: eat(TokenType.TIMES); return new Times(e, factor());
-		case DIV: eat(TokenType.DIV); return new Divide(e, factor());
+		case TIMES: eat(TokenType.TIMES); return new Times(tok.row + ":" + tok.col, e, factor());
+		case DIV: eat(TokenType.DIV); return new Divide(tok.row + ":" + tok.col, e, factor());
 		default: return e;
 	}}
 
 	// NOT -> (! EXP) | EXP
 	Exp not() { switch (tok.type) {
-		case BANG: eat(BANG); return new Not(exp());
+		case BANG: eat(BANG); return new Not(tok.row + ":" + tok.col, exp());
 		default: return call();
 	}}
 
@@ -235,13 +235,13 @@ public class Parser {
 			if(tok.type == ID) {
 				Identifier i = identifier();
 				eat(LPAREN); ExpList el = expList(); eat(RPAREN);
-				return _call(new Call(e, i, el));
+				return _call(new Call(tok.row + ":" + tok.col, e, i, el));
 			} else {
-				eat(LENGTH); return _call(new ArrayLength(e));
+				eat(LENGTH); return _call(new ArrayLength(tok.row + ":" + tok.col, e));
 			}
 		case LBRACKET:
 			eat(LBRACKET); Exp e2 = exp(); eat(RBRACKET);
-			return new ArrayLookup(e, e2);
+			return new ArrayLookup(tok.row + ":" + tok.col, e, e2);
 		default: return e;
 	}}
 
@@ -249,26 +249,26 @@ public class Parser {
 	Exp unary() { switch (tok.type) {
 		case INTLIT:
 			int val = ((IntLiteralToken)tok).value;
-			eat(INTLIT); return new IntegerLiteral(val);
+			eat(INTLIT); return new IntegerLiteral(tok.row + ":" + tok.col, val);
 		case STRINGLIT:
 			String s = ((StringLiteralToken)tok).value;
-			eat(STRINGLIT); return new StringLiteral(s);
+			eat(STRINGLIT); return new StringLiteral(tok.row + ":" + tok.col, s);
 		case TRUE:
-			eat(TRUE); return new True();
+			eat(TRUE); return new True(tok.row + ":" + tok.col);
 		case FALSE:
-			eat(FALSE); return new False();
+			eat(FALSE); return new False(tok.row + ":" + tok.col);
 		case ID:
-			return new IdentifierExp(identifier());
+			return new IdentifierExp(tok.row + ":" + tok.col, identifier());
 		case THIS:
 			eat(THIS); return new This(tok.row+":"+tok.col);
 		case NEW:
 			eat(NEW);
 			if(tok.type == TokenType.ID) {
 				Identifier i = identifier();
-				eat(LPAREN, RPAREN); return new NewObject(i);
+				eat(LPAREN, RPAREN); return new NewObject(tok.row + ":" + tok.col, i);
 			} else {
 				eat(INT, LBRACKET); Exp e = exp();
-				eat(RBRACKET); return new NewArray(e);
+				eat(RBRACKET); return new NewArray(tok.row + ":" + tok.col, e);
 			}
 		case LPAREN:
 			eat(LPAREN); Exp e = exp();

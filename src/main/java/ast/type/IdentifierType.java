@@ -5,10 +5,13 @@ import ast.Identifier;
 import ast.Visitor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class IdentifierType extends Type {
 
+	public HashSet<Type> superTypes;
 	public Identifier i;
+	public ClassDecl classDecl;
 
 	public ClassDecl decl;
 
@@ -16,6 +19,7 @@ public class IdentifierType extends Type {
 
 	private IdentifierType(Identifier i) {
 		this.i = i;
+		superTypes = new HashSet<>();
 	}
 
 	public static IdentifierType getInstance(Identifier i) {

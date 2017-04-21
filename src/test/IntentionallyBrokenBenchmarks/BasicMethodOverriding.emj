@@ -1,0 +1,32 @@
+class main {
+    public static void main(String[] args) {
+        System.out.println("");
+    }
+}
+
+// tests correct overriding of method
+class A {
+    int method1(int a, int b, int c) { return 0; }
+}
+class B extends A {}
+class C extends B {
+    int method1(int a, int b, int c) { return 1; }
+}
+
+// tests incorrect method overriding because of different return types
+class A1 {
+    int method1(int a, int b, int c) { return 0; }
+}
+class B1 extends A {}
+class C1 extends B {
+    String method1(int a, int b, int c) { return "asdf"; }
+}
+
+// tests incorrect method overriding because of different number of arguments
+class A2 {
+    String method1(int a, int b, int c) { return "asdf"; }
+}
+class B2 extends A {}
+class C2 extends B {
+    String method1(int a, int b, int c, int d) { return "asdf"; }
+}

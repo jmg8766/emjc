@@ -8,8 +8,8 @@ import ast.list.VarDeclList;
 public class ClassDeclExtends extends ClassDecl {
 	public Identifier parent;
 
-	public ClassDeclExtends(Identifier i, Identifier parent, VarDeclList v, MethodDeclList m) {
-		super(i, v, m);
+	public ClassDeclExtends(String pos, Identifier i, Identifier parent, VarDeclList v, MethodDeclList m) {
+		super(pos, i, v, m);
 		this.parent = parent;
 	}
 
