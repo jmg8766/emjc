@@ -42,6 +42,7 @@ public class TypeAnalysis implements Visitor<Type> {
      * @return
      */
     private boolean checkSubType(Type r, Type l) {
+        System.out.println("Checking type " + r + " " + l);
         if (r instanceof PrimitiveType && l instanceof PrimitiveType)
             if(r == l)
                 return true;
@@ -57,6 +58,7 @@ public class TypeAnalysis implements Visitor<Type> {
     public Type visit(Program n) {
         n.m.accept(this);
         n.cl.list.forEach(c -> c.accept(this));
+        System.out.println("DONE ++++++++++++");
         return null;
     }
 
@@ -69,7 +71,7 @@ public class TypeAnalysis implements Visitor<Type> {
     @Override
     public Type visit(ClassDeclSimple n) {
         n.ml.list.forEach(m -> m.accept(this));
-        return null;
+        return n.t;
     }
 
     @Override
@@ -158,7 +160,7 @@ public class TypeAnalysis implements Visitor<Type> {
     public Type visit(Assign n) {
         if (!checkSubType(n.e.accept(this), n.i.b.t))
             error(n.i.s);
-        return null;
+        return n.i.b.t;
     }
 
     @Override
@@ -269,7 +271,7 @@ public class TypeAnalysis implements Visitor<Type> {
             error("Does not support array of type: " + t1);
         if( t2 != IntegerType.getInstance())
             error("Index has to be of type integer but is "+ t2);
-        return null;
+        return IntegerType.getInstance();
     }
 
     @Override
