@@ -25,8 +25,9 @@ public class TypeAnalysis implements Visitor<Type> {
     private boolean checkSubType(Type right, Type left) {
         if(right == left) return true;
         if (right instanceof IdentifierType &&
-                ((IdentifierType) right).decl != null &&
-                ((IdentifierType) right).decl.parentSet.contains(left)) return true;
+                ((IdentifierType)right).superTypes.contains(left)) return true;
+//                ((IdentifierType) right).decl != null &&
+//                ((IdentifierType) right).decl.parentSet.contains(left)) return true;
         return false;
     }
 
@@ -255,8 +256,7 @@ public class TypeAnalysis implements Visitor<Type> {
                     if (e.size() != f.size()) break; //Need to check parent class method
                     for (int i = 0; i < n.el.list.size(); i++) {
                         Type e1 = e.get(i).accept(this);
-                        if (e1 != f.get(i).t) {
-//                        if(!checkSubType(e1, f.get(i).t)) {
+                        if(!checkSubType(e1, f.get(i).t)) {
                             error(n.pos, "expected parameter " + (i+1) + " of [" + m.i.s +
                                     "] method call to be of type or subtype: [" + f.get(i).t + "] instead of [" + e1 + "]");
                             break;

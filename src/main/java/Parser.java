@@ -6,7 +6,6 @@ import ast.expression.*;
 import ast.list.*;
 import ast.statement.*;
 import ast.type.*;
-import org.testng.Assert;
 import token.*;
 
 import static token.TokenType.*;

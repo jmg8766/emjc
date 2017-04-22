@@ -127,6 +127,12 @@ public class SymbolGenerator implements Visitor<Object> {
                 // Check for different number of arguments in the overriding method
                 if (((MethodDecl) last).fl.list.size() != m.fl.list.size()) {
                     error(m.i.pos, "method override with different args");
+                } else {
+                    for(int i = 0; i< m.fl.list.size(); i++) {
+                        if(m.fl.list.get(i).t != ((MethodDecl)last).fl.list.get(i).t) {
+                            error(m.fl.list.get(i).pos, "method override with arguments of different types");
+                        }
+                    }
                 }
                 // If both the overriding and overridden methods aren't Class types, and they not the same exact type
                 if ((!(last.t instanceof IdentifierType) || !(m.t instanceof IdentifierType)) && last.t != m.t) {

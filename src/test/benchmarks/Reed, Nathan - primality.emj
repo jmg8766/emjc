@@ -20,6 +20,9 @@ class PrimalityTester {
         boolean retValue;
         int i;
         retValue = true;
+
+		// evaluates as (num < (1 || (num == 1)))    operator precedence: == || <
+		// should be (num < 1) || (num == 1)
 		if (num < 1 || num == 1)
 			retValue = false ;
 		else if (num < 3 || num == 3)

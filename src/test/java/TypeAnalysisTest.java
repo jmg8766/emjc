@@ -16,7 +16,7 @@ public class TypeAnalysisTest {
 		Emjc.output = new PrintStream(baos);
 	}
 
-    @Test(dataProvider = "benchmarkFiles", enabled = false)
+    @Test(dataProvider = "benchmarkFiles", enabled = true)
     void testAllBenchmarks(File f) {
 		System.out.println("Performing type analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--type", f.getPath()});
@@ -31,7 +31,7 @@ public class TypeAnalysisTest {
 
     @Test(enabled = false)
     void testSingleFile() {
-	    File f = new File("/home/justin/IdeaProjects/emjc1/src/test/benchmarks/BubbleSort.emj");
+	    File f = new File("/home/justin/IdeaProjects/emjc1/src/test/benchmarks/TreeVisitor.emj");
 		System.out.println("Performing type analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--type", f.getPath()});
 
@@ -53,7 +53,7 @@ public class TypeAnalysisTest {
         baos.reset();
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
     void testSubtypeMethodOverriding() {
         System.out.println("Testing subtype method overriding");
         Emjc.main(new String[] {"--type", "/home/justin/IdeaProjects/emjc1/src/test/IntentionallyBrokenBenchmarks/SubtypeMethodOverriding.emj"});
