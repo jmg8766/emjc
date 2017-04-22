@@ -10,10 +10,11 @@ import java.nio.file.Paths;
  */
 public class Emjc {
 
-    static StringBuilder errors = new StringBuilder();
+    static StringBuilder errors;
 	static PrintStream output = System.out;
 
 	public static void main(String[] args) {
+		errors = new StringBuilder();
 		if (args.length == 2) {
 			switch (args[0]) {
 				case "--lex":

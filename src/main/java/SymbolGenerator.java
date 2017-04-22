@@ -6,8 +6,6 @@ import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 import symbol.SymbolTable;
-
-import java.io.PrintStream;
 import java.util.LinkedHashSet;
 import java.util.TreeSet;
 
@@ -71,7 +69,7 @@ public class SymbolGenerator implements Visitor<Object> {
         n.i.b = n;
         // Set class type
         n.t = IdentifierType.getInstance(n.i);
-        n.i2.b = new Formal(StringType.getInstance(), n.i2);
+        //n.i2.b = new Formal(StringType.getInstance(), n.i2);
         // visit the main statement
         n.s.accept(this);
         return null;
@@ -83,9 +81,6 @@ public class SymbolGenerator implements Visitor<Object> {
 
         // Set the binding for this classDecl
         n.i.b = t.get(n.i);
-
-		n.t = IdentifierType.getInstance(n.i);
-		((IdentifierType)n.t).decl = n;
 
         // add each varDecl to class scope
         n.vl.list.forEach(v -> v.accept(this));
@@ -119,10 +114,6 @@ public class SymbolGenerator implements Visitor<Object> {
         // Set the binding for this classDecl and it's parent
         n.i.b = t.get(n.i);
 
-        // set information about the classDecl in the identifier type for this class
-		n.t = IdentifierType.getInstance(n.i);
-		((IdentifierType)n.t).decl = n;
-
         n.parent.b = t.get(n.parent);
 
         // add all varDecl for current class
@@ -143,7 +134,7 @@ public class SymbolGenerator implements Visitor<Object> {
                 }
                 // Otherwise if both are Classes, check if the overriding method is a subtype of the overridden method
                 else if (last.t instanceof IdentifierType && m.t instanceof IdentifierType && !((IdentifierType) m.t).superTypes.contains(last.t)) {
-                    error(m.i.pos, "method override with different type, Expected subtype: [" + last.t + "] found: [" + m.t + "]");
+                    error(m.i.pos, "method override with different type, Expected subtype of: [" + last.t + "] found: [" + m.t + "]");
                 }
             } else t.put(m.i, m);
             m.i.b = m;
@@ -352,6 +343,7 @@ public class SymbolGenerator implements Visitor<Object> {
         else {
             n.i = t.get(n.i).i;
             n.t = t.get(n.i).t;
+            ((IdentifierType)n.t).decl = (ClassDecl)t.get(n.i);
         }
         return null;
     }

@@ -30,7 +30,6 @@ public class Parser {
 
     private void error(String s) {
         System.out.println(tok.row + ":" + tok.col + " error: " + s);
-        Assert.fail();
         System.exit(0);
     }
 
@@ -119,7 +118,7 @@ public class Parser {
     }
 
     Formal formal() {
-        return new Formal(type(), identifier());
+        return new Formal(tok.row + ":" + tok.col, type(), identifier());
     }
 
     Type type() {
@@ -242,7 +241,7 @@ public class Parser {
     }
 
     // ===== EXPRESSIONS =========
-    // Precedence (.) -> (!) -> (*,/) -> (+,-) -> (<,==) -> (&&) -> (||)
+    // Precedence (unary) -> (. []) -> (!) -> (*,/) -> (+,-) -> (<,==) -> (&&) -> (||)
 
     // EXP -> OR _OR
     Exp exp() { return _or(or()); }
@@ -286,10 +285,10 @@ public class Parser {
         switch (tok.type) {
             case LESSTHAN:
                 eat(LESSTHAN);
-                return new LessThan(tok.row + ":" + tok.col, e, exp());
+                return new LessThan(tok.row + ":" + tok.col, e, ltEq());
             case EQUALS:
                 eat(EQUALS);
-                return new Equals(tok.row + ":" + tok.col, e, exp());
+                return new Equals(tok.row + ":" + tok.col, e, ltEq());
             default:
                 return e;
         }
@@ -336,7 +335,7 @@ public class Parser {
         switch (tok.type) {
             case BANG:
                 eat(BANG);
-                return new Not(tok.row + ":" + tok.col, exp());
+                return new Not(tok.row + ":" + tok.col, not());
             default:
                 return call();
         }

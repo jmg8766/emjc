@@ -10,7 +10,7 @@ import java.util.Vector;
 
 public class TypeAnalysis implements Visitor<Type> {
 
-    public static StringBuffer output = new StringBuffer();
+    public static StringBuffer output;
 
     private void error(String pos, String error) {
         output.append(pos + " error: " + error + "\n");
@@ -23,14 +23,16 @@ public class TypeAnalysis implements Visitor<Type> {
      * @return
      */
     private boolean checkSubType(Type right, Type left) {
-        output.append("Checking type " + right + " " + left);
         if(right == left) return true;
-        if (right instanceof IdentifierType && ((IdentifierType) right).decl.parentSet.contains(left)) return true;
+        if (right instanceof IdentifierType &&
+                ((IdentifierType) right).decl != null &&
+                ((IdentifierType) right).decl.parentSet.contains(left)) return true;
         return false;
     }
 
     @Override
     public Type visit(Program n) {
+        output = new StringBuffer();
         n.m.accept(this);
         n.cl.list.forEach(c -> c.accept(this));
         return null;
@@ -64,12 +66,7 @@ public class TypeAnalysis implements Visitor<Type> {
         n.vl.list.forEach(v -> v.accept(this));
         n.sl.list.forEach(s -> s.accept(this));
         Type t1 = n.e.accept(this);
-        if(n.t != t1)
-            error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
-        //TODO Tried to compare the declarations of the identifiers as the identifiers are not unique - check if they have to be modified in SymbolTable/Here.
-//        if((n.t != t1 && !(n.t instanceof IdentifierType)) ||
-//                (n.t instanceof IdentifierType && t1 instanceof IdentifierType && ((IdentifierType)n.t).decl != ((IdentifierType)t1).decl))
-//            error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
+        if(n.t != t1) error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
         return n.t;
     }
 
@@ -111,9 +108,7 @@ public class TypeAnalysis implements Visitor<Type> {
 
     @Override
     public Type visit(If n) {
-        if( n.e.accept(this) != BooleanType.getInstance()) // TODO Needs position
-            error(n.pos,"exp has to valuate to boolean " );
-
+        if( n.e.accept(this) != BooleanType.getInstance()) error(n.pos,"exp has to valuate to boolean " );
         n.s1.accept(this);
         if(n.s2 != null) n.s2.accept(this);
         return null;
@@ -137,10 +132,8 @@ public class TypeAnalysis implements Visitor<Type> {
     @Override
     public Type visit(Assign n) {
         Type t1 = n.e.accept(this);
-        if(t1 instanceof IdentifierType && n.i.b.t instanceof IdentifierType && (((IdentifierType)n.i.b.t).decl == ((IdentifierType)t1).decl))
-            return null;
         if(n.i.b.t != t1 || (n.i.b.t instanceof IdentifierType && !checkSubType(t1, n.i.b.t)))
-            error(n.pos, "Right hand side " + t1 + " of Assign must be a subtype of the lefthand side " + n.i.b.t); //TODO pos
+            error(n.pos, "Right hand side " + t1 + " of Assign must be a subtype of the lefthand side " + n.i.b.t);
         return null;
     }
 
@@ -253,17 +246,7 @@ public class TypeAnalysis implements Visitor<Type> {
             return null;
         }
         ClassDecl c = ((IdentifierType)t1).decl;
-        // get the method decl
-//        MethodDecl relevantMethod = c.ml.list.stream().filter(m -> m.i == n.i).findFirst().orElse(null);
-//        if(relevantMethod == null) error("");
-//
-//        if (n.el.list.size() != relevantMethod.fl.list.size()) {
-//
-//            return relevantMethod.t;
-//        }
-//        for(int i = 0; i< relevantMethod.fl.list.size(); i++) {
-//            if()
-//        }
+        if(c == null) return null;
         while(true) {
             for (MethodDecl m : c.ml.list) {
                 if (m.i.s.equals(n.i.s)) {
@@ -272,7 +255,12 @@ public class TypeAnalysis implements Visitor<Type> {
                     if (e.size() != f.size()) break; //Need to check parent class method
                     for (int i = 0; i < n.el.list.size(); i++) {
                         Type e1 = e.get(i).accept(this);
-                        if (e1 == f.get(i).t) continue;
+                        if (e1 != f.get(i).t) {
+//                        if(!checkSubType(e1, f.get(i).t)) {
+                            error(n.pos, "expected parameter " + (i+1) + " of [" + m.i.s +
+                                    "] method call to be of type or subtype: [" + f.get(i).t + "] instead of [" + e1 + "]");
+                            break;
+                        }
                     }
                     return n.t = m.t;
                 }
@@ -281,7 +269,7 @@ public class TypeAnalysis implements Visitor<Type> {
                 c = (ClassDecl) ((ClassDeclExtends) c).parent.b;
             else break;
         }
-        error(n.pos, "The method" + n.i +"is not declared for " + t1);
+        error(n.pos, "The method: [" + n.i.s +"] is not declared for " + t1);
         return null;
     }
 
@@ -332,6 +320,7 @@ public class TypeAnalysis implements Visitor<Type> {
 
     @Override
     public Type visit(NewObject n) {
+
         return n.t = IdentifierType.getInstance(n.i);
     }
 

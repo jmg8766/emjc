@@ -4,8 +4,6 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
-import java.nio.file.Paths;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Test(dataProviderClass = Providers.class)
@@ -28,11 +26,12 @@ public class TypeAnalysisTest {
 		Assert.assertSame(new String(baos.toByteArray(), UTF_8).trim().intern(), "Valid eMiniJava Program".intern());
 		Emjc.errors = new StringBuilder();
 		baos.reset();
+		Emjc.output = new PrintStream(baos);
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     void testSingleFile() {
-	    File f = new File("/home/justin/IdeaProjects/emjc1/src/test/benchmarks/Reed, Nathan - primality.emj");
+	    File f = new File("/home/justin/IdeaProjects/emjc1/src/test/benchmarks/BubbleSort.emj");
 		System.out.println("Performing type analysis on file: " + f.getName());
 		Emjc.main(new String[] {"--type", f.getPath()});
 
@@ -50,6 +49,18 @@ public class TypeAnalysisTest {
 
 		System.out.println(baos.toString());
 		//TODO: check output
+        Emjc.errors = new StringBuilder();
+        baos.reset();
 	}
 
+	@Test(enabled = true)
+    void testSubtypeMethodOverriding() {
+        System.out.println("Testing subtype method overriding");
+        Emjc.main(new String[] {"--type", "/home/justin/IdeaProjects/emjc1/src/test/IntentionallyBrokenBenchmarks/SubtypeMethodOverriding.emj"});
+
+        System.out.println(baos.toString());
+        //TODO: check output
+        Emjc.errors = new StringBuilder();
+        baos.reset();
+    }
 }
