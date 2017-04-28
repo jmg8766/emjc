@@ -133,7 +133,7 @@ public class TypeAnalysis implements Visitor<Type> {
     @Override
     public Type visit(Assign n) {
         Type t1 = n.e.accept(this);
-        if(n.i.b.t != t1 || (n.i.b.t instanceof IdentifierType && !checkSubType(t1, n.i.b.t)))
+        if(n.i.b.t != t1 && (n.i.b.t instanceof IdentifierType && !checkSubType(t1, n.i.b.t)))
             error(n.pos, "Right hand side " + t1 + " of Assign must be a subtype of the lefthand side " + n.i.b.t);
         return null;
     }
@@ -179,7 +179,7 @@ public class TypeAnalysis implements Visitor<Type> {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
 
-        if(t1 != t2 || (t1 instanceof IdentifierType && t2 instanceof IdentifierType))
+        if(t1 != t2 && (t1 instanceof IdentifierType && t2 instanceof IdentifierType))
             error(n.pos, "Cannot compare types " + t1 + " and " + t2);
         return (n.t = BooleanType.getInstance());
     }
