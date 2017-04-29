@@ -1,7 +1,9 @@
 import org.testng.annotations.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -38,8 +40,19 @@ public class CodeGenerationTest {
         System.out.println("Generating class files for : " + f.getName());
         Emjc.main(new String[]{"--cgen", f.getPath()});
 
-        // TODO: check that a class file exists for this file
-        // TODO: run class file, compare output with javac class file version
+        // attempt to run generated class file with java
+        String path = f.getPath().substring(0, f.getPath().lastIndexOf("/"));
+        String file = f.getPath().substring(f.getPath().lastIndexOf("/") + 1).replace(".emj", "");
+
+        String command = "java -cp " + path + " " + file;
+        System.out.println("command being run: " + command);
+        Process p = Runtime.getRuntime().exec(command);
+
+        BufferedReader stdOutput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+        stdOutput.lines().forEach(System.out::println);
+        stdError.lines().forEach(System.out::println);
     }
 
 

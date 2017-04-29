@@ -22,7 +22,7 @@ public class ClassFileGenerator implements Visitor<String> {
                 ".super java/lang/Object\n\n" +
                 ".method public <init>()V\n" +
                     "\taload_0\n" +
-                    "\tinvokespecial java/lang/Oject/<init>()V\n" +
+                    "\tinvokespecial java/lang/Object/<init>()V\n" +
                     "\treturn\n" +
                 ".end method\n\n" +
                 //TODO: default constructor?
@@ -30,6 +30,7 @@ public class ClassFileGenerator implements Visitor<String> {
                 ".limit stack 9\n" + //TODO: limit stack and locals
                 ".limit locals 9\n" +
                 n.s.accept(this) + "\n" +
+                "return\n" +
                 ".end method";
     }
 

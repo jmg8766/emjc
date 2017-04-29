@@ -63,8 +63,7 @@ public class Emjc {
                         String path = args[1].substring(0, args[1].lastIndexOf("/") + 1);
 						System.out.println(path);
 						System.out.println(args[1]);
-						Runtime.getRuntime().exec("java -jar jasmin.jar -d" +
-								"" + path + " " + args[1]);
+						Runtime.getRuntime().exec("java -jar jasmin.jar -d " + path + " " + args[1]);
 					} catch (IOException e) {
                         e.printStackTrace();
 					}
