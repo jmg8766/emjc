@@ -9,19 +9,38 @@ import java.nio.file.Paths;
 @Test(dataProviderClass = Providers.class)
 public class CodeGenerationTest {
 
-    @Test(dataProvider = "benchmarkFiles", enabled = true)
+    @Test(dataProvider = "benchmarkFiles", enabled = false)
     void testAllBenchmarks(File f) throws IOException {
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
             Files.delete(Paths.get(f.getPath().replace(".emj", ".j")));
-        } catch(NoSuchFileException e ) {} //ignored
+        } catch (NoSuchFileException e) {
+        } //ignored
 
         // run program with the --cgen flag
         System.out.println("Generating class files for : " + f.getName());
-        Emjc.main(new String[] {"--cgen", f.getPath()});
+        Emjc.main(new String[]{"--cgen", f.getPath()});
 
         // TODO: check that a class file exists for this file
         // TODO: run class file, compare output with javac class file version
     }
+
+    @Test(enabled = true)
+    void testAllBenchmarks() throws IOException {
+        File f = new File("src/test/benchmarks/Simple.emj");
+        try { // remove the class file corresponding to this file if it's been already generated
+            Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
+            Files.delete(Paths.get(f.getPath().replace(".emj", ".j")));
+        } catch (NoSuchFileException e) {
+        } //ignored
+
+        // run program with the --cgen flag
+        System.out.println("Generating class files for : " + f.getName());
+        Emjc.main(new String[]{"--cgen", f.getPath()});
+
+        // TODO: check that a class file exists for this file
+        // TODO: run class file, compare output with javac class file version
+    }
+
 
 }

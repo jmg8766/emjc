@@ -20,10 +20,15 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(MainClass n) {
         return ".class public " + n.i.s + "\n" + //TODO: public?
                 ".super java/lang/Object\n\n" +
+                ".method public <init>()V\n" +
+                    "\taload_0\n" +
+                    "\tinvokespecial java/lang/Oject/<init>()V\n" +
+                    "\treturn\n" +
+                ".end method\n\n" +
                 //TODO: default constructor?
                 ".method public static main([Ljava/lang/String;)V\n" +
-                ".limit stack ?\n" + //TODO: limit stack and locals
-                ".limit locals 0\n" +
+                ".limit stack 9\n" + //TODO: limit stack and locals
+                ".limit locals 9\n" +
                 n.s.accept(this) + "\n" +
                 ".end method";
     }
@@ -70,32 +75,32 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(IntArrayType n) {
-        return null;
+        return "[I";
     }
 
     @Override
     public String visit(BooleanType n) {
-        return null;
+        return "Z";
     }
 
     @Override
     public String visit(IntegerType n) {
-        return null;
+        return "I";
     }
 
     @Override
     public String visit(StringType n) {
-        return null;
+        return "Ljava/lang/String";
     }
 
     @Override
     public String visit(IdentifierType n) {
-        return null;
+        return "V";
     }
 
     @Override
     public String visit(Block n) {
-        return null;
+        return n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining("\n"));
     }
 
     @Override
@@ -110,7 +115,9 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Print n) {
-        return null;
+        return "getstatic java/lang/System/out Ljava/io/PrintStream;\n" +
+                n.e.accept(this) + "\n" +
+                "invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V";
     }
 
     @Override
@@ -185,7 +192,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(StringLiteral n) {
-        return null;
+        return "ldc \"" + n.val + "\"";
     }
 
     @Override
