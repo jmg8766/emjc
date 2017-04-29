@@ -6,6 +6,7 @@ import ast.expression.*;
 import ast.list.*;
 import ast.statement.*;
 import ast.type.*;
+import org.testng.Assert;
 import token.*;
 
 import static token.TokenType.*;
@@ -29,6 +30,7 @@ public class Parser {
 
     private void error(String s) {
         System.out.println(tok.row + ":" + tok.col + " error: " + s);
+        Assert.fail();
         System.exit(0);
     }
 

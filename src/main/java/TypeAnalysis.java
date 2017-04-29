@@ -179,7 +179,7 @@ public class TypeAnalysis implements Visitor<Type> {
         Type t1 = n.e1.accept(this);
         Type t2 = n.e2.accept(this);
 
-        if(t1 != t2 && (t1 instanceof IdentifierType && t2 instanceof IdentifierType))
+        if(t1 != t2 && !(t1 instanceof IdentifierType && t2 instanceof IdentifierType))
             error(n.pos, "Cannot compare types " + t1 + " and " + t2);
         return (n.t = BooleanType.getInstance());
     }
