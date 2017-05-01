@@ -1,7 +1,18 @@
 class Simple {
 
     public static void main(String[] args) {
-        System.out.println("hello");
+        System.out.println(new TT().asdf());
     }
 
 }
+
+class TT {
+    int a;
+    String b;
+    TT c;
+
+    public String asdf() {
+        return "hello";
+    }
+}
+
