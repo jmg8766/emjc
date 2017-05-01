@@ -6,9 +6,12 @@ import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class ClassFileGenerator implements Visitor<String> {
+
+    private int i;
 
     @Override
     public String visit(Program n) {
@@ -79,7 +82,7 @@ public class ClassFileGenerator implements Visitor<String> {
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
                 n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining()) +
                 n.e.accept(this) + "\n" +
-                n.t.accept(this).toLowerCase() + "return\n" +
+                (n.t instanceof StringType ? "a" : n.t.accept(this).toLowerCase()) + "return\n" +
                 ".end method";
     }
 
@@ -105,12 +108,12 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(StringType n) {
-        return "Ljava/lang/String";
+        return "Ljava/lang/String;";
     }
 
     @Override
     public String visit(IdentifierType n) {
-        return "A";
+        return "L" + n.i.s + ";";
     }
 
     @Override
@@ -120,7 +123,13 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(If n) {
-        return null;
+        return n.e.accept(this) + "\n" +
+                "ifeq else" + (++i) + "\n" +
+                n.s1.accept(this) + "\n" +
+                "goto done" + i + "\n" +
+                "else" + i + ":\n" +
+                n.s2.accept(this) + "\n" +
+                "done" + i + ":";
     }
 
     @Override
@@ -199,9 +208,9 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(Call n) {
         return n.e.accept(this) + "\n" + // places object on the top of the stack
                 n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) +
-                "invokevirtual ???/" + n.i.s +
-                n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining(";")) + ")" +
-                n.i.b.t.accept(this) + "\n";
+                "invokevirtual " + ((IdentifierType)n.e.t).i.s + "/" + n.i.s +
+                "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining(";")) + ")" +
+                n.t.accept(this) + "\n";
     }
 
     @Override
@@ -244,7 +253,7 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(NewObject n) {
         return "new " + n.i.s + "\n" +
                 "dup\n" +
-                "invokespecial " + n.i.s + "/<init>()" + n.t.accept(this);
+                "invokespecial " + n.i.s + "/<init>()V";
     }
 
     @Override
