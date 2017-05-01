@@ -1,4 +1,5 @@
 import ast.*;
+import ast.ClassDeclaration.ClassDecl;
 import ast.ClassDeclaration.ClassDeclExtends;
 import ast.ClassDeclaration.ClassDeclSimple;
 import ast.expression.*;
@@ -18,37 +19,48 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(MainClass n) {
-        return ".class public " + n.i.s + "\n" + //TODO: public?
+        return ".class " + n.i.s + "\n" +
                 ".super java/lang/Object\n\n" +
                 ".method public <init>()V\n" +
-                    "\taload_0\n" +
-                    "\tinvokespecial java/lang/Object/<init>()V\n" +
-                    "\treturn\n" +
+                "\taload_0\n" +
+                "\tinvokespecial java/lang/Object/<init>()V\n" +
+                "\treturn\n" +
                 ".end method\n\n" +
-                //TODO: default constructor?
                 ".method public static main([Ljava/lang/String;)V\n" +
                 ".limit stack 9\n" + //TODO: limit stack and locals
-                ".limit locals 9\n" +
+                ".limit locals 1\n" +
                 n.s.accept(this) + "\n" +
                 "return\n" +
                 ".end method";
     }
 
+    public String visit(ClassDecl n) {
+        return n.accept(this);
+    }
+
     @Override
     public String visit(ClassDeclSimple n) {
-        return ".class public" + n.i.s + "\n" + //TODO: public?
+        return ".class " + n.i.s + "\n" +
                 ".super java/lang/Object\n\n" +
-                //TODO: default constructor?
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
+                ".method public <init>()V\n" +
+                "\taload_0\n" +
+                "\tinvokespecial java/lang/Object/<init>()V\n" +
+                "\treturn\n" +
+                ".end method\n\n" +
                 n.ml.list.stream().map(m -> m.accept(this)).collect(Collectors.joining("\n"));
     }
 
     @Override
     public String visit(ClassDeclExtends n) {
-        return ".class public" + n.i.s + "\n" + //TODO: public?
+        return ".class " + n.i.s + "\n" +
                 ".super " + n.parent.s + "\n\n" +
-                //TODO: default constructor?
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
+                ".method public <init>()V\n" +
+                "\taload_0\n" +
+                "\tinvokespecial java/lang/Object/<init>()V\n" +
+                "\treturn\n" +
+                ".end method\n\n" +
                 n.ml.list.stream().map(m -> m.accept(this)).collect(Collectors.joining("\n"));
     }
 
@@ -62,6 +74,8 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(MethodDecl n) {
         String parameters = n.fl.list.stream().map(f -> f.accept(this)).collect(Collectors.joining(";"));
         return ".method public " + n.i.s + "(" + parameters + ")" + n.t.accept(this) + "\n" +
+                ".limit stack ?\n" +
+                ".limit locals ?\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
                 n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining()) +
                 n.e.accept(this) + "\n" +
@@ -96,7 +110,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(IdentifierType n) {
-        return "V";
+        return "A";
     }
 
     @Override
@@ -183,12 +197,16 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Call n) {
-        return null;
+        return n.e.accept(this) + "\n" + // places object on the top of the stack
+                n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) +
+                "invokevirtual ???/" + n.i.s +
+                n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining(";")) + ")" +
+                n.i.b.t.accept(this) + "\n";
     }
 
     @Override
     public String visit(IntegerLiteral n) {
-        return null;
+        return "iload " + n.i;
     }
 
     @Override
@@ -208,7 +226,8 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(IdentifierExp n) {
-        return null;
+        return ";IdentifierExp\n"
+                ; //TODO
     }
 
     @Override
@@ -223,7 +242,9 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(NewObject n) {
-        return null;
+        return "new " + n.i.s + "\n" +
+                "dup\n" +
+                "invokespecial " + n.i.s + "/<init>()" + n.t.accept(this);
     }
 
     @Override
@@ -233,6 +254,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Identifier n) {
-        return null;
+        return ";Identifier\n"
+                ; //TODO
     }
 }

@@ -28,7 +28,7 @@ public class CodeGenerationTest {
     }
 
     @Test(enabled = true)
-    void testAllBenchmarks() throws IOException {
+    void testSingleBenchmark() throws IOException {
         File f = new File("src/test/benchmarks/Simple.emj");
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
