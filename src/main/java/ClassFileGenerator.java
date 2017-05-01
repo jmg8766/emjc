@@ -42,7 +42,7 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(ClassDeclSimple n) {
         return ".class " + n.i.s + "\n" +
                 ".super java/lang/Object\n\n" +
-                n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
+                n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) + "\n" +
                 ".method public <init>()V\n" +
                 "\taload_0\n" +
                 "\tinvokespecial java/lang/Object/<init>()V\n" +
@@ -74,8 +74,8 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(MethodDecl n) {
         String parameters = n.fl.list.stream().map(f -> f.accept(this)).collect(Collectors.joining(";"));
         return ".method public " + n.i.s + "(" + parameters + ")" + n.t.accept(this) + "\n" +
-                ".limit stack ?\n" +
-                ".limit locals ?\n" +
+                ".limit stack 9\n" + //TODO set appropriate stack size
+                ".limit locals 9\n" + //TODO set appropriate stack size
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
                 n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining()) +
                 n.e.accept(this) + "\n" +

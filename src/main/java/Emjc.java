@@ -68,8 +68,7 @@ public class Emjc {
                         // classInfo[0] = class name       classInfo[1] = jasmin input file
                         try(BufferedWriter b = Files.newBufferedWriter(Paths.get(path + classInfo[0] + ".j"))) {
                             b.write(classInfo[1]); b.flush();
-                            Process process = Runtime.getRuntime().exec("java -jar jasmin.jar -d " + path + classInfo[0] + ".j");
-//                            Process process = Runtime.getRuntime().exec("cat " + path + classInfo[0] + ".j");
+                            Process process = Runtime.getRuntime().exec("java -jar jasmin.jar -d " + path + " " + path + classInfo[0] + ".j");
 
                             //TODO: remove this
                             BufferedReader stdOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
