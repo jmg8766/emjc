@@ -6,11 +6,14 @@ import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 
-import java.util.Stack;
+import java.util.HashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ClassFileGenerator implements Visitor<String> {
 
+    private HashMap<Decl, Integer> localVars = new HashMap<>();
+    private int localVarsIndex = 0;
     private int i;
 
     @Override
@@ -73,21 +76,33 @@ public class ClassFileGenerator implements Visitor<String> {
         return ".field public " + n.i.s + " " + n.t.accept(this);
     }
 
+    public void localVarDecl(Decl n) {
+        localVars.put(n, localVarsIndex++);
+    }
+
     @Override
     public String visit(MethodDecl n) {
         String parameters = n.fl.list.stream().map(f -> f.accept(this)).collect(Collectors.joining(";"));
-        return ".method public " + n.i.s + "(" + parameters + ")" + n.t.accept(this) + "\n" +
+        n.vl.list.forEach(this::localVarDecl);
+        String type = (n.t instanceof StringType ? "a" : n.t.accept(this).toLowerCase());
+        if(type.equals("z")) type = "i";
+        String ret = ".method public " + n.i.s + "(" + parameters + ")" + n.t.accept(this) + "\n" +
                 ".limit stack 9\n" + //TODO set appropriate stack size
                 ".limit locals 9\n" + //TODO set appropriate stack size
-                n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
-                n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining()) +
+                n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining()) + "\n" +
                 n.e.accept(this) + "\n" +
-                (n.t instanceof StringType ? "a" : n.t.accept(this).toLowerCase()) + "return\n" +
+                type + "return\n" +
                 ".end method";
+        Stream.concat(n.vl.list.stream(), n.fl.list.stream()).forEach(v -> {
+            localVars.remove(v);
+            localVarsIndex--;
+        });
+        return ret;
     }
 
     @Override
     public String visit(Formal n) {
+        localVars.put(n, localVarsIndex++);
         return n.t.accept(this);
     }
 
@@ -118,23 +133,33 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Block n) {
-        return n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining("\n"));
+        return n.sl.list.stream().map(s -> "\t" + s.accept(this)).collect(Collectors.joining("\n"));
     }
 
     @Override
     public String visit(If n) {
-        return n.e.accept(this) + "\n" +
-                "ifeq else" + (++i) + "\n" +
+        int labelNum = ++i;
+        return ";IF ------------------------\n" +
+                n.e.accept(this) + "\n" +
+                "ifeq else" + labelNum + "\n" +
                 n.s1.accept(this) + "\n" +
-                "goto done" + i + "\n" +
-                "else" + i + ":\n" +
+                "goto done" + labelNum + "\n" +
+                "else" + labelNum + ":\n" +
                 n.s2.accept(this) + "\n" +
-                "done" + i + ":";
+                "done" + labelNum + ":\n" +
+                ";END IF -------------------\n";
     }
 
     @Override
     public String visit(While n) {
-        return null;
+        int labelNum = ++i;
+        return ";WHILE ------------------------\n" +
+                "while" + labelNum + ":\n" +
+                n.e.accept(this) + "\n" +
+                "ifeq done" + labelNum + "\n" +
+                n.s.accept(this) + "\n" +
+                "goto while" + labelNum + "\n" +
+                ";END WHILE -------------------\n";
     }
 
     @Override
@@ -146,7 +171,12 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Assign n) {
-        return null;
+        String type = n.i.b.t.accept(this).toLowerCase();
+        if(type.equals("z")) type = "i";
+        return ";ASSIGN ------------------\n" +
+                n.e.accept(this) + "\n" +
+                type + "store " + localVars.get(n.i.b) + "\n" +
+                ";END-ASSIGN -------------\n";
     }
 
     @Override
@@ -225,18 +255,18 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(True n) {
-        return null;
+        return "ldc 1";
     }
 
     @Override
     public String visit(False n) {
-        return null;
+        return "ldc 0";
     }
 
     @Override
     public String visit(IdentifierExp n) {
-        return ";IdentifierExp\n"
-                ; //TODO
+        return ";IdentifierExp --------------\n" +
+                "iload " + localVars.get(n.i.b) + "\n";
     }
 
     @Override
@@ -263,7 +293,8 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Identifier n) {
-        return ";Identifier\n"
+        return ";Identifier----------------------\n"
+
                 ; //TODO
     }
 }
