@@ -100,6 +100,7 @@ public class ClassFileGenerator implements Visitor<String> {
                 n.e.accept(this) + "\n" +
                 type + "return\n" +
                 ".end method";
+//        localVars.entrySet().forEach(set -> System.out.println(set.getKey().i.s + " -- " +set.getValue()));
         Stream.concat(n.vl.list.stream(), n.fl.list.stream()).forEach(v -> {
             localVars.remove(v);
             localVarsIndex--;
@@ -187,8 +188,7 @@ public class ClassFileGenerator implements Visitor<String> {
     @Override
     public String visit(Assign n) {
         String type = n.i.b.t.accept(this);
-        if (type.equals("Z")) type = "I";
-        else if(type.startsWith("L") && localVars.get(n.i.b) != null) type = "A";
+        if(localVars.get(n.i.b) != null) { if (type.equals("Z")) type = "I"; else if (type.startsWith("L")) type = "A"; }
         String var = localVars.get(n.i.b) == null ?
                 "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n"
                 :
