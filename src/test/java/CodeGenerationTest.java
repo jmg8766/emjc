@@ -22,7 +22,6 @@ public class CodeGenerationTest extends Providers {
 
     @Test(dataProvider = "singleFile"/*"benchmarkFiles"*/)
     void test(File f) throws IOException, InterruptedException {
-        String asdf;
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
             Files.delete(Paths.get(f.getPath().replace(".emj", ".j")));
