@@ -66,12 +66,12 @@ public class ClassFileGenerator implements Visitor<String> {
         n.vl.list.stream().forEach(v -> reference.put(v, n.i.s + "/"+v.i.s));
         return ".class " + n.i.s + "\n" +
                 ".super " + n.parent.s + "\n\n" +
-                n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
+                n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) + "\n" +
                 ".method public <init>()V\n" +
                 ".limit stack 100\n" + //TODO: limit stack and locals
                 ".limit locals 100\n" +
                 "\taload_0\n" +
-                "\tinvokespecial java/lang/Object/<init>()V\n" +
+                "\tinvokespecial " + n.parent.b.t + "/<init>()V\n" +
                 "\treturn\n" +
                 ".end method\n\n" +
                 n.ml.list.stream().map(m -> m.accept(this)).collect(Collectors.joining("\n"));

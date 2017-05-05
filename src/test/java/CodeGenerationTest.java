@@ -23,8 +23,8 @@ public class CodeGenerationTest extends Providers {
 //        return Stream.of(new File("src/test/benchmarks/TestGetterSetter.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-    @Test(dataProvider = "singleFile")
-//    @Test(dataProvider = "benchmarkFiles")
+//    @Test(dataProvider = "singleFile")
+    @Test(dataProvider = "benchmarkFiles")
     void test(File f) throws IOException, InterruptedException {
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
@@ -48,7 +48,6 @@ public class CodeGenerationTest extends Providers {
         // print any errors that happen while running the emjc compiled program
         new BufferedReader(new InputStreamReader(p1.getErrorStream())).lines().forEach(System.out::println);
         String emjcCompiledProgramOutput = new BufferedReader(new InputStreamReader(p1.getInputStream())).lines().collect(Collectors.joining("\n"));
-//        System.out.println("\nemjc compiled program's output: " + emjcCompiledProgramOutput + "\n");
 
 
         String newPath = f.getPath().replace(".emj", ".java").replace(" ", "\\ ").replace(",", "\\,");
@@ -68,7 +67,6 @@ public class CodeGenerationTest extends Providers {
         // print any errors that happen while running the javac compiled program
         new BufferedReader(new InputStreamReader(p3.getErrorStream())).lines().forEach(System.out::println);
         String javacCompiledProgramOutput = new BufferedReader(new InputStreamReader(p3.getInputStream())).lines().collect(Collectors.joining("\n"));
-//        System.out.println("\njavac compiled program's output: " + javacCompiledProgramOutput + "\n");
 
         System.out.println("Expected: " + javacCompiledProgramOutput);
         System.out.println("Actual: " + emjcCompiledProgramOutput);
