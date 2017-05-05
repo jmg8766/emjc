@@ -46,7 +46,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ClassDeclSimple n) {
-        n.vl.list.stream().forEach(v -> {reference.put(v, n.i.s + "/"+v.i.s); v.accept(this);});
+        n.vl.list.stream().forEach(v -> reference.put(v, n.i.s + "/"+v.i.s));
         return ".class " + n.i.s + "\n" +
                 ".super java/lang/Object\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) + "\n" +
@@ -60,7 +60,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ClassDeclExtends n) {
-        n.vl.list.stream().forEach(v -> {reference.put(v, n.i.s + "/"+v.i.s); v.accept(this);});
+        n.vl.list.stream().forEach(v -> reference.put(v, n.i.s + "/"+v.i.s));
         return ".class " + n.i.s + "\n" +
                 ".super " + n.parent.s + "\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
@@ -196,6 +196,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ArrayAssign n) {
+        //TODO
         return null;
     }
 
@@ -294,11 +295,13 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ArrayLookup n) {
+        //TODO
         return null;
     }
 
     @Override
     public String visit(ArrayLength n) {
+        //TODO
         return null;
     }
 
@@ -350,6 +353,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(NewArray n) {
+        //TODO
         return null;
     }
 
