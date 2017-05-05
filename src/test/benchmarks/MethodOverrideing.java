@@ -70,9 +70,4 @@ class Square extends Rectangle {
 		System.out.println("My sides are all equal");
 		return l * 4;
 	}
-
-	public String setLength(int l1) {
-		l = l1;
-		return "yes";
-	}
 }

@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.sql.SQLOutput;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,9 +18,9 @@ public class CodeGenerationTest extends Providers {
     @DataProvider
     public Iterator<Object[]> singleFile() {
 //        return Stream.of(new File("src/test/benchmarks/Gottshall, Justin - MergeSort.emj")).map(f -> new Object[] {f}).iterator();
-//        return Stream.of(new File("src/test/benchmarks/TreeVisitor.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/TreeVisitor.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
-        return Stream.of(new File("src/test/benchmarks/TestGetterSetter.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/TestGetterSetter.emj")).map(f -> new Object[] {f}).iterator();
     }
 
     @Test(dataProvider = "singleFile")
@@ -41,18 +40,18 @@ public class CodeGenerationTest extends Providers {
 
         // attempt to run generated class file with java and store the output
         String path = f.getPath().substring(0, f.getPath().lastIndexOf("/"));
-        //TODO Handle space in file path
-        String file = f.getPath().substring(f.getPath().lastIndexOf("/") + 1).replace(".emj", "").replace(" ", "\\ ");
-        System.out.println(file + "  acutal: " + f.toString());
+        String file = f.getPath().substring(f.getPath().lastIndexOf("/") + 1).replace(".emj", "").replace(" ", "\\ ").replace(",", "\\,");
+
         System.out.println("Running [emjc] compiled program\n");
         Process p1 = Runtime.getRuntime().exec("java -cp " + path + " " + file);
         p1.waitFor();
         // print any errors that happen while running the emjc compiled program
         new BufferedReader(new InputStreamReader(p1.getErrorStream())).lines().forEach(System.out::println);
         String emjcCompiledProgramOutput = new BufferedReader(new InputStreamReader(p1.getInputStream())).lines().collect(Collectors.joining("\n"));
+//        System.out.println("\nemjc compiled program's output: " + emjcCompiledProgramOutput + "\n");
 
 
-        String newPath = f.getPath().replace(".emj", ".java").replace(" ", "\\ ");
+        String newPath = f.getPath().replace(".emj", ".java").replace(" ", "\\ ").replace(",", "\\,");
         Runtime.getRuntime().exec("cp " + f.getPath() + " " + newPath).waitFor();
 
         time = -System.currentTimeMillis();
@@ -69,6 +68,7 @@ public class CodeGenerationTest extends Providers {
         // print any errors that happen while running the javac compiled program
         new BufferedReader(new InputStreamReader(p3.getErrorStream())).lines().forEach(System.out::println);
         String javacCompiledProgramOutput = new BufferedReader(new InputStreamReader(p3.getInputStream())).lines().collect(Collectors.joining("\n"));
+//        System.out.println("\njavac compiled program's output: " + javacCompiledProgramOutput + "\n");
 
         System.out.println("Expected: " + javacCompiledProgramOutput);
         System.out.println("Actual: " + emjcCompiledProgramOutput);

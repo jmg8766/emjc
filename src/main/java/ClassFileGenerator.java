@@ -323,7 +323,7 @@ public class ClassFileGenerator implements Visitor<String> {
     @Override
     public String visit(Call n) {
         return n.e.accept(this) + "\n" + // places object on the top of the stack
-                n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) +
+                n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) + "\n" +
                 "invokevirtual " + ((IdentifierType) n.e.t).i.s + "/" + n.i.s +
                 "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")" +
                 n.t.accept(this) + "\n";
