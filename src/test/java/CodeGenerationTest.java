@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.sql.SQLOutput;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,15 +18,20 @@ public class CodeGenerationTest extends Providers {
 
     @DataProvider
     public Iterator<Object[]> singleFile() {
-        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/Gottshall, Justin - MergeSort.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/TreeVisitor.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/TestGetterSetter.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-    @Test(dataProvider = "singleFile"/*"benchmarkFiles"*/)
+    @Test(dataProvider = "singleFile")
+//    @Test(dataProvider = "benchmarkFiles")
     void test(File f) throws IOException, InterruptedException {
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
             Files.delete(Paths.get(f.getPath().replace(".emj", ".j")));
         } catch (NoSuchFileException e) {} //ignored
+
 
         // generate class files with emjc
         long time = -System.currentTimeMillis();
@@ -35,8 +41,9 @@ public class CodeGenerationTest extends Providers {
 
         // attempt to run generated class file with java and store the output
         String path = f.getPath().substring(0, f.getPath().lastIndexOf("/"));
-        String file = f.getPath().substring(f.getPath().lastIndexOf("/") + 1).replace(".emj", "");
-
+        //TODO Handle space in file path
+        String file = f.getPath().substring(f.getPath().lastIndexOf("/") + 1).replace(".emj", "").replace(" ", "\\ ");
+        System.out.println(file + "  acutal: " + f.toString());
         System.out.println("Running [emjc] compiled program\n");
         Process p1 = Runtime.getRuntime().exec("java -cp " + path + " " + file);
         p1.waitFor();
@@ -45,16 +52,16 @@ public class CodeGenerationTest extends Providers {
         String emjcCompiledProgramOutput = new BufferedReader(new InputStreamReader(p1.getInputStream())).lines().collect(Collectors.joining("\n"));
 
 
-        String newPath = f.getPath().replace(".emj", ".java");
+        String newPath = f.getPath().replace(".emj", ".java").replace(" ", "\\ ");
         Runtime.getRuntime().exec("cp " + f.getPath() + " " + newPath).waitFor();
 
         time = -System.currentTimeMillis();
-        System.out.println("Generating class files with [javac] for : [" + f.getName().replace(".emj", ".java") + "]");
+        System.out.println("Generating class files with [javac] for : [" + f.getName().replace(".emj", ".java")+ "]");
         Process p2 = Runtime.getRuntime().exec("javac " + newPath);
         p2.waitFor();
         System.out.println("class files generated in " + (time + System.currentTimeMillis()) + " ms");
         // print any errors generated compiling the program with javac
-        new BufferedReader(new InputStreamReader(p2.getErrorStream())).lines().forEach(System.out::println);
+        new BufferedReader(new InputStreamReader(p2.getErrorStream())).lines().forEach(System.err::println);
 
         System.out.println("Running [javac] compiled program\n");
         Process p3 = Runtime.getRuntime().exec("java -cp " + path + " " + file);
@@ -62,6 +69,9 @@ public class CodeGenerationTest extends Providers {
         // print any errors that happen while running the javac compiled program
         new BufferedReader(new InputStreamReader(p3.getErrorStream())).lines().forEach(System.out::println);
         String javacCompiledProgramOutput = new BufferedReader(new InputStreamReader(p3.getInputStream())).lines().collect(Collectors.joining("\n"));
+
+        System.out.println("Expected: " + javacCompiledProgramOutput);
+        System.out.println("Actual: " + emjcCompiledProgramOutput);
 
         // assert that the output of both programs is equal
         System.out.println("Comparing the output");

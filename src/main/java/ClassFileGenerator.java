@@ -6,6 +6,7 @@ import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,8 +34,8 @@ public class ClassFileGenerator implements Visitor<String> {
                 "\treturn\n" +
                 ".end method\n\n" +
                 ".method public static main([Ljava/lang/String;)V\n" +
-                ".limit stack 9\n" + //TODO: limit stack and locals
-                ".limit locals 1\n" +
+                ".limit stack 100\n" + //TODO: limit stack and locals
+                ".limit locals 100\n" +
                 n.s.accept(this) + "\n" +
                 "return\n" +
                 ".end method";
@@ -51,6 +52,8 @@ public class ClassFileGenerator implements Visitor<String> {
                 ".super java/lang/Object\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) + "\n" +
                 ".method public <init>()V\n" +
+                ".limit stack 100\n" + //TODO: limit stack and locals
+                ".limit locals 100\n" +
                 "\taload_0\n" +
                 "\tinvokespecial java/lang/Object/<init>()V\n" +
                 "\treturn\n" +
@@ -65,6 +68,8 @@ public class ClassFileGenerator implements Visitor<String> {
                 ".super " + n.parent.s + "\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
                 ".method public <init>()V\n" +
+                ".limit stack 100\n" + //TODO: limit stack and locals
+                ".limit locals 100\n" +
                 "\taload_0\n" +
                 "\tinvokespecial java/lang/Object/<init>()V\n" +
                 "\treturn\n" +
@@ -84,13 +89,13 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(MethodDecl n) {
-        String parameters = n.fl.list.stream().map(f -> f.accept(this)).collect(Collectors.joining(";"));
+        String parameters = n.fl.list.stream().map(f -> f.accept(this)).collect(Collectors.joining(""));
         n.vl.list.forEach(this::localVarDecl);
-        String type = (n.t instanceof StringType ? "a" : n.t.accept(this).toLowerCase());
+        String type = ((n.t instanceof StringType || n.t instanceof IntArrayType || n.t instanceof IdentifierType) ? "a" : n.t.accept(this).toLowerCase());
         if (type.equals("z")) type = "i";
         String ret = ".method public " + n.i.s + "(" + parameters + ")" + n.t.accept(this) + "\n" +
-                ".limit stack 9\n" + //TODO set appropriate stack size
-                ".limit locals 9\n" + //TODO set appropriate stack size
+                ".limit stack 100\n" + //TODO set appropriate stack size
+                ".limit locals 100\n" + //TODO set appropriate stack size
                 n.sl.list.stream().map(s -> s.accept(this)).collect(Collectors.joining()) + "\n" +
                 n.e.accept(this) + "\n" +
                 type + "return\n" +
@@ -104,7 +109,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Formal n) {
-        localVars.put(n, localVarsIndex++);
+        localVars.put(n, ++localVarsIndex);
         return n.t.accept(this);
     }
 
@@ -163,7 +168,7 @@ public class ClassFileGenerator implements Visitor<String> {
                 "ifeq done" + labelNum + "\n" +
                 n.s.accept(this) + "\n" +
                 "goto while" + labelNum + "\n" +
-                ";END WHILE -------------------\n";
+                "done"+ labelNum +":\n;END WHILE -------------------\n";
     }
 
     @Override
@@ -183,8 +188,7 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(Assign n) {
         String type = n.i.b.t.accept(this);
         if (type.equals("Z")) type = "I";
-        else if(type.equals("Ljava/lang/String;") && localVars.get(n.i.b) != null) type = "A";
-        // TODO Handle reference variable
+        else if(type.startsWith("L") && localVars.get(n.i.b) != null) type = "A";
         String var = localVars.get(n.i.b) == null ?
                 "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n"
                 :
@@ -254,10 +258,9 @@ public class ClassFileGenerator implements Visitor<String> {
     @Override
     public String visit(Equals n) {
         // ifeq nfalse nfalse: iconst_0 goto end nTrue: iconst_1 end
-
+        //TODO Use java equals method
         int labelNum = ++i;
         StringBuilder sb = new StringBuilder();
-
         sb.append(";Equals ------------------\n" + n.e1.accept(this) + "\n" + n.e2.accept(this) + "\n");
         if (n.e1.t instanceof IntegerType || n.e1.t instanceof BooleanType) sb.append("if_icmpeq nTrue" + labelNum + "\n");
         else if (n.e1.t instanceof IdentifierType || n.e1.t instanceof IntArrayType || n.e1.t instanceof StringType) sb.append("if_acmpeq nTrue" + labelNum + "\n");
@@ -287,56 +290,34 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Minus n) {
-            return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\nisub\n";
+            return n.e1.accept(this) + n.e2.accept(this) + "isub\n";
     }
 
     @Override
     public String visit(Times n) {
-        return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\nimul\n";
+        return n.e1.accept(this) + n.e2.accept(this) + "imul\n";
     }
 
     @Override
     public String visit(Divide n) {
-        return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\nidiv\n";
-    }
-
-    public String loadVariable(Decl d) { //local variable
-        if(localVars.containsKey(d))
-            return null;
-            //return n.e.accept(this) + "\n" + type.toLowerCase() + "store " + localVars.get(n.i.b) + "\n"
-        else
-            return "aload_0\n"+ d.accept(this) + "\n" +"putfield " + reference.get(d.i.b) + " ";
-    }
-
-    public String putVariable(Exp n){
-        //TODO
-//        String var = "aload_0\n"+ "\n" +"getfield " + reference.get(n.i.b) +  " " + n.i.b.t.accept(this) + "\n" + n.e1.accept(this) + "\n"+ n.e2.accept(this) + "\niastore\n";
-
-        return null;
+        return n.e1.accept(this) + n.e2.accept(this) + "idiv\n";
     }
 
     @Override
     public String visit(ArrayLookup n) {
-        String var = "";
-        IdentifierExp exp = ((IdentifierExp)n.e1);
-        if(localVars.get(exp.i) == null)         // field variable
-            var = "aload_0\n"+ "\n" +"getfield " + reference.get(exp.i.b) +  " " + exp.i.b.t.accept(this) + "\n" + n.e2.accept(this) + "\niaload\n";
-        else // global variable
-            var = "aload " + localVars.get(exp.i.b) +"\n"+ n.e2.accept(this) + "\n"+ n.e2.accept(this) + "\niaload\n";
+        String var = n.e1.accept(this);
+        //        if(localVars.get(exp.i) == null)         // field variable
+//            var = "aload_0\n"+ "\n" +"getfield " + reference.get(exp.i.b) +  " " + exp.i.b.t.accept(this) + "\n" + n.e2.accept(this) + "\niaload\n";
+//        else // global variable
+//            var = "aload " + localVars.get(exp.i.b) +"\n"+ n.e2.accept(this) + "\n"+ n.e2.accept(this) + "\niaload\n";
         return ";ArrayLookup ------------------------\n" +
-                var +
+                var + n.e2.accept(this) + "\niaload\n" +
                 "\n;EndArrayLookup ------------------";
     }
 
     @Override
     public String visit(ArrayLength n) {
-        String var;
-        IdentifierExp exp = ((IdentifierExp)n.e);
-        if(localVars.get(exp.i) == null)         // field variable
-            var = "aload_0\n"+ "\n" +"getfield " + reference.get(exp.i.b) +  " " + exp.i.b.t.accept(this);
-        else // global variable
-            var = "aload " + localVars.get(exp.i.b);
-        return var + "\narraylength";
+        return n.e.accept(this) + " \narraylength\n";
     }
 
     @Override
@@ -344,35 +325,31 @@ public class ClassFileGenerator implements Visitor<String> {
         return n.e.accept(this) + "\n" + // places object on the top of the stack
                 n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) +
                 "invokevirtual " + ((IdentifierType) n.e.t).i.s + "/" + n.i.s +
-                "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining(";")) + ")" +
+                "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")" +
                 n.t.accept(this) + "\n";
     }
 
     @Override
     public String visit(IntegerLiteral n) {
-        return "ldc " + n.i;
+        return "ldc " + n.i + "\n";
     }
 
     @Override
-    public String visit(StringLiteral n) {
-        return "ldc \"" + n.val + "\"";
-    }
+    public String visit(StringLiteral n) { return "ldc \"" + n.val + "\""; }
 
     @Override
-    public String visit(True n) {
-        return "ldc 1";
-    }
+    public String visit(True n) { return "ldc 1\n"; }
 
     @Override
     public String visit(False n) {
-        return "ldc 0";
+        return "ldc 0\n";
     }
 
     @Override
     public String visit(IdentifierExp n) {
-        //TODO Check if this covers all cases
+        //TODO Handle ArrayType
         String ret = ";-----IDENTIFIER_EXP--------------\n";
-        String type = n.i.b.t.accept(this); //TODO Make Common
+        String type = n.i.b.t.accept(this);
         String command;
         if(type.equals("Z") || type.equals("I")) command = "iload ";
         else command = "aload ";
@@ -382,7 +359,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(This n) {
-        return "aload_0";
+        return "aload_0\n";
     }
 
     @Override

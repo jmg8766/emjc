@@ -64,7 +64,8 @@ public class Emjc {
                             Stream.of(p2.m).map(c -> new String[] {c.i.s, cfg.visit(c)}),
                             p2.cl.list.stream().map(c -> new String[] {c.i.s, cfg.visit(c)})
                     ).forEach(classInfo -> {
-                        // classInfo[0] = class name       classInfo[1] = jasmin input file
+//                         classInfo[0] = classInfo[0].replace(" ", "\\ ");
+                        System.out.println("Generating class file");
                         try(BufferedWriter b = Files.newBufferedWriter(Paths.get(path + classInfo[0] + ".j"))) {
                             b.write(classInfo[1]); b.flush();
                             Process process = Runtime.getRuntime().exec("java -jar jasmin.jar -d " + path + " " + path + classInfo[0] + ".j");
