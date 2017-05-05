@@ -1,3 +1,5 @@
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.BufferedReader;
@@ -7,52 +9,65 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@Test(dataProviderClass = Providers.class)
-public class CodeGenerationTest {
+public class CodeGenerationTest extends Providers {
 
-    @Test(dataProvider = "benchmarkFiles", enabled = false)
-    void testAllBenchmarks(File f) throws IOException {
-        try { // remove the class file corresponding to this file if it's been already generated
-            Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
-            Files.delete(Paths.get(f.getPath().replace(".emj", ".j")));
-        } catch (NoSuchFileException e) {
-        } //ignored
-
-        // run program with the --cgen flag
-        System.out.println("Generating class files for : " + f.getName());
-        Emjc.main(new String[]{"--cgen", f.getPath()});
-
-        // TODO: check that a class file exists for this file
-        // TODO: run class file, compare output with javac class file version
+    @DataProvider
+    public Iterator<Object[]> singleFile() {
+        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-    @Test(enabled = true)
-    void testSingleBenchmark() throws IOException {
-        File f = new File("src/test/benchmarks/Simple.emj");
+    @Test(dataProvider = "singleFile"/*"benchmarkFiles"*/)
+    void test(File f) throws IOException, InterruptedException {
+        String asdf;
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
             Files.delete(Paths.get(f.getPath().replace(".emj", ".j")));
-        } catch (NoSuchFileException e) {
-        } //ignored
+        } catch (NoSuchFileException e) {} //ignored
 
-        // run program with the --cgen flag
-        System.out.println("Generating class files for : " + f.getName());
+        // generate class files with emjc
+        long time = -System.currentTimeMillis();
+        System.out.println("Generating class files with [emjc] for : [" + f.getName() + "]");
         Emjc.main(new String[]{"--cgen", f.getPath()});
+        System.out.println("class files generated in " + (time + System.currentTimeMillis()) + " ms");
 
-        // attempt to run generated class file with java
+        // attempt to run generated class file with java and store the output
         String path = f.getPath().substring(0, f.getPath().lastIndexOf("/"));
         String file = f.getPath().substring(f.getPath().lastIndexOf("/") + 1).replace(".emj", "");
 
-        String command = "java -cp " + path + " " + file;
-        System.out.println("command being run: " + command);
-        Process p = Runtime.getRuntime().exec(command);
+        System.out.println("Running [emjc] compiled program\n");
+        Process p1 = Runtime.getRuntime().exec("java -cp " + path + " " + file);
+        p1.waitFor();
+        // print any errors that happen while running the emjc compiled program
+        new BufferedReader(new InputStreamReader(p1.getErrorStream())).lines().forEach(System.out::println);
+        String emjcCompiledProgramOutput = new BufferedReader(new InputStreamReader(p1.getInputStream())).lines().collect(Collectors.joining("\n"));
 
-        BufferedReader stdOutput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-        stdOutput.lines().forEach(System.out::println);
-        stdError.lines().forEach(System.out::println);
+        String newPath = f.getPath().replace(".emj", ".java");
+        Runtime.getRuntime().exec("cp " + f.getPath() + " " + newPath).waitFor();
+
+        time = -System.currentTimeMillis();
+        System.out.println("Generating class files with [javac] for : [" + f.getName().replace(".emj", ".java") + "]");
+        Process p2 = Runtime.getRuntime().exec("javac " + newPath);
+        p2.waitFor();
+        System.out.println("class files generated in " + (time + System.currentTimeMillis()) + " ms");
+        // print any errors generated compiling the program with javac
+        new BufferedReader(new InputStreamReader(p2.getErrorStream())).lines().forEach(System.out::println);
+
+        System.out.println("Running [javac] compiled program\n");
+        Process p3 = Runtime.getRuntime().exec("java -cp " + path + " " + file);
+        p3.waitFor();
+        // print any errors that happen while running the javac compiled program
+        new BufferedReader(new InputStreamReader(p3.getErrorStream())).lines().forEach(System.out::println);
+        String javacCompiledProgramOutput = new BufferedReader(new InputStreamReader(p3.getInputStream())).lines().collect(Collectors.joining("\n"));
+
+        // assert that the output of both programs is equal
+        System.out.println("Comparing the output");
+        Assert.assertEquals(emjcCompiledProgramOutput, javacCompiledProgramOutput);
+        System.out.println("Output is the same!!!");
     }
 
 

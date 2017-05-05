@@ -297,14 +297,6 @@ public class TypeAnalysis implements Visitor<Type> {
     public Type visit(IdentifierExp n) {
         n.t = n.i.b.t;
         return n.i.b.t;
-//        return IdentifierType.getInstance(n.i.b.i);
-//        Type t1 = n.i.b.accept(this);
-//        if(t1 instanceof IdentifierType) {
-//            t1 = IdentifierType.getInstance(n.i.b.i);
-//        }
-//        n.t = t1;
-//        output.println("ID: " + n.i.s + " -- " +n.t + n.i.pos);
-//        return n.t;
     }
 
     @Override

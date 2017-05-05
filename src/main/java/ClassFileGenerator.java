@@ -14,8 +14,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     private HashMap<Decl, Integer> localVars = new HashMap<>();
     private HashMap<Decl, String> reference = new HashMap<>();
-    private int localVarsIndex = 0;
-    private int i;
+    private int localVarsIndex = 0, i;
 
     @Override
     public String visit(Program n) {
@@ -143,13 +142,15 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(If n) {
         int labelNum = ++i;
         return ";IF ------------------------\n" +
+
                 n.e.accept(this) + "\n" +
                 "ifeq else" + labelNum + "\n" +
                 n.s1.accept(this) + "\n" +
-                "goto done" + labelNum + "\n" +
+                (n.s2 != null ? "goto done" + labelNum + "\n" : "") +
                 "else" + labelNum + ":\n" +
-                n.s2.accept(this) + "\n" +
-                "done" + labelNum + ":\n" +
+                (n.s2 != null ? n.s2.accept(this) + "\n" +
+                "done" + labelNum + ":\n" : "") +
+
                 ";END IF -------------------\n";
     }
 
@@ -182,9 +183,12 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(Assign n) {
         String type = n.i.b.t.accept(this);
         if (type.equals("Z")) type = "I";
-        else if(type.equals("Ljava/lang/String;")) type = "A";
+        else if(type.equals("Ljava/lang/String;") && localVars.get(n.i.b) != null) type = "A";
         // TODO Handle reference variable
-        String var = localVars.get(n.i.b) == null ?  "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n" :  n.e.accept(this) + "\n" + type.toLowerCase() + "store " + localVars.get(n.i.b) + "\n";
+        String var = localVars.get(n.i.b) == null ?
+                "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n"
+                :
+                n.e.accept(this) + "\n" + type.toLowerCase() + "store " + localVars.get(n.i.b) + "\n";
         return ";ASSIGN ------------------\n" +
                 var +
                 ";END-ASSIGN -------------\n";
@@ -197,23 +201,51 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(And n) {
-        return null;
+        return ";---- AND ------------------\n" +
+
+                new If(null, n.e1,
+                    new If(null, n.e2, // if first expression is true
+                        new True(null), // and second expression is true, return true
+                        new False(null)), // and second expression if false, return false
+                    new False(null)) // if first expression if false, return false
+                .accept(this) + "\n" +
+
+                ";----- END-AND ------------";
     }
 
     @Override
     public String visit(Or n) {
-        return null;
+        return ";---- OR ------------------\n" +
+
+                new If(null, n.e1,
+                    new True(null), // if first exp is true, return true
+                    new If(null, n.e2,
+                        new True(null), // if first exp is false, but second is true, return true
+                        new False(null)) // if first and second exp are false, return false
+                ).accept(this) + "\n" +
+
+               ";----- END-AND ------------";
     }
 
     @Override
     public String visit(LessThan n) {
-        return null;
+        int labelNum = ++i;
+        return ";---LESSTHAN --------------\n" +
+                n.e1.accept(this) + "\n" +
+                n.e2.accept(this) + "\n" +
+                "isub\n" +
+                "ifle retTrue" + labelNum + "\n" +
+                "\ticonst_0\n" +
+                "\tgoto done" + labelNum + "\n" +
+                "retTrue" + labelNum + ":\n" +
+                "\ticonst_1\n" +
+                "done" + labelNum + ":\n" +
+                ";-------END-LESSTHAN------------\n";
     }
 
     @Override
     public String visit(Equals n) {
         // ifeq nfalse nfalse: iconst_0 goto end nTrue: iconst_1 end
-        // TODO Lazy evaluation - short circuit
 
         int labelNum = ++i;
         StringBuilder sb = new StringBuilder();
@@ -222,8 +254,10 @@ public class ClassFileGenerator implements Visitor<String> {
         if (n.e1.t == n.e2.t && (n.e1.t instanceof IntegerType || n.e1.t instanceof BooleanType)) sb.append("if_icmpeq nTrue" + labelNum + "\n");
         else if (n.e1.t == n.e2.t && n.e1.t instanceof IdentifierType) sb.append("if_acmpeq nTrue" + labelNum + "\n");
 
-        sb.append("nFalse" + labelNum + ":\niconst_0\ngoto done" + labelNum +"\n");
-        sb.append("nTrue" + labelNum + ":\niconst_1\ndone" + labelNum + ":");
+        sb.append("nFalse" + labelNum + ":\niconst_0\n" +
+                "goto done" + labelNum +"\n");
+        sb.append("nTrue" + labelNum + ":\niconst_1\n" +
+                "done" + labelNum + ":");
 
         return sb.toString();
     }
@@ -300,18 +334,18 @@ public class ClassFileGenerator implements Visitor<String> {
     @Override
     public String visit(IdentifierExp n) {
         //TODO Check if this covers all cases
-        String ret = ";IdentifierExp --------------\n";
+        String ret = ";-----IDENTIFIER_EXP--------------\n";
         String type = n.i.b.t.accept(this); //TODO Make Common
         String command;
         if(type.equals("Z") || type.equals("I")) command = "iload ";
         else command = "aload ";
-        ret += localVars.containsKey(n.i.b) ? command + localVars.get(n.i.b) + "\n" : "aload_0\ngetfield " + reference.get(n.i.b) + " " + type + "\n";
-        return ret;
+        ret += localVars.containsKey(n.i.b) ? command + localVars.get(n.i.b) + "\n" : "aload 0\ngetfield " + reference.get(n.i.b) + " " + type + "\n";
+        return ret + ";----END-IDENTIFIER_EXP ------------------\n";
     }
 
     @Override
     public String visit(This n) {
-        return null;
+        return "aload_0";
     }
 
     @Override
@@ -328,13 +362,14 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Not n) {
-        return null;
+        return ";---- NOT ---------\n" +
+                new If(null, n.e, new False(null), new True(null)).accept(this) + "\n" +
+                ";---- END NOT -------\n";
     }
 
     @Override
     public String visit(Identifier n) {
-        return ";Identifier----------------------\n"
-
-                ; //TODO
+        return ";Identifier----------------------\n" +
+                "; UNIMPLEMENTED"; //TODO
     }
 }
