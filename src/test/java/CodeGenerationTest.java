@@ -18,13 +18,14 @@ public class CodeGenerationTest extends Providers {
     @DataProvider
     public Iterator<Object[]> singleFile() {
 //        return Stream.of(new File("src/test/benchmarks/Gottshall, Justin - MergeSort.emj")).map(f -> new Object[] {f}).iterator();
-        return Stream.of(new File("src/test/benchmarks/TreeVisitor.emj")).map(f -> new Object[] {f}).iterator();
-//        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
-//        return Stream.of(new File("src/test/benchmarks/TestGetterSetter.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/TreeVisitor.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/MergSort.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/BinaryTree.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/BubbleSort.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-    @Test(dataProvider = "singleFile")
-//    @Test(dataProvider = "benchmarkFiles")
+//    @Test(dataProvider = "singleFile")
+    @Test(dataProvider = "benchmarkFiles")
     void test(File f) throws IOException, InterruptedException {
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
@@ -41,7 +42,6 @@ public class CodeGenerationTest extends Providers {
         // attempt to run generated class file with java and store the output
         String path = f.getPath().substring(0, f.getPath().lastIndexOf("/"));
         String file = f.getPath().substring(f.getPath().lastIndexOf("/") + 1).replace(".emj", "").replace(" ", "\\ ").replace(",", "\\,");
-
         System.out.println("Running [emjc] compiled program\n");
         Process p1 = Runtime.getRuntime().exec("java -cp " + path + " " + file);
         p1.waitFor();

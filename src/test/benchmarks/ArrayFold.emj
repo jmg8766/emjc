@@ -1,7 +1,7 @@
 class ArrayFold {
      public static void main ( String [ ] args ) {
 
-        sidef(new Star().start());
+        sidef(new start().start());
      }
 }
 

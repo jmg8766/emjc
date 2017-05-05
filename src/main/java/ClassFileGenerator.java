@@ -91,6 +91,7 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(MethodDecl n) {
         String parameters = n.fl.list.stream().map(f -> f.accept(this)).collect(Collectors.joining(""));
         n.vl.list.forEach(this::localVarDecl);
+        // Assign return type to be object for String, IntArray and Objects
         String type = ((n.t instanceof StringType || n.t instanceof IntArrayType || n.t instanceof IdentifierType) ? "a" : n.t.accept(this).toLowerCase());
         if (type.equals("z")) type = "i";
         String ret = ".method public " + n.i.s + "(" + parameters + ")" + n.t.accept(this) + "\n" +
@@ -188,7 +189,7 @@ public class ClassFileGenerator implements Visitor<String> {
     @Override
     public String visit(Assign n) {
         String type = n.i.b.t.accept(this);
-        if(localVars.get(n.i.b) != null) { if (type.equals("Z")) type = "I"; else if (type.startsWith("L")) type = "A"; }
+        if(localVars.get(n.i.b) != null) { if (type.equals("Z")) type = "I"; else if (type.startsWith("L") || type.equals("[I")) type = "A"; }
         String var = localVars.get(n.i.b) == null ?
                 "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n"
                 :
@@ -246,7 +247,7 @@ public class ClassFileGenerator implements Visitor<String> {
                 n.e1.accept(this) + "\n" +
                 n.e2.accept(this) + "\n" +
                 "isub\n" +
-                "ifle retTrue" + labelNum + "\n" +
+                "iflt retTrue" + labelNum + "\n" +
                 "\ticonst_0\n" +
                 "\tgoto done" + labelNum + "\n" +
                 "retTrue" + labelNum + ":\n" +
