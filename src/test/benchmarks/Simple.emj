@@ -8,18 +8,14 @@ class Simple {
 
 class TT {
     int a;
-    String b;
-    TT c;
+    String b2;
 
     public String asdf() {
-        String bb;
-        int d;
-        d = 6;
-        a = 100;
-        d = a/d;
-        System.out.println(d);
-        bb = "ans " + d;
-        return bb;
+        a = 6;
+        b2 = "hello";
+        System.out.println(b2);
+        b2 = "ans" + a;
+        return "asdf";
 
     }
 }

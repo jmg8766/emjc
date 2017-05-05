@@ -56,9 +56,8 @@ public class Emjc {
                     errors.append(TypeAnalysis.output);
                     if (!errors.toString().isEmpty()) { output.println(errors.toString()); return; }
 
-
                     // class file generation with jasmin
-//                    args[1] = args[1].replace(".emj", ".j");
+                    // args[1] = args[1].replace(".emj", ".j");
                     String path = args[1].substring(0, args[1].lastIndexOf("/") + 1);
                     ClassFileGenerator cfg = new ClassFileGenerator();
                     Stream.concat(

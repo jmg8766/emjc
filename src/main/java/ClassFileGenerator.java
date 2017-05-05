@@ -196,8 +196,15 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ArrayAssign n) {
-        //TODO
-        return null;
+        String var;
+        if(localVars.get(n.i.b) == null)         // field variable
+            var = "aload_0\n"+ "\n" +"getfield " + reference.get(n.i.b) +  " " + n.i.b.t.accept(this) + "\n" + n.e1.accept(this) + "\n"+ n.e2.accept(this) + "\niastore\n";
+        else // global variable
+            var = "aload " + localVars.get(n.i.b) +"\n"+ n.e1.accept(this) + "\n"+ n.e2.accept(this) + "\niastore\n";
+        return ";ArrayAssign -------------------------\n"+
+                var +
+                "\n;EndArrayAssign\n";
+
     }
 
     @Override
@@ -252,8 +259,8 @@ public class ClassFileGenerator implements Visitor<String> {
         StringBuilder sb = new StringBuilder();
 
         sb.append(";Equals ------------------\n" + n.e1.accept(this) + "\n" + n.e2.accept(this) + "\n");
-        if (n.e1.t == n.e2.t && (n.e1.t instanceof IntegerType || n.e1.t instanceof BooleanType)) sb.append("if_icmpeq nTrue" + labelNum + "\n");
-        else if (n.e1.t == n.e2.t && n.e1.t instanceof IdentifierType) sb.append("if_acmpeq nTrue" + labelNum + "\n");
+        if (n.e1.t instanceof IntegerType || n.e1.t instanceof BooleanType) sb.append("if_icmpeq nTrue" + labelNum + "\n");
+        else if (n.e1.t instanceof IdentifierType || n.e1.t instanceof IntArrayType || n.e1.t instanceof StringType) sb.append("if_acmpeq nTrue" + labelNum + "\n");
 
         sb.append("nFalse" + labelNum + ":\niconst_0\n" +
                 "goto done" + labelNum +"\n");
@@ -293,16 +300,43 @@ public class ClassFileGenerator implements Visitor<String> {
         return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\nidiv\n";
     }
 
-    @Override
-    public String visit(ArrayLookup n) {
+    public String loadVariable(Decl d) { //local variable
+        if(localVars.containsKey(d))
+            return null;
+            //return n.e.accept(this) + "\n" + type.toLowerCase() + "store " + localVars.get(n.i.b) + "\n"
+        else
+            return "aload_0\n"+ d.accept(this) + "\n" +"putfield " + reference.get(d.i.b) + " ";
+    }
+
+    public String putVariable(Exp n){
         //TODO
+//        String var = "aload_0\n"+ "\n" +"getfield " + reference.get(n.i.b) +  " " + n.i.b.t.accept(this) + "\n" + n.e1.accept(this) + "\n"+ n.e2.accept(this) + "\niastore\n";
+
         return null;
     }
 
     @Override
+    public String visit(ArrayLookup n) {
+        String var = "";
+        IdentifierExp exp = ((IdentifierExp)n.e1);
+        if(localVars.get(exp.i) == null)         // field variable
+            var = "aload_0\n"+ "\n" +"getfield " + reference.get(exp.i.b) +  " " + exp.i.b.t.accept(this) + "\n" + n.e2.accept(this) + "\niaload\n";
+        else // global variable
+            var = "aload " + localVars.get(exp.i.b) +"\n"+ n.e2.accept(this) + "\n"+ n.e2.accept(this) + "\niaload\n";
+        return ";ArrayLookup ------------------------\n" +
+                var +
+                "\n;EndArrayLookup ------------------";
+    }
+
+    @Override
     public String visit(ArrayLength n) {
-        //TODO
-        return null;
+        String var;
+        IdentifierExp exp = ((IdentifierExp)n.e);
+        if(localVars.get(exp.i) == null)         // field variable
+            var = "aload_0\n"+ "\n" +"getfield " + reference.get(exp.i.b) +  " " + exp.i.b.t.accept(this);
+        else // global variable
+            var = "aload " + localVars.get(exp.i.b);
+        return var + "\narraylength";
     }
 
     @Override
@@ -353,8 +387,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(NewArray n) {
-        //TODO
-        return null;
+        return n.e.accept(this) + "\n" + "newarray int\n";
     }
 
     @Override
