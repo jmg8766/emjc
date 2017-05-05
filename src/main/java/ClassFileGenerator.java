@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 public class ClassFileGenerator implements Visitor<String> {
 
     private HashMap<Decl, Integer> localVars = new HashMap<>();
+    private HashMap<Decl, String> reference = new HashMap<>();
     private int localVarsIndex = 0;
     private int i;
 
@@ -46,6 +47,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ClassDeclSimple n) {
+        n.vl.list.stream().forEach(v -> {reference.put(v, n.i.s + "/"+v.i.s); v.accept(this);});
         return ".class " + n.i.s + "\n" +
                 ".super java/lang/Object\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) + "\n" +
@@ -59,6 +61,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ClassDeclExtends n) {
+        n.vl.list.stream().forEach(v -> {reference.put(v, n.i.s + "/"+v.i.s); v.accept(this);});
         return ".class " + n.i.s + "\n" +
                 ".super " + n.parent.s + "\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
@@ -77,7 +80,7 @@ public class ClassFileGenerator implements Visitor<String> {
     }
 
     public void localVarDecl(Decl n) {
-        localVars.put(n, localVarsIndex++);
+        localVars.put(n, ++localVarsIndex);
     }
 
     @Override
@@ -85,7 +88,7 @@ public class ClassFileGenerator implements Visitor<String> {
         String parameters = n.fl.list.stream().map(f -> f.accept(this)).collect(Collectors.joining(";"));
         n.vl.list.forEach(this::localVarDecl);
         String type = (n.t instanceof StringType ? "a" : n.t.accept(this).toLowerCase());
-        if(type.equals("z")) type = "i";
+        if (type.equals("z")) type = "i";
         String ret = ".method public " + n.i.s + "(" + parameters + ")" + n.t.accept(this) + "\n" +
                 ".limit stack 9\n" + //TODO set appropriate stack size
                 ".limit locals 9\n" + //TODO set appropriate stack size
@@ -164,18 +167,26 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Print n) {
+        //TODO Should boolean be true / false instead of 1/0
+        String print;
+        if(n.e.t instanceof IntegerType || n.e.t instanceof BooleanType)
+            print = "invokevirtual java/io/PrintStream/println(I)V\n";
+        else
+            print = "invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
         return "getstatic java/lang/System/out Ljava/io/PrintStream;\n" +
                 n.e.accept(this) + "\n" +
-                "invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V";
+                print;
     }
 
     @Override
     public String visit(Assign n) {
-        String type = n.i.b.t.accept(this).toLowerCase();
-        if(type.equals("z")) type = "i";
+        String type = n.i.b.t.accept(this);
+        if (type.equals("Z")) type = "I";
+        else if(type.equals("Ljava/lang/String;")) type = "A";
+        // TODO Handle reference variable
+        String var = localVars.get(n.i.b) == null ?  "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n" :  n.e.accept(this) + "\n" + type.toLowerCase() + "store " + localVars.get(n.i.b) + "\n";
         return ";ASSIGN ------------------\n" +
-                n.e.accept(this) + "\n" +
-                type + "store " + localVars.get(n.i.b) + "\n" +
+                var +
                 ";END-ASSIGN -------------\n";
     }
 
@@ -201,27 +212,50 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Equals n) {
-        return null;
+        // ifeq nfalse nfalse: iconst_0 goto end nTrue: iconst_1 end
+        // TODO Lazy evaluation - short circuit
+
+        int labelNum = ++i;
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(";Equals ------------------\n" + n.e1.accept(this) + "\n" + n.e2.accept(this) + "\n");
+        if (n.e1.t == n.e2.t && (n.e1.t instanceof IntegerType || n.e1.t instanceof BooleanType)) sb.append("if_icmpeq nTrue" + labelNum + "\n");
+        else if (n.e1.t == n.e2.t && n.e1.t instanceof IdentifierType) sb.append("if_acmpeq nTrue" + labelNum + "\n");
+
+        sb.append("nFalse" + labelNum + ":\niconst_0\ngoto done" + labelNum +"\n");
+        sb.append("nTrue" + labelNum + ":\niconst_1\ndone" + labelNum + ":");
+
+        return sb.toString();
     }
 
     @Override
     public String visit(Plus n) {
-        return null;
+        // String -- new StringBuilder/append/toString()
+        //TODO Overriding
+        if (n.e1.t == n.e2.t && n.e1.t instanceof IntegerType)
+            return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\niadd\n";
+        else if ((n.e1.t == IntegerType.getInstance() && n.e2.t == StringType.getInstance()))
+            return "new java/lang/StringBuilder\ndup\ninvokespecial java/lang/StringBuilder/<init>()V\n" + n.e1.accept(this) + "\ninvokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;\n" + n.e2.accept(this) +"\ninvokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;\ninvokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;";
+        else if (n.e1.t == StringType.getInstance() && n.e2.t == IntegerType.getInstance())
+            return "new java/lang/StringBuilder\ndup\ninvokespecial java/lang/StringBuilder/<init>()V\n" + n.e1.accept(this) + "\ninvokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;\n"+ n.e2.accept(this) + "\ninvokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;\ninvokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;";
+        else
+            return "new java/lang/StringBuilder\ndup\ninvokespecial java/lang/StringBuilder/<init>()V\n" + n.e1.accept(this) + "\ninvokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;\n"+ n.e2.accept(this) + "\ninvokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;\ninvokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;";
+
     }
 
     @Override
     public String visit(Minus n) {
-        return null;
+            return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\nisub\n";
     }
 
     @Override
     public String visit(Times n) {
-        return null;
+        return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\nimul\n";
     }
 
     @Override
     public String visit(Divide n) {
-        return null;
+        return n.e1.accept(this) + "\n" + n.e2.accept(this) + "\nidiv\n";
     }
 
     @Override
@@ -238,14 +272,14 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(Call n) {
         return n.e.accept(this) + "\n" + // places object on the top of the stack
                 n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) +
-                "invokevirtual " + ((IdentifierType)n.e.t).i.s + "/" + n.i.s +
+                "invokevirtual " + ((IdentifierType) n.e.t).i.s + "/" + n.i.s +
                 "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining(";")) + ")" +
                 n.t.accept(this) + "\n";
     }
 
     @Override
     public String visit(IntegerLiteral n) {
-        return "iload " + n.i;
+        return "ldc " + n.i;
     }
 
     @Override
@@ -265,8 +299,14 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(IdentifierExp n) {
-        return ";IdentifierExp --------------\n" +
-                "iload " + localVars.get(n.i.b) + "\n";
+        //TODO Check if this covers all cases
+        String ret = ";IdentifierExp --------------\n";
+        String type = n.i.b.t.accept(this); //TODO Make Common
+        String command;
+        if(type.equals("Z") || type.equals("I")) command = "iload ";
+        else command = "aload ";
+        ret += localVars.containsKey(n.i.b) ? command + localVars.get(n.i.b) + "\n" : "aload_0\ngetfield " + reference.get(n.i.b) + " " + type + "\n";
+        return ret;
     }
 
     @Override

@@ -12,7 +12,15 @@ class TT {
     TT c;
 
     public String asdf() {
-        return "hello";
+        String bb;
+        int d;
+        d = 6;
+        a = 100;
+        d = a/d;
+        System.out.println(d);
+        bb = "ans " + d;
+        return bb;
+
     }
 }
 

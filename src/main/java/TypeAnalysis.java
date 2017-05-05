@@ -295,6 +295,7 @@ public class TypeAnalysis implements Visitor<Type> {
 
     @Override
     public Type visit(IdentifierExp n) {
+        n.t = n.i.b.t;
         return n.i.b.t;
 //        return IdentifierType.getInstance(n.i.b.i);
 //        Type t1 = n.i.b.accept(this);

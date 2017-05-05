@@ -54,7 +54,7 @@ public class Emjc {
                     // type analysis
                     new TypeAnalysis().visit(p2);
                     errors.append(TypeAnalysis.output);
-                    if (!errors.toString().isEmpty()) output.println(errors.toString());
+                    if (!errors.toString().isEmpty()) { output.println(errors.toString()); System.exit(1); }
 
 
                     // class file generation with jasmin
