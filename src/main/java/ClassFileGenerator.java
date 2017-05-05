@@ -47,7 +47,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ClassDeclSimple n) {
-        n.vl.list.stream().forEach(v -> {reference.put(v, n.i.s + "/"+v.i.s); v.accept(this);});
+        n.vl.list.stream().forEach(v -> reference.put(v, n.i.s + "/"+v.i.s));
         return ".class " + n.i.s + "\n" +
                 ".super java/lang/Object\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) + "\n" +
@@ -61,7 +61,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ClassDeclExtends n) {
-        n.vl.list.stream().forEach(v -> {reference.put(v, n.i.s + "/"+v.i.s); v.accept(this);});
+        n.vl.list.stream().forEach(v -> reference.put(v, n.i.s + "/"+v.i.s));
         return ".class " + n.i.s + "\n" +
                 ".super " + n.parent.s + "\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) +
@@ -183,7 +183,6 @@ public class ClassFileGenerator implements Visitor<String> {
         String type = n.i.b.t.accept(this);
         if (type.equals("Z")) type = "I";
         else if(type.equals("Ljava/lang/String;")) type = "A";
-        // TODO Handle reference variable
         String var = localVars.get(n.i.b) == null ?  "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n" :  n.e.accept(this) + "\n" + type.toLowerCase() + "store " + localVars.get(n.i.b) + "\n";
         return ";ASSIGN ------------------\n" +
                 var +
@@ -192,21 +191,25 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ArrayAssign n) {
+        //TODO
         return null;
     }
 
     @Override
     public String visit(And n) {
+        //TODO
         return null;
     }
 
     @Override
     public String visit(Or n) {
+        //TODO
         return null;
     }
 
     @Override
     public String visit(LessThan n) {
+        //TODO
         return null;
     }
 
@@ -260,11 +263,13 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ArrayLookup n) {
+        //TODO
         return null;
     }
 
     @Override
     public String visit(ArrayLength n) {
+        //TODO
         return null;
     }
 
@@ -311,11 +316,13 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(This n) {
+        //TODO
         return null;
     }
 
     @Override
     public String visit(NewArray n) {
+        //TODO
         return null;
     }
 
@@ -328,6 +335,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Not n) {
+        //TODO
         return null;
     }
 
