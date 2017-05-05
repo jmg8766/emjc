@@ -6,8 +6,7 @@ public class BooleanType extends PrimitiveType {
 
 	private static final BooleanType instance = new BooleanType();
 
-	private BooleanType() {
-	}
+	private BooleanType() {}
 
 	public static BooleanType getInstance() {
 		return instance;

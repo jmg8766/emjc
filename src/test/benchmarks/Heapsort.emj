@@ -2,7 +2,7 @@
 //Author Two : Akshay Kalbhor
 //Benchmark Two : Heapsort
 
-public class Heapsort {
+class Heapsort {
 	public static void main(String[] args) {
 		//change size of heap from init() method
 		//initial size = 10
