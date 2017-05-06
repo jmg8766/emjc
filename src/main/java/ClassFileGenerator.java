@@ -7,6 +7,7 @@ import ast.statement.*;
 import ast.type.*;
 
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,6 +16,14 @@ public class ClassFileGenerator implements Visitor<String> {
     private HashMap<Decl, Integer> localVars = new HashMap<>();
     private HashMap<Decl, String> reference = new HashMap<>();
     private int localVarsIndex = 0, i;
+
+    private boolean getSubType(Call n) {
+
+        //"(" + n.el.list.stream().map(e -> checkSubtype(e.t.accept(this))).collect(Collectors.joining("")) + ")" +
+        //if (right instanceof IdentifierType && ((IdentifierType)right).superTypes.contains(left)) return true;
+
+        return false;
+    }
 
     @Override
     public String visit(Program n) {
@@ -41,7 +50,9 @@ public class ClassFileGenerator implements Visitor<String> {
     }
 
     public String visit(ClassDecl n) {
-        return n.accept(this);
+        String ret =  n.accept(this);
+        reference.clear();
+        return ret;
     }
 
     @Override
@@ -190,7 +201,7 @@ public class ClassFileGenerator implements Visitor<String> {
         String type = n.i.b.t.accept(this);
         if(localVars.get(n.i.b) != null) { if (type.equals("Z")) type = "I"; else if (type.startsWith("L") || type.equals("[I")) type = "A"; }
         String var = localVars.get(n.i.b) == null ?
-                "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n"
+                "aload_0\n"+ n.e.accept(this) + "\n" +"putfield " + reference.get(n.i.b) + " " + type + "\n" // TODO CHECK THERE ARE NULL VALUES
                 :
                 n.e.accept(this) + "\n" + type.toLowerCase() + "store " + localVars.get(n.i.b) + "\n";
         return ";ASSIGN ------------------\n" +
@@ -322,10 +333,13 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(Call n) {
-        return n.e.accept(this) + "\n" + // places object on the top of the stack
+
+        return ";TYPE : "+ "(" + ((MethodDecl)n.i.b).fl.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")"  +
+                "\n"+n.e.accept(this) + "\n" + // places object on the top of the stack
                 n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) + "\n" +
                 "invokevirtual " + ((IdentifierType) n.e.t).i.s + "/" + n.i.s +
-                "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")" +
+//                "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")" +
+                "(" + ((MethodDecl)n.i.b).fl.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")"  +
                 n.t.accept(this) + "\n";
     }
 

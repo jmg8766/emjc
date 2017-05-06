@@ -8,10 +8,6 @@ class A {}
 class Test9Valid extends A{
    public int func(){
                 A a;
-                a = this.f();
                 return 0;
         }
-    public Test9Valid f(){
-        return this;
-    }
 }

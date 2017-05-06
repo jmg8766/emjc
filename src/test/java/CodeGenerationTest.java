@@ -19,13 +19,13 @@ public class CodeGenerationTest extends Providers {
     public Iterator<Object[]> singleFile() {
 //        return Stream.of(new File("src/test/benchmarks/Gottshall, Justin - MergeSort.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/TreeVisitor.emj")).map(f -> new Object[] {f}).iterator();
-        return Stream.of(new File("src/test/benchmarks/MergSort.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/MergSort.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/BinaryTree.emj")).map(f -> new Object[] {f}).iterator();
-//        return Stream.of(new File("src/test/benchmarks/BubbleSort.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-//    @Test(dataProvider = "singleFile")
-    @Test(dataProvider = "benchmarkFiles")
+    @Test(dataProvider = "singleFile")
+//    @Test(dataProvider = "benchmarkFiles")
     void test(File f) throws IOException, InterruptedException {
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));

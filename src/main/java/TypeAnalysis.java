@@ -262,6 +262,7 @@ public class TypeAnalysis implements Visitor<Type> {
                             break;
                         }
                     }
+                    n.i.b = m;
                     return n.t = m.t;
                 }
             }
