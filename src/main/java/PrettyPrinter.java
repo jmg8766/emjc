@@ -280,4 +280,9 @@ public class PrettyPrinter implements Visitor<String> {
         if (!id.containsKey(n.b)) { id.put(n.b, n.s + '_' + (idCount++) + "_"); }
         return id.get(n.b);
     }
+
+    @Override
+    public String visit(Sidef n) {
+        return n.e.accept(this);
+    }
 }

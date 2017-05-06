@@ -176,7 +176,7 @@ public class Parser {
                 return assign();
             case SIDEF:
                 eat(SIDEF, LPAREN);
-                Exp e = exp();
+                Exp e = new Sidef(tok.row + ":" + tok.col, exp());
                 eat(RPAREN, SEMICOLON);
                 return e;
             default:

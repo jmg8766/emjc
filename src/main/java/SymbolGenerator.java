@@ -366,4 +366,9 @@ public class SymbolGenerator implements Visitor<Object> {
         else n.b = d;
         return null;
     }
+
+    @Override
+    public Object visit(Sidef n) {
+        return n.e.accept(this);
+    }
 }

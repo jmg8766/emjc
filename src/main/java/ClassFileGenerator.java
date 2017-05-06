@@ -343,7 +343,6 @@ public class ClassFileGenerator implements Visitor<String> {
                 "\n"+n.e.accept(this) + "\n" + // places object on the top of the stack
                 n.el.list.stream().map(e -> e.accept(this)).collect(Collectors.joining("\n")) + "\n" +
                 "invokevirtual " + ((IdentifierType) n.e.t).i.s + "/" + n.i.s +
-//                "(" + n.el.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")" +
                 "(" + ((MethodDecl)n.i.b).fl.list.stream().map(e -> e.t.accept(this)).collect(Collectors.joining("")) + ")"  +
                 n.t.accept(this) + "\n";
     }
@@ -404,5 +403,11 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(Identifier n) {
         return ";Identifier----------------------\n" +
                 "; UNIMPLEMENTED"; //TODO
+    }
+
+    @Override
+    public String visit(Sidef n) {
+        return n.e.accept(this) + "\n" +
+                "pop\n";
     }
 }

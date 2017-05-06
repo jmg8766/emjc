@@ -45,4 +45,6 @@ public interface Visitor<R> {
 	R visit(NewArray n);
 	R visit(NewObject n); R visit(Not n);
 	R visit(Identifier n);
+
+    R visit(Sidef sidef);
 }

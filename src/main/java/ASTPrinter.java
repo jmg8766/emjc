@@ -204,4 +204,9 @@ public class ASTPrinter implements Visitor<String> {
 	public String visit(Identifier n) {
 		return "(ID " + n.s + ")";
 	}
+
+	@Override
+	public String visit(Sidef n) {
+	    return n.e.accept(this);
+	}
 }

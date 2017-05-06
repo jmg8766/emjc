@@ -329,4 +329,9 @@ public class TypeAnalysis implements Visitor<Type> {
     public Type visit(Identifier n) {
         return n.b.t;
     }
+
+    @Override
+    public Type visit(Sidef n) {
+        return n.e.accept(this);
+    }
 }
