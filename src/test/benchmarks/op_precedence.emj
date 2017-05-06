@@ -5,7 +5,7 @@
     + multi-line comments!
 */
 
-class Precedence {
+class op_precedence {
     public static void main(String[] args){
         sidef(new A().method());
     }

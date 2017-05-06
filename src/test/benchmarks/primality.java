@@ -2,7 +2,7 @@
 //name  : Primality
 //goal  : Checks if a number is prime
 
-class Primality {
+class primality {
 	public static void main(String[] a){
 		System.out.println(new PrimalityTester().is_prime(6700417)); // it is prime.
 	}

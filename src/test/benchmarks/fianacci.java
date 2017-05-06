@@ -1,4 +1,4 @@
-class Main {
+class fianacci {
 	// Main function
 	// Serves as a unit test to evaluate fib (int n)
 	public static void main (String[] args) {{

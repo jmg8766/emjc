@@ -5,7 +5,7 @@
     + multiline comments!
 */
 
-class Precedence {
+class binding_tightness {
     public static void main(String[] args){
         sidef(new RealMain().realMain());
     }

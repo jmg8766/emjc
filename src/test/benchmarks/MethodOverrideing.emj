@@ -1,6 +1,6 @@
 //author: Will Smith
 
-class MethodOverriding {
+class MethodOverrideing {
 	public static void main (String[] args) {
 		System.out.println(new TestSuite().start());
 	}

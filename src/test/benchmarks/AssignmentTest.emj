@@ -1,4 +1,4 @@
-class Tester{
+class AssignmentTest {
     public static void main(String[] a){
         System.out.println(new Test3Valid().func(0,false));
     }
@@ -12,7 +12,8 @@ class Test3Valid {
     public boolean func(int a, boolean b){
         A x;
         B y;
-        int [] z;
+        int[] z;
+        z = new int[100];
         x = new A();
         y = new B();
         x = y;

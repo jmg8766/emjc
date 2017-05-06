@@ -1,16 +1,16 @@
 //author: Justin Gottshall & Dhanasekar Elangovan
 
-class PrimesMain {
+class Primes {
 
     public static void main(String[] a) {
         {
-            System.out.println(new Primes().getPrimesSlow());
-            System.out.println(new Primes().getPrimesFast());
+            System.out.println(new Primes1().getPrimesSlow());
+            System.out.println(new Primes1().getPrimesFast());
         }
     }
 }
 
-class Primes {
+class Primes1 {
     // generate the first 1000 primes really inefficiently
     public String getPrimesSlow() {
         int[] primes; int index; String s;
