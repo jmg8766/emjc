@@ -1,7 +1,7 @@
 class Simple {
 
     public static void main(String[] args) {
-        System.out.println(new TT().asdf(5, 3));
+        System.out.println(new BB().asdf(5, new TT()));
     }
 
 }
@@ -10,15 +10,10 @@ class TT {
     int a;
     String b2;
 
-    public String asdf(int b, int c) {
-        String str;
-        a = 10;
-        b2 = "hello";
-        str = "asd";
-        System.out.println(c+b);
-        b2 = "ans" + a;
+    public String asdf(int b, TT c) {
         return "asdf";
-
     }
 }
+
+class BB extends TT {}
 
