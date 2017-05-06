@@ -1,12 +1,11 @@
-import ast.*;
 import ast.ClassDeclaration.ClassDecl;
 import ast.ClassDeclaration.ClassDeclExtends;
 import ast.ClassDeclaration.ClassDeclSimple;
+import ast.*;
 import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
 
-import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -177,12 +176,12 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(Print n) {
         //TODO Should boolean be true / false instead of 1/0
         String print;
-        if(n.e.t instanceof IntegerType || n.e.t instanceof BooleanType)
-            print = "invokevirtual java/io/PrintStream/println(I)V\n";
-        else
-            print = "invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
+        if(n.e.t instanceof IntegerType) print = "invokevirtual java/io/PrintStream/println(I)V\n";
+        else print = "invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V\n";
         return "getstatic java/lang/System/out Ljava/io/PrintStream;\n" +
-                n.e.accept(this) + "\n" +
+                (n.e.t instanceof BooleanType ?
+                    new If(null, n.e, new StringLiteral(null,"true"), new StringLiteral(null,"false")).accept(this) :
+                    n.e.accept(this)) + "\n" +
                 print;
     }
 

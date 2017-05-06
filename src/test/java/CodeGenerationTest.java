@@ -68,8 +68,8 @@ public class CodeGenerationTest extends Providers {
         new BufferedReader(new InputStreamReader(p3.getErrorStream())).lines().forEach(System.out::println);
         String javacCompiledProgramOutput = new BufferedReader(new InputStreamReader(p3.getInputStream())).lines().collect(Collectors.joining("\n"));
 
-        System.out.println("Expected: " + javacCompiledProgramOutput);
-        System.out.println("Actual: " + emjcCompiledProgramOutput);
+//        System.out.println("Expected: " + javacCompiledProgramOutput);
+//        System.out.println("Actual: " + emjcCompiledProgramOutput);
 
         // assert that the output of both programs is equal
         System.out.println("Comparing the output");

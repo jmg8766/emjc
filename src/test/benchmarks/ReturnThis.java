@@ -6,7 +6,7 @@ class ReturnThis{
 
 class A {}
 class Test9Valid extends A{
-        public int func(){
+   public int func(){
                 A a;
                 a = this.f();
                 return 0;

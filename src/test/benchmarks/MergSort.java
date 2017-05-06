@@ -1,4 +1,4 @@
-class Main {
+class MergSort {
   public static void main (String [] args) {
     sidef (new MergeSort ().runBenchmarks ());
   }
