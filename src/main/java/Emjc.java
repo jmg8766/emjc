@@ -54,32 +54,52 @@ public class Emjc {
                     // type analysis
                     new TypeAnalysis().visit(p2);
                     errors.append(TypeAnalysis.output);
-                    if (!errors.toString().isEmpty()) { output.println(errors.toString()); return; }
+                    if (!errors.toString().isEmpty()) {
+                        output.println(errors.toString());
+                        return;
+                    }
 
                     // class file generation with jasmin
                     // args[1] = args[1].replace(".emj", ".j");
                     String path = args[1].substring(0, args[1].lastIndexOf("/") + 1);
                     ClassFileGenerator cfg = new ClassFileGenerator();
                     Stream.concat(
-                            Stream.of(p2.m).map(c -> new String[] {c.i.s, cfg.visit(c)}),
-                            p2.cl.list.stream().map(c -> new String[] {c.i.s, cfg.visit(c)})
+                            Stream.of(p2.m).map(c -> new String[]{c.i.s, cfg.visit(c)}),
+                            p2.cl.list.stream().map(c -> new String[]{c.i.s, cfg.visit(c)})
                     ).forEach(classInfo -> {
 //                         classInfo[0] = classInfo[0].replace(" ", "\\ ");
 //                        System.out.println("Generating class file");
-                        try(BufferedWriter b = Files.newBufferedWriter(Paths.get(path + classInfo[0] + ".j"))) {
-                            b.write(classInfo[1]); b.flush();
+                        try (BufferedWriter b = Files.newBufferedWriter(Paths.get(path + classInfo[0] + ".j"))) {
+                            b.write(classInfo[1]);
+                            b.flush();
                             Process process = Runtime.getRuntime().exec("java -jar jasmin.jar -d " + path + " " + path + classInfo[0] + ".j");
 
                             //TODO: remove this
-                            BufferedReader stdOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                            stdOutput.lines().forEach(System.out::println);
-                            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-                            stdError.lines().forEach(System.out::println);
+//                            BufferedReader stdOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//                            stdOutput.lines().forEach(System.out::println);
+//                            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+//                            stdError.lines().forEach(System.out::println);
                             //--------------
 
                             process.waitFor();
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                        }
                     });
+                    return;
+                case "--opt": //TODO
+                    Emjc.main(new String[]{"--cgen", args[1]});
+                    return;
+                case "--optinfo":
+                    // generate unoptimized class file
+                    Emjc.main(new String[]{"--cgen", args[1]});
+                    // get the number of instructions in all the generated class files
+                    System.out.println("#bytecode before optimization: " + countByteCodeInstructions(args[1]));
+
+                    // generate optimized class file
+                    Emjc.main(new String[]{"--opt", args[1]});
+                    //get the number of instructions in all the generated class files
+                    System.out.println("#bytecode after optimization: " + countByteCodeInstructions(args[1]));
+
                     return;
             }
         }
@@ -92,11 +112,27 @@ public class Emjc {
         System.out.println("\t--name\t\tGenerates output from name analysis");
         System.out.println("\t--type\t\tGenerates output from type analysis");
         System.out.println("\t--cgen\t\tGenerates output from intermediate code generation");
+        System.out.println("\t--opt\t\tGenerates optimized executable program");
+        System.out.println("\t--optinfo\tGenerates optimized executable program with some statistics");
         System.out.println("\t--help\t\tPrints a synopsis of options");
     }
 
-    public static void genClassFile(String jasminContents, String fileName) {
-
+    private static long countByteCodeInstructions(String srcFilePath) {
+        String path = srcFilePath.substring(0, srcFilePath.lastIndexOf("/") + 1);
+        return new Parser(new Lexer(srcFilePath)).program().cl.list.stream()
+                .map(c -> c.i.s)
+                .map(className -> path + className)
+                .mapToLong(classPath -> {
+                    try {
+                        InputStream i = Runtime.getRuntime().exec("javap -c " + classPath.replace(".emj", ".class")).getInputStream();
+                        return new BufferedReader(new InputStreamReader(i)).lines()
+                                .map(String::trim).filter(line -> !line.isEmpty())
+                                .filter(line -> Character.isDigit(line.charAt(0)))
+                                .count();
+                    } catch (IOException e) {
+                    }
+                    return 0;
+                }).sum();
     }
 
 }
