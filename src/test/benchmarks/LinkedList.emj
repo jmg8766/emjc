@@ -59,14 +59,14 @@ class Element {
     // returns true if they are equal and false
     // otherwise
     public boolean Compare(int num1 , int num2){
-	    boolean retval ;
-	    int aux02 ;
-	    retval = false ;
-	    aux02 = num2 + 1 ;
-	    if (num1 < num2) retval = false ;
-	    else if (!(num1 < aux02)) retval = false ;
-	    else retval = true ;
-	    return retval ;
+	boolean retval ;
+	int aux02 ;
+	retval = false ;
+	aux02 = num2 + 1 ;
+	if (num1 < num2) retval = false ;
+	else if (!(num1 < aux02)) retval = false ;
+	else retval = true ;
+	return retval ;
     }
 
 }
@@ -104,8 +104,8 @@ class List{
     
     // Update the the pointer to the next node
     public boolean SetNext(List v_next){
-	    next = v_next ;
-	    return true ;
+	next = v_next ;
+	return true ;
     }
     
     // Delete an element e from the list

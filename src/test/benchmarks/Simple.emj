@@ -1,22 +1,30 @@
 class Simple {
 
     public static void main(String[] args) {
-        System.out.println(new BB().a(new int[0], new int[0], 0, 2));
+        System.out.println(new BB().asdf(0, 5));
     }
 
 }
 
 class TT {
-    String b2;
-
-    public String asdf(int b, BB c) {
+    int b2;
+    // test if kill works
+    public String asdf(int b, int c) {
+                int i;
+               b2 = 10;
+               b = b2 - b2;
+               b2 = 2;
+               c = b2 - b2;
+               b = 50 - 60;
+               while(b2 < 5) {
+                   i = b2 + 1;
+                   b2 = b2 + 1;
+               }
+               System.out.println(b2 - b2);
         return "asdf";
     }
-
-    public int a(int[] b, int[] c, int d, int e) {
-        return 0;
-    }
 }
+
 
 class BB extends TT {}
 

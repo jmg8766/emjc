@@ -1,6 +1,6 @@
 package ast;
 
-public class Identifier {
+public class Identifier extends Tree{
 	public String pos;
 	public Decl b;
 	public String s;
@@ -10,7 +10,21 @@ public class Identifier {
 		this.s = s;
 	}
 
+	public int hashCode(){
+		return s.intern().hashCode();
+	}
+
+	public boolean equals(Object obj) {
+		if(obj instanceof Identifier && s.equals(((Identifier)obj).s))
+			return true;
+		return false;
+	}
+
 	public <R> R accept(Visitor<R> v) {
 		return v.visit(this);
+	}
+
+	public String toString(){
+		return this.s;
 	}
 }

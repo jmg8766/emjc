@@ -12,7 +12,23 @@ public class IntegerLiteral extends Exp {
 		this.t = IntegerType.getInstance();
 	}
 
+	public int hashCode() {
+		return this.i;
+	}
+
+	public boolean equals(Object obj){
+		if(obj instanceof IntegerLiteral && ((IntegerLiteral)obj).i == this.i)
+			return true;
+		else
+			return false;
+
+	}
+
 	public <R> R accept(Visitor<R> v) {
 		return v.visit(this);
+	}
+
+	public String toString() {
+		return Integer.toString(this.i);
 	}
 }

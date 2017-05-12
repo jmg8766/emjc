@@ -18,20 +18,18 @@ class Select {
 	//here k goes from 0 to length of the array. Smallest element in the array is k = 0
 	//Biggest element in the array is at (k = array.length - 1)
 	public int start(int k, int left, int right) {
-        int retValue;
 		sidef(this.init());
 		
 		if (k < left) {
 			System.out.println("Value of k is invalid");
-			retValue = 0;
-		} else if (right < k) {
-			System.out.println("Value of k is invalid");
-			retValue = 0;
-		} else {
-		    retValue = this.select(inputArray, k, left, right);
+			return 0;
 		}
-
-		return retValue;
+		
+		if (right < k) {
+			System.out.println("Value of k is invalid");
+			return 0;
+		}
+		return this.select(inputArray, k, left, right);
 	}
 	
 	public int init() {

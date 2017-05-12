@@ -2,7 +2,7 @@ package ast;
 
 import ast.list.ClassDeclList;
 
-public class Program {
+public class Program extends Tree{
 	public MainClass m;
 	public ClassDeclList cl;
 

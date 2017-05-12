@@ -67,7 +67,9 @@ public class TypeAnalysis implements Visitor<Type> {
         n.vl.list.forEach(v -> v.accept(this));
         n.sl.list.forEach(s -> s.accept(this));
         Type t1 = n.e.accept(this);
-        if(n.t != t1) error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
+        //if(n.t != t1)
+        if(n.t != t1 && (n.t instanceof IdentifierType && t1 instanceof IdentifierType && !(((IdentifierType) t1).superTypes.contains(n.t))))
+            error(n.pos, "Expected Return type " + n.t + " does not match the current return type " + t1);
         return n.t;
     }
 
@@ -256,7 +258,7 @@ public class TypeAnalysis implements Visitor<Type> {
                     if (e.size() != f.size()) break; //Need to check parent class method
                     for (int i = 0; i < n.el.list.size(); i++) {
                         Type e1 = e.get(i).accept(this);
-                        if(!checkSubType(e1, f.get(i).t)) {
+                        if(!checkSubType(e1, f.get(i).accept(this))) {
                             error(n.pos, "expected parameter " + (i+1) + " of [" + m.i.s +
                                     "] method call to be of type or subtype: [" + f.get(i).t + "] instead of [" + e1 + "]");
                             break;
@@ -314,7 +316,6 @@ public class TypeAnalysis implements Visitor<Type> {
 
     @Override
     public Type visit(NewObject n) {
-
         return n.t = IdentifierType.getInstance(n.i);
     }
 

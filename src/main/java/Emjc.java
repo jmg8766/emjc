@@ -1,5 +1,6 @@
 import ast.ClassDeclaration.ClassDecl;
 import ast.Program;
+import graphs.AlgebraicSimplification;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -60,20 +61,16 @@ public class Emjc {
                     }
 
                     // class file generation with jasmin
-                    // args[1] = args[1].replace(".emj", ".j");
                     String path = args[1].substring(0, args[1].lastIndexOf("/") + 1);
                     ClassFileGenerator cfg = new ClassFileGenerator();
                     Stream.concat(
                             Stream.of(p2.m).map(c -> new String[]{c.i.s, cfg.visit(c)}),
                             p2.cl.list.stream().map(c -> new String[]{c.i.s, cfg.visit(c)})
                     ).forEach(classInfo -> {
-//                         classInfo[0] = classInfo[0].replace(" ", "\\ ");
-//                        System.out.println("Generating class file");
-                        try (BufferedWriter b = Files.newBufferedWriter(Paths.get(path + classInfo[0] + ".j"))) {
-                            b.write(classInfo[1]);
-                            b.flush();
-                            Process process = Runtime.getRuntime().exec("java -jar jasmin.jar -d " + path + " " + path + classInfo[0] + ".j");
-
+                        try(BufferedWriter b = Files.newBufferedWriter(Paths.get(path + classInfo[0] + ".j"))) {
+                            b.write(classInfo[1]); b.flush();
+                            String[] cmd = {"java", "-jar", "jasmin.jar", "-d", path, path+classInfo[0]+".j"};
+                            Process process = Runtime.getRuntime().exec(cmd);
                             //TODO: remove this
 //                            BufferedReader stdOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 //                            stdOutput.lines().forEach(System.out::println);
@@ -87,7 +84,32 @@ public class Emjc {
                     });
                     return;
                 case "--opt": //TODO
-                    Emjc.main(new String[]{"--cgen", args[1]});
+                    //Emjc.main(new String[]{"--cgen", args[1]});
+                    Program p3 = new Parser(new Lexer(args[1])).program();
+                    // name analysis
+                    errors.append(new SymbolGenerator().visit(p3));
+                    // type analysis
+                    new TypeAnalysis().visit(p3);
+                    errors.append(TypeAnalysis.output);
+                    if (!errors.toString().isEmpty()) {
+                        output.println(errors.toString());
+                        return;
+                    }
+                    AlgebraicSimplification var = new AlgebraicSimplification();
+                    var.visit(p3);
+                    // class file generation with jasmin
+                    String path1 = args[1].substring(0, args[1].lastIndexOf("/") + 1);
+                    ClassFileGenerator cfg1 = new ClassFileGenerator();
+                    Stream.concat(
+                            Stream.of(p3.m).map(c -> new String[]{c.i.s, cfg1.visit(c)}),
+                            p3.cl.list.stream().map(c -> new String[]{c.i.s, cfg1.visit(c)})
+                    ).forEach(classInfo -> {
+                        try(BufferedWriter b1 = Files.newBufferedWriter(Paths.get(path1 + classInfo[0] + ".j"))) {
+                            b1.write(classInfo[1]); b1.flush();
+                            String[] cmd = {"java", "-jar", "jasmin.jar", "-d", path1, path1+classInfo[0]+".j"};
+                            Process process = Runtime.getRuntime().exec(cmd);
+                            process.waitFor();
+                        } catch (Exception e) {}});
                     return;
                 case "--optinfo":
                     // generate unoptimized class file
@@ -134,5 +156,4 @@ public class Emjc {
                     return 0;
                 }).sum();
     }
-
 }

@@ -10,8 +10,21 @@ public class Times extends Exp {
 		this.e1 = e1;
 		this.e2 = e2;
 	}
+	public int hashCode() {
+		return this.e1.hashCode() * this.e2.hashCode();
+	}
+
+	public boolean equals(Object obj) {
+		if(obj instanceof Times && (((Times) obj).e1.equals(this.e1)) && ((Times)obj).e2.equals(this.e2))
+			return true;
+		return false;
+	}
 
 	public <R> R accept(Visitor<R> v) {
 		return v.visit(this);
+	}
+
+	public String toString(){
+		return this.e1 + " * " + this.e2;
 	}
 }

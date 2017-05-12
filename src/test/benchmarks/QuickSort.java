@@ -48,7 +48,7 @@ class SortClass {
 	public int[] sort(int[] inputArray) {
 		array = inputArray;
 		size = inputArray.length;
-		sidef(this.quickSort(0, size - 1));
+		this.quickSort(0, size - 1);
 		return array;
 	}
 	
@@ -70,17 +70,17 @@ class SortClass {
 				j = j - 1;
 			}
 			if (i < (j + 1)) {
-				sidef(this.exchangeNumbers(i, j));
+				this.exchangeNumbers(i, j);
 				i = i + 1;
 				j = j - 1;
 			}
 		}
 		
 		if (lowerIndex < j) {
-			sidef(this.quickSort(lowerIndex, j));
+			this.quickSort(lowerIndex, j);
 		}
 		if (i < higherIndex) {
-			sidef(this.quickSort(i, higherIndex));
+			this.quickSort(i, higherIndex);
 		}
 		return 0;
 	}

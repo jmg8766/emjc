@@ -1,8 +1,8 @@
-class fianacci {
+class Main {
 	// Main function
 	// Serves as a unit test to evaluate fib (int n)
 	public static void main (String[] args) {{
-		new fibanacci ().fib_test();
+		sidef (new fibanacci ().fib_test ());
 	}}
 }
 

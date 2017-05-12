@@ -2,7 +2,7 @@ package ast;
 
 import ast.type.Type;
 
-public abstract class Decl {
+public abstract class Decl extends Tree {
     public Type t;
     public Identifier i;
 

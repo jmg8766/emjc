@@ -302,12 +302,12 @@ public class Parser {
     // _TERM -> (+|-) TERM | empty
     Exp _term(Exp e) {
         switch (tok.type) {
-            case PLUS:
-                eat(TokenType.PLUS);
-                return new Plus(tok.row + ":" + tok.col, e, term());
             case MINUS:
                 eat(TokenType.MINUS);
                 return new Minus(tok.row + ":" + tok.col, e, term());
+            case PLUS:
+                eat(TokenType.PLUS);
+                return new Plus(tok.row + ":" + tok.col, e, term());
             default:
                 return e;
         }

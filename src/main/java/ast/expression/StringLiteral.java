@@ -15,4 +15,8 @@ public class StringLiteral extends Exp {
 	public <R> R accept(Visitor<R> v) {
 		return v.visit(this);
 	}
+
+	public String toString(){
+		return this.val;
+	}
 }

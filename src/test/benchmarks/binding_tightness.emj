@@ -7,16 +7,7 @@
 
 class binding_tightness {
     public static void main(String[] args){
-        sidef(new RealMain().realMain());
-    }
-}
-
-class RealMain {
-    public int realMain() {
-	   int result;
-	   result = 1 + new ContainerClass().makePrime().initPrimes()[3];
-       System.out.println(result); // 8
-       return 0;
+       System.out.println(1 + new ContainerClass().makePrime().initPrimes()[3]); // 8
     }
 }
 
@@ -27,10 +18,10 @@ class ContainerClass {
 }
 
 class Primes {
-
     int[] primes;
 
     public int[] initPrimes(){  // returns an array of the first ten prime numbers
+
         primes = new int[10];
 
         primes[0] = 2;

@@ -37,6 +37,9 @@ public class SymbolGenerator implements Visitor<Object> {
 
     public String visit(Program n) {
         mainClassName = n.m.i.s;
+        ClassDecl obj = new ClassDeclSimple("", new Identifier("", "Object"), null,null);
+        obj.t = IdentifierType.getInstance(obj.i);
+        t.put(obj.i, obj);
         // add all classDecl to global scope
         n.cl.list.forEach(c -> {
             if (t.put(c.i, c) != null) error(c.i.pos, "class is defined more than once");
@@ -51,12 +54,13 @@ public class SymbolGenerator implements Visitor<Object> {
         // visit each class
         n.cl.list.forEach(c -> {
             inheritanceChain.clear();
+            ((IdentifierType) c.t).superTypes.add(obj.t);
             t.beginScope();
             c.accept(this);
             t.endScope();
-            LinkedHashSet ps = new LinkedHashSet();
-            ps.addAll(inheritanceChain);
-            c.parentSet = ps;
+//            LinkedHashSet ps = new LinkedHashSet();
+//            ps.addAll(inheritanceChain);
+//            c.parentSet = ps;
         });
 
         StringBuilder b = new StringBuilder();
@@ -78,6 +82,9 @@ public class SymbolGenerator implements Visitor<Object> {
     public Object visit(ClassDeclSimple n) {
         // add n to the inheritance chain just so to handle "this"
         inheritanceChain.add(n);
+
+        ((IdentifierType) n.t).superTypes.add(n.t);
+
 
         // Set the binding for this classDecl
         n.i.b = t.get(n.i);
@@ -107,6 +114,7 @@ public class SymbolGenerator implements Visitor<Object> {
         else if (!inheritanceChain.add(n)) error(n.i.pos, "cyclical inheritance");
         else if (t.get(n.parent) == null) error(n.i.pos, "Attempted to extend non-existent class: [" + n.parent.s + "]");
         else t.get(n.parent).accept(this);
+
 
         // add information about all supertypes of this class to it's type
         inheritanceChain.forEach(classDecl -> ((IdentifierType) n.t).superTypes.add(classDecl.t));
@@ -138,10 +146,14 @@ public class SymbolGenerator implements Visitor<Object> {
                 if ((!(last.t instanceof IdentifierType) || !(m.t instanceof IdentifierType)) && last.t != m.t) {
                     error(m.i.pos, "method override with different type, Expected type: [" + last.t + "] found: [" + m.t + "]");
                 }
+
+                /*
+                 * We are not allowed covariance
+                 */
                 // Otherwise if both are Classes, check if the overriding method is a subtype of the overridden method
-                else if (last.t instanceof IdentifierType && m.t instanceof IdentifierType && !((IdentifierType) m.t).superTypes.contains(last.t)) {
-                    error(m.i.pos, "method override with different type, Expected subtype of: [" + last.t + "] found: [" + m.t + "]");
-                }
+                // else if (last.t instanceof IdentifierType && m.t instanceof IdentifierType && !((IdentifierType) m.t).superTypes.contains(last.t))
+                //    error(m.i.pos, "method override with different type, Expected subtype of: [" + last.t + "] found: [" + m.t + "]");
+
             } else t.put(m.i, m);
             m.i.b = m;
         });

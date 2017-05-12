@@ -74,7 +74,7 @@ public class ClassFileGenerator implements Visitor<String> {
     @Override
     public String visit(ClassDeclExtends n) {
         n.vl.list.forEach(v -> reference.put(v, n.i.s + "/" + v.i.s));
-        ((IdentifierType)n.t).superTypes.forEach(t -> ((IdentifierType)t).decl.vl.list.forEach(v -> reference.put(v, n.i.s + "/" + v.i.s)));
+        ((IdentifierType)n.t).superTypes.forEach(t -> {if(!((IdentifierType)t).i.s.equals("Object"))((IdentifierType)t).decl.vl.list.forEach(v -> reference.put(v, n.i.s + "/" + v.i.s));});
 
         return ".class " + n.i.s + "\n" +
                 ".super " + n.parent.s + "\n\n" +
@@ -113,7 +113,6 @@ public class ClassFileGenerator implements Visitor<String> {
                 n.e.accept(this) + "\n" +
                 type + "return\n" +
                 ".end method";
-//        localVars.entrySet().forEach(set -> System.out.println(set.getKey().i.s + " -- " +set.getValue()));
         Stream.concat(n.vl.list.stream(), n.fl.list.stream()).forEach(v -> {
             localVars.remove(v);
             localVarsIndex--;
@@ -285,7 +284,6 @@ public class ClassFileGenerator implements Visitor<String> {
                 "goto done" + labelNum +"\n");
         sb.append("nTrue" + labelNum + ":\niconst_1\n" +
                 "done" + labelNum + ":");
-
         return sb.toString();
     }
 
@@ -333,7 +331,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(ArrayLength n) {
-        return n.e.accept(this) + " \narraylength\n";
+        return n.e.accept(this) + "arraylength\n";
     }
 
     @Override

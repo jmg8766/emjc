@@ -18,4 +18,8 @@ public class Assign extends Statement {
 	public <R> R accept(Visitor<R> v) {
 		return v.visit(this);
 	}
+
+	public String toString(){
+		return this.i + " = " + this.e;
+	}
 }
