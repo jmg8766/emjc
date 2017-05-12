@@ -7,7 +7,6 @@ import ast.statement.*;
 import ast.type.*;
 
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +74,6 @@ public class ClassFileGenerator implements Visitor<String> {
     public String visit(ClassDeclExtends n) {
         n.vl.list.forEach(v -> reference.put(v, n.i.s + "/" + v.i.s));
         ((IdentifierType)n.t).superTypes.forEach(t -> {if(!((IdentifierType)t).i.s.equals("Object"))((IdentifierType)t).decl.vl.list.forEach(v -> reference.put(v, n.i.s + "/" + v.i.s));});
-
         return ".class " + n.i.s + "\n" +
                 ".super " + n.parent.s + "\n\n" +
                 n.vl.list.stream().map(v -> v.accept(this)).collect(Collectors.joining("\n")) + "\n" +
