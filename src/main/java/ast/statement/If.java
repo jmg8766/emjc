@@ -4,7 +4,7 @@ import ast.Visitor;
 import ast.expression.Exp;
 
 public class If extends Statement {
-	public String pos;
+//	public String pos;
 	public Exp e;
 	public Statement s1;
 	public Statement s2;

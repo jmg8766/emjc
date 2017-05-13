@@ -37,7 +37,7 @@ public class DeadCodeEliminator implements Visitor<Tree> {
                 m.sl.list = m.sl.list.stream().filter(s -> {
                     if(usages.contains(s)) return true;
                     else {
-                        System.out.println("removing a top level statement: " + s);
+                        System.out.println("removing a top level statement: " + s + " pos: " + s.pos);
                         return false;
                     }
                 }).collect(Collectors.toList());
@@ -66,7 +66,7 @@ public class DeadCodeEliminator implements Visitor<Tree> {
         n.sl.list = n.sl.list.stream().filter(s -> {
             if(usages.contains(s)) return true;
             else {
-                System.out.println("removing a statement inside a block: " + s);
+                System.out.println("removing a statement inside a block: " + s + " pos: " + s.pos);
                 return false;
             }
         }).collect(Collectors.toList());
