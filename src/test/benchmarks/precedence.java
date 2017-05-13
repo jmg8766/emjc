@@ -19,12 +19,7 @@ class C {
         boolean operation3;
         boolean operation4;
 
-<<<<<<< Updated upstream
         operation1 = 4 - 6 * 2 - 4 - 8 / 2;      // 16
-        //operation1 = 8 / 4 / 2;      // 16
-=======
-        operation1 = 8/4; //4 - 6 * 2 - 4 - 8 / 2;      // 16
->>>>>>> Stashed changes
         System.out.println(operation1);
 
         return 0;

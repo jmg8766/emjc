@@ -10,47 +10,47 @@ import ast.type.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 // Generates the kill and gen sets - which is used for transformations later
 public class AlgebraicSimplification implements Visitor {
 
     HashMap<Identifier, HashSet<Exp>> expressionsList = new HashMap();
+
     HashMap<Exp, Identifier> availableExpressions = new HashMap();
 
     public void removeExpressions(Identifier i) {
         //TODO Remove print
         if(expressionsList.containsKey(i)) {
             expressionsList.get(i).forEach(e -> {
-                System.out.println("removing from: " + i + " :" + e);
+//                System.out.println("removing from: " + i + " :" + e);
                 availableExpressions.remove(e);
             });
         }
     }
 
     public void addExpression(Exp exp, Identifier i) {
-
-        // if(exp instanceof IntegerLiteral || exp instanceof StringLiteral) { removeExpressions(i); return;}
-
-        availableExpressions.put(exp, i);
-
-        //TODO remove print
-        if(expressionsList.containsKey(i))
-            removeExpressions(i);
-        else {
-            System.out.println("Adding Exp: " + exp + " id:" + i);
-            expressionsList.put(i, new HashSet<>());
-            expressionsList.get(i).add(exp);
+        if(!(exp instanceof IntegerLiteral) && !(exp instanceof StringLiteral) && !(exp instanceof IdentifierExp) && !(exp instanceof True) && !(exp instanceof False)  ) { // Skipping Integer and String literals as they don't improve
+            availableExpressions.put(exp, i);
+            //TODO remove print
+                if (expressionsList.containsKey(i))
+                    removeExpressions(i); // Remove the variables previous assignments
+                else {
+//                System.out.println("Adding  " + exp + " type :" + exp.getClass() + " => " + i);
+                expressionsList.put(i, new HashSet<>());
+                expressionsList.get(i).add(exp);
+                }
+                return;
         }
-        System.out.println("Adding  "+exp + " => " + i);
-
-        return;
+        removeExpressions(i);
+        expressionsList.put(i, new HashSet<>());
     }
 
     public IdentifierExp useAvaialable(Exp e) {
-//        System.out.println("Using available for exp" + e);
         Identifier i = availableExpressions.get(e);
         IdentifierExp avail = new IdentifierExp(i.pos, i);
         avail.t = e.t;
+        System.out.println("Using available "+ avail + " for exp " + e);
         return avail;
     }
 
@@ -71,6 +71,8 @@ public class AlgebraicSimplification implements Visitor {
     public Object visit(ClassDeclSimple n) {
         n.vl.list.forEach(v -> v.accept(this));
         n.ml.list.forEach(m-> m.accept(this));
+        expressionsList = new HashMap<>();
+        availableExpressions = new HashMap<>();
         return null;
     }
 
@@ -78,30 +80,50 @@ public class AlgebraicSimplification implements Visitor {
     public Object visit(ClassDeclExtends n) {
         n.vl.list.forEach(v -> v.accept(this));
         n.ml.list.forEach(m-> m.accept(this));
+        expressionsList = new HashMap<>();
+        availableExpressions = new HashMap<>();
         return null;
     }
 
     @Override
     public Object visit(VarDecl n) {
-//        expressionsList.put(n.i, new HashSet<>());
+        expressionsList.put(n.i, new HashSet<>());
         return null;
     }
 
     @Override
     public Object visit(MethodDecl n) {
-        //TODO add to entry node
+        HashMap classExpList = new HashMap<>();
+        classExpList.putAll(expressionsList);
+        HashMap classAvailableExpressions = new HashMap<>();
+        classAvailableExpressions.putAll(availableExpressions);
+
         n.fl.list.forEach(f -> f.accept(this));
-        n.vl.list.forEach(v -> v.accept(this));
         n.sl.list.forEach(s->s.accept(this));
-        expressionsList.clear();
-        availableExpressions.clear();
+
+//        System.out.println("=======" + n.i + " " +n.i.pos + "==============");
+//        expressionsList.entrySet().forEach(System.out::println);
+//        System.out.println("=======================================");
+//        availableExpressions.entrySet().forEach(System.out::println);
+//        System.out.println("=======================================");
+
+        expressionsList.keySet().retainAll(classExpList.keySet());
+//        expressionsList.entrySet().forEach(System.out::println);
+
+//        availableExpressions.keySet().retainAll(classAvailableExpressions.keySet());
+//        System.out.println("=======================================");
+//
+//        availableExpressions.entrySet().forEach(System.out::println);
+//        System.out.println("=======================================");
+
         return n;
     }
 
     @Override
     public Object visit(Formal n) {
-//        expressionsList.put(n.i, new HashSet<>());
-        return n;
+        removeExpressions(n.i);
+        expressionsList.put(n.i, new HashSet<>());
+        return null;
     }
 
     @Override
@@ -142,7 +164,6 @@ public class AlgebraicSimplification implements Visitor {
 
     @Override
     public Object visit(If n) {
-
         n.e.accept(this);
 
         //nTrue TODO Find a better way of doing this
@@ -168,7 +189,6 @@ public class AlgebraicSimplification implements Visitor {
 
         expressionsList.keySet().retainAll(expListAfterTrue.keySet());
         availableExpressions.keySet().retainAll(availListAfterTrue.keySet());
-
         return n;
         //return startIf.merge();
     }
@@ -203,21 +223,26 @@ public class AlgebraicSimplification implements Visitor {
         // Use available expression
         if(availableExpressions.containsKey(n.e)) n.e = useAvaialable(n.e);
         // Add the new expression
-        else { if(n.e.accept(this) != null) addExpression(n.e, n.i); }
+        else if(n.e.accept(this) != null) addExpression(n.e, n.i);
         return n;
     }
 
     @Override
     public Object visit(ArrayAssign n) {
-        removeExpressions(n.i);
-        // TODO Handle array access
+
+        if(expressionsList.containsKey(n.i)) {
+            expressionsList.get(n.i).forEach(e-> {
+                if(e.equals(n.e1)) {
+                    availableExpressions.remove(e); // TODO THAT Expression maybe bound
+                }
+            });
+        }
+
         if(availableExpressions.containsKey(n.e2)) n.e2 = useAvaialable(n.e2);
         // Add the new expression
-        else { if(n.e2.accept(this) != null) addExpression(n.e2, n.i); }
-        return n;
+        return null;
     }
 
-    //TODO And Or short - circuit
     @Override
     public Object visit(And n) {
         HashMap<Identifier, HashSet<Exp>> expListExp1 = new HashMap<>();
@@ -248,24 +273,80 @@ public class AlgebraicSimplification implements Visitor {
 
     @Override
     public Object visit(Or n) {
-        //TODO
-        return null;
+        HashMap<Identifier, HashSet<Exp>> expListExp1 = new HashMap<>();
+        expListExp1.putAll(expressionsList);
+        HashMap<Exp, Identifier> availListExp1 = new HashMap();
+        availListExp1.putAll(availableExpressions);
+
+
+        n.e1.accept(this);
+
+        HashMap<Identifier, HashSet<Exp>> expListExp2 = new HashMap<>();
+        expListExp2.putAll(expressionsList);
+        HashMap<Exp, Identifier> availListExp2= new HashMap<>();
+        availListExp2.putAll(availableExpressions);
+
+        //nFalse
+        if(n.e2 != null) {
+            expressionsList = expListExp1;
+            availableExpressions = availListExp1;
+            n.e2.accept(this);
+        }
+
+        expressionsList.keySet().retainAll(expListExp2.keySet());
+        availableExpressions.keySet().retainAll(availListExp2.keySet());
+
+        return n;
     }
 
     @Override
     public Object visit(LessThan n) {
-        //TODO
-        return null;
+        if(availableExpressions.containsKey(n.e1)) useAvaialable(n.e1);
+        else n.e1.accept(this);
+
+        if(availableExpressions.containsKey(n.e2)) useAvaialable(n.e2);
+        else n.e2.accept(this);
+
+        return n;
     }
 
     @Override
     public Object visit(Equals n) {
-        //TODO
-        return null;
+        if(availableExpressions.containsKey(n.e1)) useAvaialable(n.e1);
+        else n.e1.accept(this);
+
+        if(availableExpressions.containsKey(n.e2)) useAvaialable(n.e2);
+        else n.e2.accept(this);
+
+        return n;
+    }
+
+    public ArrayList<Exp> getPlusOperands(Plus n){
+        ArrayList<Exp> ret = new ArrayList<>();
+        if(n.e1 instanceof Plus) ret.addAll(getPlusOperands(((Plus)n.e1))); else ret.add(n.e1);
+        if(n.e2 instanceof Plus) ret.addAll(getPlusOperands(((Plus)n.e2))); else ret.add(n.e2);
+        return ret;
     }
 
     @Override
     public Object visit(Plus n) {
+        if(!availableExpressions.containsKey(n.e1) || availableExpressions.containsKey(n.e2)) {
+            ArrayList arr = getPlusOperands(n);
+            if (arr.size() > 2) {
+                Iterator<Exp> itr = arr.iterator();
+                Iterator<Exp> itr2 = arr.iterator();
+                itr2.next();
+                while (itr2.hasNext()) {
+                    System.out.println(itr);
+                    Exp exp1 = itr.next();
+                    Exp exp2 = itr2.next();
+                    if (availableExpressions.containsKey(new Plus("", exp1, exp2))) {
+                        //TODO use this - skip two
+                    }
+
+                }
+            }
+        }
         if(n.e1 instanceof IdentifierExp) expressionsList.get(((IdentifierExp)n.e1).i).add(n);
         if(n.e2 instanceof IdentifierExp) expressionsList.get(((IdentifierExp)n.e2).i).add(n);
 
@@ -282,17 +363,9 @@ public class AlgebraicSimplification implements Visitor {
 
     @Override
     public Object visit(Minus n) {
-//        Object minus = new Object();
-//        if(n.e1.t instanceof IntegerType && n.e2.t instanceof IntegerType)
-//                return minus;
 
-        if(n.e1 instanceof IdentifierExp) expressionsList.get(((IdentifierExp)n.e1).i).add(n);
-        else if(n.e1 instanceof StringLiteral || n.e1 instanceof IntegerLiteral)
-            System.out.println();
-
-        if(n.e2 instanceof IdentifierExp) expressionsList.get(((IdentifierExp)n.e2).i).add(n);
-
-
+        if(n.e1 instanceof IdentifierExp) expressionsList.get(((IdentifierExp)n.e1).i).add(n); // Attach identifiers to expressions
+        if(n.e2 instanceof IdentifierExp) expressionsList.get(((IdentifierExp)n.e2).i).add(n); // Attach identifiers to expressions
 
         if(availableExpressions.containsKey(n.e1))
             n.e1 = useAvaialable(n.e1);
@@ -339,12 +412,8 @@ public class AlgebraicSimplification implements Visitor {
 
     @Override
     public Object visit(ArrayLookup n) {
-        //TODO - Optimize
-        if(availableExpressions.containsKey(n.e1)) n.e1 = useAvaialable(n.e1);
-        else n.e1.accept(this);
-        if(availableExpressions.containsKey(n.e2)) n.e2 = useAvaialable(n.e2);
-        else n.e2.accept(this);
-        return n;
+        if(n.e1 instanceof IdentifierExp && expressionsList.containsKey(((IdentifierExp)n.e1).i)) { expressionsList.get(((IdentifierExp)n.e1).i).add(n);}
+        return null;
     }
 
     @Override
@@ -357,6 +426,9 @@ public class AlgebraicSimplification implements Visitor {
     @Override
     public Object visit(Call n) {
         n.e.accept(this);
+        if(n.e instanceof This) {
+
+        }
         n.el.list.forEach(e->e.accept(this));
         return n;
     }
@@ -373,22 +445,21 @@ public class AlgebraicSimplification implements Visitor {
 
     @Override
     public Object visit(True n) {
-        return null;
+        return n;
     }
+
 
     @Override
     public Object visit(False n) {
-        return null;
+        return n;
     }
 
     @Override
-    public Object visit(IdentifierExp n) {
-        return null;
-    }
+    public Object visit(IdentifierExp n) {return n;}
 
     @Override
     public Object visit(This n) {
-        return null;
+        return n;
     }
 
     @Override
@@ -403,7 +474,9 @@ public class AlgebraicSimplification implements Visitor {
 
     @Override
     public Object visit(Not n) {
-        return null;
+        if(availableExpressions.containsKey(n.e)) useAvaialable(n);
+        else n.e.accept(this);
+        return n;
     }
 
     @Override

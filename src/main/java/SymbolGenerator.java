@@ -58,9 +58,6 @@ public class SymbolGenerator implements Visitor<Object> {
             t.beginScope();
             c.accept(this);
             t.endScope();
-//            LinkedHashSet ps = new LinkedHashSet();
-//            ps.addAll(inheritanceChain);
-//            c.parentSet = ps;
         });
 
         StringBuilder b = new StringBuilder();

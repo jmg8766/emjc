@@ -1,8 +1,7 @@
 class listSort {
 
-     public static void main ( String [ ] args ) {
-           sidef(        new Start()  .  start()   );
-
+    public static void main(String[] args) {
+        new Start().start();
      }
 
 }

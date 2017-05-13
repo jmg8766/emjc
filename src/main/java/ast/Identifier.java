@@ -1,5 +1,7 @@
 package ast;
 
+import ast.expression.IdentifierExp;
+
 public class Identifier extends Tree{
 	public String pos;
 	public Decl b;
@@ -15,7 +17,7 @@ public class Identifier extends Tree{
 	}
 
 	public boolean equals(Object obj) {
-		if(obj instanceof Identifier && s.equals(((Identifier)obj).s))
+		if((obj instanceof Identifier && s.equals(((Identifier)obj).s)) || (obj instanceof IdentifierExp && s.equals(((IdentifierExp)obj).i.s)))
 			return true;
 		return false;
 	}

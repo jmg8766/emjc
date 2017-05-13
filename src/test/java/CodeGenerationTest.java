@@ -17,11 +17,11 @@ public class CodeGenerationTest extends Providers {
     public Iterator<Object[]> singleFile() {
 //        return Stream.of(new File("src/test/benchmarks/listSort.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/ArrayFold.emj")).map(f -> new Object[] {f}).iterator();
-        return Stream.of(new File("src/test/benchmarks/precedence.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/ThisTest.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-//    @Test(dataProvider = "singleFile")
-    @Test(dataProvider = "benchmarkFiles", enabled = true)
+    @Test(dataProvider = "singleFile")
+//    @Test(dataProvider = "benchmarkFiles", enabled = true)
     static void test(File f) throws IOException, InterruptedException {
 
         try { // remove the class file corresponding to this file if it's been already generated
@@ -61,8 +61,7 @@ public class CodeGenerationTest extends Providers {
 
 
         // TODO - ENABLE IT TO CREATE CLASS FILE
-//        Runtime.getRuntime().exec(createJavaFileCmd).waitFor();
-
+        Runtime.getRuntime().exec(createJavaFileCmd).waitFor();
 
         time = -System.currentTimeMillis();
         // generate class files with javac

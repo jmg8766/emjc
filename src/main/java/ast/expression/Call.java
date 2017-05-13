@@ -16,16 +16,15 @@ public class Call extends Exp {
 		this.el = el;
 	}
 
-//	public int hashCode(){
-//		return this.e.hashCode()+this.i.hashCode()+this.el.hashCode();
-//	}
-//
-//	public boolean equals(Object obj){
-//		if(obj instanceof Call && (((Call) obj).e.equals(this.e)) && ((Call) obj).i.equals(this.i)){
-//
-//		}
-//		return false;
-//	}
+	public int hashCode(){
+		return this.e.hashCode()+this.i.hashCode()+this.el.hashCode();
+	}
+
+	public boolean equals(Object obj){
+		if(obj instanceof Call && (((Call) obj).e.equals(this.e)) && ((Call) obj).i.equals(this.i) && (((Call) obj).el.equals(el)))
+				return true;
+		return false;
+	}
 
 	@Override
 	public <R> R accept(Visitor<R> v) {

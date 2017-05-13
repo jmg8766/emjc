@@ -304,6 +304,7 @@ public class Parser {
         switch (tok.type) {
             case MINUS:
                 eat(TokenType.MINUS);
+//                return _term(new Minus(tok.row + ":" + tok.col, e, factor()));
                 return _term(new Minus(tok.row + ":" + tok.col, e, factor()));
             case PLUS:
                 eat(TokenType.PLUS);

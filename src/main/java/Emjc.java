@@ -54,12 +54,17 @@ public class Emjc {
                     // name analysis
                     errors.append(new SymbolGenerator().visit(p2));
                     // type analysis
-                    new TypeAnalysis().visit(p2);
-                    errors.append(TypeAnalysis.output);
+                    if (errors.toString().isEmpty()) {
+                        new TypeAnalysis().visit(p2);
+                        errors.append(TypeAnalysis.output);
+                    }
+
                     if (!errors.toString().isEmpty()) {
                         output.println(errors.toString());
                         return;
                     }
+
+
 
                     // class file generation with jasmin
                     String path = args[1].substring(0, args[1].lastIndexOf("/") + 1);
