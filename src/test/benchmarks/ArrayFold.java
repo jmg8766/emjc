@@ -14,9 +14,9 @@ class Start {
     arr[0] = 54; arr[1] = 73; arr[2] = 7; arr[3] = 42; arr[4] = 33; arr[5] = 7; 
     System.out.println ("array: " + af.toString(arr)) ;
 
-    lt = new Lt(); sidef(lt.setB(41));
+    lt = new Lt(); lt.setB(41);
     filArr = af.filter(arr, lt);
-    sidef(af.foo(lt));
+    af.foo(lt);
     System.out.println ("filtered array: " + af.toString(filArr)) ;
 
     addOp = new Add();

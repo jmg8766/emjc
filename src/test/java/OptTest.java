@@ -16,12 +16,14 @@ public class OptTest extends Providers {
 //        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/LinkedList.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/ArrayFold.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/Squares.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/fibanacci.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/Factorial.emj")).map(f -> new Object[] {f}).iterator();
-        return Stream.of(new File("src/test/benchmarks/Array.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/Array.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-//    @Test(dataProvider = "singleFile", enabled = true)
-    @Test(dataProvider = "benchmarkFiles", enabled = true)
+    @Test(dataProvider = "singleFile", enabled = true)
+//    @Test(dataProvider = "benchmarkFiles", enabled = true)
     void optTest(File f) throws IOException, InterruptedException {
         Emjc.main(new String[] {"--optinfo", f.getPath()});
         System.out.println();
