@@ -27,8 +27,20 @@ public class DeadCodeEliminator implements Visitor<Tree> {
             c.ml.list = c.ml.list.stream().filter(usages::contains).collect(Collectors.toList());
             // remove any unused variable declarations and statements from remaining method declarations
             c.ml.list.forEach(m -> {
-                m.vl.list = m.vl.list.stream().filter(usages::contains).collect(Collectors.toList());
-                m.sl.list = m.sl.list.stream().filter(usages::contains).collect(Collectors.toList());
+                m.vl.list = m.vl.list.stream().filter(v -> {
+                    if(usages.contains(v)) return true;
+                    else {
+                        System.out.println("removing a local var Declaration: " + v);
+                        return false;
+                    }
+                }).collect(Collectors.toList());
+                m.sl.list = m.sl.list.stream().filter(s -> {
+                    if(usages.contains(s)) return true;
+                    else {
+                        System.out.println("removing a top level statement: " + s);
+                        return false;
+                    }
+                }).collect(Collectors.toList());
 
                 // visit each statement
                 m.sl.list.forEach(s -> s.accept(this));
@@ -51,7 +63,13 @@ public class DeadCodeEliminator implements Visitor<Tree> {
 
 
     public Tree visit(Block n) {
-        n.sl.list = n.sl.list.stream().filter(usages::contains).collect(Collectors.toList());
+        n.sl.list = n.sl.list.stream().filter(s -> {
+            if(usages.contains(s)) return true;
+            else {
+                System.out.println("removing a statement inside a block: " + s);
+                return false;
+            }
+        }).collect(Collectors.toList());
         return null;
     }
 

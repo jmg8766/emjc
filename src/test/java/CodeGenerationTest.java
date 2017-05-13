@@ -61,7 +61,7 @@ public class CodeGenerationTest extends Providers {
 
 
         // TODO - ENABLE IT TO CREATE CLASS FILE
-        Runtime.getRuntime().exec(createJavaFileCmd).waitFor();
+//        Runtime.getRuntime().exec(createJavaFileCmd).waitFor();
 
         time = -System.currentTimeMillis();
         // generate class files with javac

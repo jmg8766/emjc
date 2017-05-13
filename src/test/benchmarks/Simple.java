@@ -12,13 +12,12 @@ class TT {
         int b2;
         BB bb;
         bb = new BB();
-        sidef(bb.count());
+        bb.count();
         b2 = 10 * 10;
         b = 10 * 10 + 10 * 10;
         if(!(10 * 10 == 120 + 10 * 10)) {
             System.out.println(b);
         }
-
         return "asdf";
     }
 }
@@ -38,7 +37,7 @@ class BB {
     }
 
     public int count() {
-        sidef(this.setValues());
+        this.setValues();
         if(!( a == 0))
             System.out.println(a + b);
         else

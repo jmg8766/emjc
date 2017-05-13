@@ -50,7 +50,7 @@ public class AlgebraicSimplification implements Visitor {
         Identifier i = availableExpressions.get(e);
         IdentifierExp avail = new IdentifierExp(i.pos, i);
         avail.t = e.t;
-        System.out.println("Using available "+ avail + " for exp " + e);
+//        System.out.println("Using available "+ avail + " for exp " + e);
         return avail;
     }
 
@@ -337,7 +337,7 @@ public class AlgebraicSimplification implements Visitor {
                 Iterator<Exp> itr2 = arr.iterator();
                 itr2.next();
                 while (itr2.hasNext()) {
-                    System.out.println(itr);
+//                    System.out.println(itr);
                     Exp exp1 = itr.next();
                     Exp exp2 = itr2.next();
                     if (availableExpressions.containsKey(new Plus("", exp1, exp2))) {

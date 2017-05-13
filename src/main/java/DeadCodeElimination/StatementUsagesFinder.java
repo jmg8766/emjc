@@ -61,7 +61,7 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
 //        n.vl.list.forEach(v -> v.accept(this));
 
         // then visit formals TODO: maybe removing the ones that weren't used
-        n.fl.list.forEach(f -> f.accept(this));
+//        n.fl.list.forEach(f -> f.accept(this));
 
         return null;
     }
@@ -108,12 +108,13 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
         HashSet<Identifier> branch = new HashSet<>(); branch.addAll(varDefinitionsNeeded);
         HashSet<Tree> branchUsages = new HashSet<>(); branchUsages.addAll(usages);
 
-
         // restore from backup
         varDefinitionsNeeded.clear(); varDefinitionsNeeded.addAll(backup);
         usages.clear(); usages.addAll(backupUsages);
 
-        if(n.s2 != null) n.s2.accept(this);
+        if(n.s2 != null) {
+            n.s2.accept(this);
+        }
 
         // if neither side of the if statement had usages don't add this if statement to usages
         n.e.accept(this);
@@ -157,6 +158,7 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
         if (varDefinitionsNeeded.contains(n.i)) {
             varDefinitionsNeeded.remove(n.i);
             usages.add(n); // add this assignment to usages
+            usages.add(n.i.b);
             n.e.accept(this);
         }
         return null;
@@ -167,6 +169,7 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
         if(varDefinitionsNeeded.contains(n.i)) {
             //varDefinitionsNeeded.remove(n.i);
             usages.add(n);
+            usages.add(n.i.b);
             n.e1.accept(this);
             n.e2.accept(this);
         }
@@ -244,7 +247,7 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
 
     @Override
     public Boolean visit(Call n) {
-        usages.add(n); // add this Call to the used statements
+        //usages.add(n); // add this Call to the used statements
         n.el.list.forEach(e -> e.accept(this));
         n.e.accept(this); // visit the expression that yields an Object
 
@@ -304,6 +307,7 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
 
     @Override
     public Boolean visit(Sidef sidef) {
+        usages.add(sidef);
         sidef.e.accept(this);
         return null;
     }
