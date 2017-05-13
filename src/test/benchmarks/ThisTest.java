@@ -10,8 +10,8 @@ class B extends A {}
 class Test4Valid extends B {
     int x;
     public boolean func(int a){
-        //A x;
-        //return (x == this);
+        A x;
+        x = new A();
         return true;
     }
 }

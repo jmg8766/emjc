@@ -25,18 +25,23 @@ class PrimalityTester {
 		// should be (num < 1) || (num == 1)
 		if (num < 1 || num == 1)
 			retValue = false ;
-		else if (num < 3 || num == 3)
-			retValue = true ;
-		else if ( ( this.mod(num, 2) == 0 ) || ( this.mod(num, 3) == 0 ) )
-			retValue = false ;
 		else {
-		    i = 5;
-		    while (!retValue || (i * i) < num || (i * i) == num) {
-			    if ( ( this.mod(num, i) == 0 ) || ( this.mod(num, (i + 2)) == 0 ) )
-				    retValue = false ;
-			    i = i + 6;
-		    }
-        }
+		    if (num < 3 || num == 3)
+		    	retValue = true ;
+		    else
+		        if ( ( this.mod(num, 2) == 0 ) || ( this.mod(num, 3) == 0 ) )
+		    	    retValue = false ;
+		        else {
+		            i = 5;
+		            while (!retValue || (i * i) < num || (i * i) == num) {
+			            if ( ( this.mod(num, i) == 0 ) || ( this.mod(num, (i + 2)) == 0 ) ) {
+			                retValue = false ;
+			            }
+			            i = i + 6;
+		            }
+                }
+		}
+
 		return retValue;
 	}
 

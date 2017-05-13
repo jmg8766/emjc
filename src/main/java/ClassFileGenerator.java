@@ -146,7 +146,7 @@ public class ClassFileGenerator implements Visitor<String> {
 
     @Override
     public String visit(IdentifierType n) {
-        return "L" + n.i.s + ";";
+        return "L" + (n.i.s.equals("Object") ? "java/lang/Object" : n.i.s) + ";";
     }
 
     @Override

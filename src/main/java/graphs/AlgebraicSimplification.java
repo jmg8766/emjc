@@ -6,7 +6,6 @@ import ast.ClassDeclaration.ClassDeclSimple;
 import ast.expression.*;
 import ast.statement.*;
 import ast.type.*;
-import com.sun.tools.doclets.formats.html.SourceToHTMLConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,10 +130,15 @@ public class AlgebraicSimplification implements Visitor {
     }
 
     @Override
-    public Object visit(Block n) {
-        n.sl.list.forEach(s -> s.accept(this));
-        return n;
+    public Object visit(ast.statement.Block n) {
+        return null;
     }
+
+//    public Object visit(Block n) {
+        //n.sl.list.forEach(s -> s.accept(this));
+        //return n;
+//        return null;
+//    }
 
     @Override
     public Object visit(If n) {

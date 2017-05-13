@@ -256,7 +256,7 @@ public class Parser {
         switch (tok.type) {
             case OR:
                 eat(TokenType.OR);
-                return new Or(tok.row + ":" + tok.col, e, or());
+                return new Or(tok.row + ":" + tok.col, or(), e);
             default:
                 return e;
         }
@@ -271,7 +271,7 @@ public class Parser {
         switch (tok.type) {
             case AND:
                 eat(TokenType.AND);
-                return new And(tok.row + ":" + tok.col, e, and());
+                return new And(tok.row + ":" + tok.col, and(), e);
             default:
                 return e;
         }
@@ -304,7 +304,7 @@ public class Parser {
         switch (tok.type) {
             case MINUS:
                 eat(TokenType.MINUS);
-                return new Minus(tok.row + ":" + tok.col, e, term());
+                return _term(new Minus(tok.row + ":" + tok.col, e, factor()));
             case PLUS:
                 eat(TokenType.PLUS);
                 return new Plus(tok.row + ":" + tok.col, e, term());
@@ -325,7 +325,7 @@ public class Parser {
                 return new Times(tok.row + ":" + tok.col, e, factor());
             case DIV:
                 eat(TokenType.DIV);
-                return new Divide(tok.row + ":" + tok.col, e, factor());
+                return _factor(new Divide(tok.row + ":" + tok.col, e, not()));
             default:
                 return e;
         }

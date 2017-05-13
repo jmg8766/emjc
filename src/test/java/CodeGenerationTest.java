@@ -1,6 +1,3 @@
-import ast.Identifier;
-import ast.expression.IdentifierExp;
-import ast.expression.Plus;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -18,12 +15,14 @@ public class CodeGenerationTest extends Providers {
 
     @DataProvider
     public Iterator<Object[]> singleFile() {
-        return Stream.of(new File("src/test/benchmarks/listSort.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/listSort.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/ArrayFold.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/precedence.emj")).map(f -> new Object[] {f}).iterator();
     }
 
-    @Test(dataProvider = "singleFile")
-//    @Test(dataProvider = "benchmarkFiles", enabled = true)
-    void test(File f) throws IOException, InterruptedException {
+//    @Test(dataProvider = "singleFile")
+    @Test(dataProvider = "benchmarkFiles", enabled = true)
+    static void test(File f) throws IOException, InterruptedException {
 
         try { // remove the class file corresponding to this file if it's been already generated
             Files.delete(Paths.get(f.getPath().replace(".emj", ".class")));
@@ -35,7 +34,7 @@ public class CodeGenerationTest extends Providers {
         System.out.println("Generating class files with [emjc] for : [" + f.getName() + "]");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Emjc.output = new PrintStream(baos);
-        Emjc.main(new String[]{"--cgen", f.getPath()});
+        Emjc.main(new String[]{"--opt", f.getPath()});
         // fail if any errors were printed
         Assert.assertEquals(new String(baos.toByteArray()).trim(), "");
         System.out.println("class files generated in " + (time + System.currentTimeMillis()) + " ms");
@@ -62,7 +61,7 @@ public class CodeGenerationTest extends Providers {
 
 
         // TODO - ENABLE IT TO CREATE CLASS FILE
-//         Runtime.getRuntime().exec(createJavaFileCmd).waitFor();
+        Runtime.getRuntime().exec(createJavaFileCmd).waitFor();
 
         time = -System.currentTimeMillis();
         // generate class files with javac

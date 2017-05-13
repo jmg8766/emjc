@@ -7,19 +7,20 @@
 
 class precedence {
     public static void main(String[] args){
-	   new C().checkPrecedence();
+	   sidef(new C().checkPrecedence());
     }
 }
 
 class C {
 
-    public int checkPrecedence(){
+    public int checkPrecedence() {
         int operation1;
         boolean operation2;
         boolean operation3;
         boolean operation4;
 
         operation1 = 4 - 6 * 2 - 4 - 8 / 2;      // 16
+        //operation1 = 8 / 4 / 2;      // 16
         System.out.println(operation1);
 
         return 0;

@@ -1,3 +1,4 @@
+import DeadCodeElimination.DeadCodeEliminator;
 import ast.ClassDeclaration.ClassDecl;
 import ast.Program;
 import graphs.AlgebraicSimplification;
@@ -95,8 +96,9 @@ public class Emjc {
                         output.println(errors.toString());
                         return;
                     }
-                    AlgebraicSimplification var = new AlgebraicSimplification();
-                    var.visit(p3);
+                    p3 = (Program) new DeadCodeEliminator().visit(p3);
+//                    AlgebraicSimplification var = new AlgebraicSimplification();
+//                    var.visit(p3);
                     // class file generation with jasmin
                     String path1 = args[1].substring(0, args[1].lastIndexOf("/") + 1);
                     ClassFileGenerator cfg1 = new ClassFileGenerator();
@@ -121,7 +123,6 @@ public class Emjc {
                     Emjc.main(new String[]{"--opt", args[1]});
                     //get the number of instructions in all the generated class files
                     System.out.println("#bytecode after optimization: " + countByteCodeInstructions(args[1]));
-
                     return;
             }
         }
@@ -141,18 +142,21 @@ public class Emjc {
 
     private static long countByteCodeInstructions(String srcFilePath) {
         String path = srcFilePath.substring(0, srcFilePath.lastIndexOf("/") + 1);
-        return new Parser(new Lexer(srcFilePath)).program().cl.list.stream()
+        Program p = new Parser(new Lexer(srcFilePath)).program();
+        return Stream.concat(Stream.of(p.m), p.cl.list.stream())
                 .map(c -> c.i.s)
                 .map(className -> path + className)
                 .mapToLong(classPath -> {
                     try {
                         InputStream i = Runtime.getRuntime().exec("javap -c " + classPath.replace(".emj", ".class")).getInputStream();
-                        return new BufferedReader(new InputStreamReader(i)).lines()
+                        long ret = new BufferedReader(new InputStreamReader(i)).lines()
                                 .map(String::trim).filter(line -> !line.isEmpty())
                                 .filter(line -> Character.isDigit(line.charAt(0)))
                                 .count();
-                    } catch (IOException e) {
-                    }
+                        Files.delete(Paths.get(classPath + ".class"));
+                        Files.delete(Paths.get(classPath + ".j"));
+                        return ret;
+                    } catch (Exception e) {}
                     return 0;
                 }).sum();
     }
