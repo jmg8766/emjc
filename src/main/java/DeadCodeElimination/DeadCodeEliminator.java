@@ -57,7 +57,7 @@ public class DeadCodeEliminator implements Visitor<Tree> {
 
     public Tree visit(If n) {
         n.s1.accept(this);
-        n.s2.accept(this);
+        if(n.s2 != null) n.s2.accept(this);
         return null;
     }
 

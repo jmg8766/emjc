@@ -165,7 +165,7 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
     @Override
     public Boolean visit(ArrayAssign n) {
         if(varDefinitionsNeeded.contains(n.i)) {
-            varDefinitionsNeeded.remove(n.i);
+            //varDefinitionsNeeded.remove(n.i);
             usages.add(n);
             n.e1.accept(this);
             n.e2.accept(this);

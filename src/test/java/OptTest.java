@@ -16,7 +16,8 @@ public class OptTest extends Providers {
 //        return Stream.of(new File("src/test/benchmarks/Simple.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/LinkedList.emj")).map(f -> new Object[] {f}).iterator();
 //        return Stream.of(new File("src/test/benchmarks/ArrayFold.emj")).map(f -> new Object[] {f}).iterator();
-        return Stream.of(new File("src/test/benchmarks/Factorial.emj")).map(f -> new Object[] {f}).iterator();
+//        return Stream.of(new File("src/test/benchmarks/Factorial.emj")).map(f -> new Object[] {f}).iterator();
+        return Stream.of(new File("src/test/benchmarks/Array.emj")).map(f -> new Object[] {f}).iterator();
     }
 
 //    @Test(dataProvider = "singleFile", enabled = true)
