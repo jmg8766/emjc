@@ -5,7 +5,6 @@ import ast.Visitor;
 import ast.expression.Exp;
 
 public class Assign extends Statement {
-	public String pos;
 	public Identifier i;
 	public Exp e;
 

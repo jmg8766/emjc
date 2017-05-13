@@ -22,9 +22,21 @@ public class DeadCodeEliminator implements Visitor<Tree> {
 
         n.cl.list.forEach(c -> {
             // remove any unused variable declarations
-            c.vl.list = c.vl.list.stream().filter(usages::contains).collect(Collectors.toList());
+            c.vl.list = c.vl.list.stream().filter(v -> {
+                if(usages.contains(v)) return true;
+                else {
+                    System.out.println("removing class instance variable: " + v.i.s);
+                    return false;
+                }
+            }).collect(Collectors.toList());
             // remove any unused method declarations
-            c.ml.list = c.ml.list.stream().filter(usages::contains).collect(Collectors.toList());
+            c.ml.list = c.ml.list.stream().filter(m -> {
+                if(usages.contains(m)) return true;
+                else {
+                    System.out.println("removing method: " + m.i.s);
+                    return false;
+                }
+            }).collect(Collectors.toList());
             // remove any unused variable declarations and statements from remaining method declarations
             c.ml.list.forEach(m -> {
                 m.vl.list = m.vl.list.stream().filter(v -> {

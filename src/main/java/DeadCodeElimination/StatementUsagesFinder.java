@@ -17,6 +17,9 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
 
     @Override
     public Boolean visit(Program n) {
+        // so that any assignments to class instance variables will be considered a usage
+        n.cl.list.stream().flatMap(c -> c.vl.list.stream()).forEach(v -> varDefinitionsNeeded.add(v.i));
+
         usages.add(n.m.s); // add the single statement inside main to usages
         n.m.s.accept(this); // visit the contents of that statement
 
@@ -110,9 +113,9 @@ public class StatementUsagesFinder implements Visitor<Boolean> {
 
         // restore from backup
         varDefinitionsNeeded.clear(); varDefinitionsNeeded.addAll(backup);
-        usages.clear(); usages.addAll(backupUsages);
 
         if(n.s2 != null) {
+            usages.clear(); usages.addAll(backupUsages);
             n.s2.accept(this);
         }
 
